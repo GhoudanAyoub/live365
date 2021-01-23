@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:live365/components/custom_surfix_icon.dart';
 import 'package:live365/components/default_button.dart';
 import 'package:live365/components/form_error.dart';
+import 'package:live365/firebaseService/FirebaseService.dart';
 
 import '../../SizeConfig.dart';
 import '../../constants.dart';
@@ -53,14 +54,14 @@ class _SignUpFormState extends State<SignUpForm> {
           DefaultButton(
             text: "Continue",
             press: () async {
-              /*
+
               if (_formKey.currentState.validate()) {
                 dynamic result =  await FirebaseService.create(_emailContoller.text,_passwordController.text,context);
                 if (result != null){
-                  Navigator.pushNamed(context, CompleteProfileScreen.routeName);
+                 // Navigator.pushNamed(context, CompleteProfileScreen.routeName);
                   Scaffold.of(context).showSnackBar(SnackBar(content: Text('Congratulation Your Account Created')));
                 }
-              }*/
+              }
             },
           ),
         ],

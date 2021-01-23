@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:live365/SignIn/sign_in_screen.dart';
 import 'package:live365/components/default_button.dart';
 
 // This is the best practice
@@ -69,12 +70,12 @@ class _BodyState extends State<Body> {
                     Spacer(flex: 3),
                     DefaultButton(
                       text: "Continue",
-                      press: ()  {/*
+                      press: ()  {
                         if(FirebaseAuth.instance.currentUser==null){
                           Navigator.pushNamed(context, SignInScreen.routeName);
                         }else{
-                          Navigator.pushNamed(context, HomeScreen.routeName);
-                        }*/
+                         // Navigator.pushNamed(context, HomeScreen.routeName);
+                        }
                       },
                     ),
                     Spacer(),

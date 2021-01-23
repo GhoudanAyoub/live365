@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:live365/components/no_account_text.dart';
 import 'package:live365/components/socal_card.dart';
+import 'package:live365/firebaseService/FirebaseService.dart';
 import '../../SizeConfig.dart';
 import 'sign_form.dart';
 
@@ -38,12 +39,12 @@ class Body extends StatelessWidget {
                     SocalCard(
                       icon: "assets/icons/google-icon.svg",
                       press: () async {
-                        /*
+
                         dynamic result = await FirebaseService.signInWithGoogle(context);
 
                         if(result!=null){
-                          Navigator.pushNamed(context, HomeScreen.routeName);
-                        }*/
+                         // Navigator.pushNamed(context, HomeScreen.routeName);
+                        }
                       },
                     ),
                     SocalCard(

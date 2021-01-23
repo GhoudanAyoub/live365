@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:live365/components/custom_surfix_icon.dart';
 import 'package:live365/components/default_button.dart';
 import 'package:live365/components/form_error.dart';
+import 'package:live365/firebaseService/FirebaseService.dart';
+import 'package:live365/forgot_password/forgot_password_screen.dart';
 import 'package:live365/helper/keyboard.dart';
 
 import '../../SizeConfig.dart';
@@ -138,11 +140,11 @@ class _SignFormState extends State<SignForm> {
             press: () async {
               if (_formKey.currentState.validate()) {
                 KeyboardUtil.hideKeyboard(context);
-                /*
+
                 dynamic result = await FirebaseService.sign(_emailContoller.text,_passwordController.text,context);
                 if(result!=null){
                   FirebaseService.checkClientData(context);
-                }*/
+                }
               }
             },
           ),
