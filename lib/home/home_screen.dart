@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:live365/components/cam_icon.dart';
+import 'package:live365/profile/profile_screen.dart';
 
 import '../constants.dart';
 import 'components/body.dart';
@@ -47,13 +48,7 @@ class _State extends State<HomeScreen> {
                 color: white, fontSize: 20, fontWeight: FontWeight.bold),
           ),
         ),
-        Center(
-          child: Text(
-            "Profile",
-            style: TextStyle(
-                color: white, fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-        )
+        ProfileScreen(),
       ],
     );
   }

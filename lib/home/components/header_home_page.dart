@@ -9,13 +9,17 @@ class HeaderHomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    return Center(
+        child: Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         Text(
           "LIVE",
           style: TextStyle(
-              color: white, fontSize: 17, fontWeight: FontWeight.w500),
+              fontFamily: "SFProDisplay-Regular",
+              color: white,
+              fontSize: 17,
+              fontWeight: FontWeight.w500),
         ),
         SizedBox(
           width: 8,
@@ -23,8 +27,9 @@ class HeaderHomePage extends StatelessWidget {
         Text(
           ".",
           style: TextStyle(
+            fontFamily: "SFProDisplay-Bold",
             color: orange,
-            fontSize: 17,
+            fontSize: 28,
           ),
         ),
         SizedBox(
@@ -33,6 +38,7 @@ class HeaderHomePage extends StatelessWidget {
         Text(
           "RECOMMENDED",
           style: TextStyle(
+            fontFamily: "SFProDisplay-Regular",
             color: white.withOpacity(0.7),
             fontSize: 16,
           ),
@@ -43,8 +49,9 @@ class HeaderHomePage extends StatelessWidget {
         Text(
           ".",
           style: TextStyle(
+            fontFamily: "SFProDisplay-Bold",
             color: orange,
-            fontSize: 17,
+            fontSize: 28,
           ),
         ),
         SizedBox(
@@ -53,11 +60,12 @@ class HeaderHomePage extends StatelessWidget {
         Text(
           "FOLLOW",
           style: TextStyle(
+            fontFamily: "SFProDisplay-Regular",
             color: white.withOpacity(0.7),
             fontSize: 16,
           ),
         )
       ],
-    );
+    ));
   }
 }

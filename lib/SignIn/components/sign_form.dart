@@ -5,6 +5,7 @@ import 'package:live365/components/form_error.dart';
 import 'package:live365/firebaseService/FirebaseService.dart';
 import 'package:live365/forgot_password/forgot_password_screen.dart';
 import 'package:live365/helper/keyboard.dart';
+import 'package:live365/home/home_screen.dart';
 
 import '../../SizeConfig.dart';
 import '../../constants.dart';
@@ -150,6 +151,8 @@ class _SignFormState extends State<SignForm> {
                     _emailContoller.text, _passwordController.text, context);
                 if (result != null) {
                   FirebaseService.checkClientData(context);
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => HomeScreen()));
                   Scaffold.of(context)
                       .showSnackBar(SnackBar(content: Text('your Logged IN')));
                 }

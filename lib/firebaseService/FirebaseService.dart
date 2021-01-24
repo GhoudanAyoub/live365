@@ -8,10 +8,18 @@ class FirebaseService {
   static final CollectionReference userCollection =
       FirebaseFirestore.instance.collection('Live365Users');
   static UserCredential userCredential;
-  static final String Client_displayName =
-      FirebaseAuth.instance.currentUser.displayName;
+  static String Client_displayName = FirebaseAuth.instance.currentUser.email;
+  static User user;
 
 // Auth System
+  static Future SetFirebaseUser(User user2) {
+    user = user2;
+  }
+
+  static User GetFirebaseUser() {
+    return user;
+  }
+
   static Future signInWithGoogle(BuildContext context) async {
     final GoogleSignInAccount googleUser = await GoogleSignIn().signIn();
     final GoogleSignInAuthentication googleAuth =

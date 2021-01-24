@@ -4,7 +4,7 @@ import 'constants.dart';
 
 ThemeData theme() {
   return ThemeData(
-    scaffoldBackgroundColor: Colors.black87,
+    scaffoldBackgroundColor: GBottomNav,
     fontFamily: "SFProDisplay-Regular",
     appBarTheme: appBarTheme(),
     textTheme: textTheme(),
@@ -37,7 +37,7 @@ TextTheme textTheme() {
 
 AppBarTheme appBarTheme() {
   return AppBarTheme(
-    color: Colors.black87,
+    color: GBottomNav,
     elevation: 0,
     brightness: Brightness.light,
     iconTheme: IconThemeData(color: Colors.white),
