@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:live365/SignUp/sign_up_screen.dart';
 
 import '../constants.dart';
 import '../SizeConfig.dart';
@@ -18,7 +19,7 @@ class NoAccountText extends StatelessWidget {
           style: TextStyle(fontSize: getProportionateScreenWidth(16)),
         ),
         GestureDetector(
-          onTap: () => {},//Navigator.pushNamed(context, SignUpScreen.routeName),
+          onTap: () => Navigator.pushNamed(context, SignUpScreen.routeName),
           child: Text(
             "Sign Up",
             style: TextStyle(

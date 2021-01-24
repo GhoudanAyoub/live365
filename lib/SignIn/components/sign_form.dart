@@ -144,6 +144,7 @@ class _SignFormState extends State<SignForm> {
                 dynamic result = await FirebaseService.sign(_emailContoller.text,_passwordController.text,context);
                 if(result!=null){
                   FirebaseService.checkClientData(context);
+                  Scaffold.of(context).showSnackBar(SnackBar(content: Text('your Logged IN')));
                 }
               }
             },

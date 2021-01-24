@@ -11,15 +11,12 @@ void main() async {
   await Firebase.initializeApp();
   runApp(MyApp());
 }
-
 class MyApp extends StatelessWidget {
-
   @override
   Widget build(BuildContext context)  {
-    SizeConfig().init(context);
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
+      title: 'Live 365',
       theme: theme(),
       initialRoute: SplashScreen.routeName,
       routes: routes,
