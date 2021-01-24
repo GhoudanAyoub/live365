@@ -3,8 +3,11 @@ import 'package:live365/components/custom_surfix_icon.dart';
 import 'package:live365/components/default_button.dart';
 import 'package:live365/components/form_error.dart';
 import 'package:live365/components/no_account_text.dart';
+import 'package:live365/firebaseService/FirebaseService.dart';
+
 import '../../SizeConfig.dart';
 import '../../constants.dart';
+import '../../theme.dart';
 
 class Body extends StatelessWidget {
   @override
@@ -47,6 +50,7 @@ class ForgotPassForm extends StatefulWidget {
 
 class _ForgotPassFormState extends State<ForgotPassForm> {
   final _formKey = GlobalKey<FormState>();
+  TextEditingController _emailContoller = TextEditingController();
   List<String> errors = [];
   String email;
   @override
@@ -56,6 +60,8 @@ class _ForgotPassFormState extends State<ForgotPassForm> {
       child: Column(
         children: [
           TextFormField(
+            controller: _emailContoller,
+            style: TextStyle(color: Colors.white),
             keyboardType: TextInputType.emailAddress,
             onSaved: (newValue) => email = newValue,
             onChanged: (value) {
@@ -87,8 +93,8 @@ class _ForgotPassFormState extends State<ForgotPassForm> {
             decoration: InputDecoration(
               labelText: "Email",
               hintText: "Enter your email",
-              // If  you are using latest version of flutter then lable text and hint text shown like this
-              // if you r using flutter less then 1.20.* then maybe this is not working properly
+              labelStyle: textTheme().bodyText2,
+              hintStyle: textTheme().bodyText2,
               floatingLabelBehavior: FloatingLabelBehavior.always,
               suffixIcon: CustomSurffixIcon(svgIcon: "assets/icons/Mail.svg"),
             ),
@@ -100,7 +106,7 @@ class _ForgotPassFormState extends State<ForgotPassForm> {
             text: "Continue",
             press: () {
               if (_formKey.currentState.validate()) {
-                // Do what you want to do
+                FirebaseService.FogetPassword(_emailContoller.text, context);
               }
             },
           ),
