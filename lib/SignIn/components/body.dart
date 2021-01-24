@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:live365/components/no_account_text.dart';
 import 'package:live365/components/socal_card.dart';
 import 'package:live365/firebaseService/FirebaseService.dart';
+import 'package:live365/home/home_screen.dart';
 
 import '../../SizeConfig.dart';
 import 'sign_form.dart';
@@ -44,7 +45,10 @@ class Body extends StatelessWidget {
                             await FirebaseService.signInWithGoogle(context);
 
                         if (result != null) {
-                          // Navigator.pushNamed(context, HomeScreen.routeName);
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => HomeScreen()));
                         }
                       },
                     ),

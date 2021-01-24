@@ -5,7 +5,7 @@ import 'constants.dart';
 ThemeData theme() {
   return ThemeData(
     scaffoldBackgroundColor: Colors.black87,
-    fontFamily: "Muli",
+    fontFamily: "SFProDisplay-Regular",
     appBarTheme: appBarTheme(),
     textTheme: textTheme(),
     inputDecorationTheme: inputDecorationTheme(),

@@ -70,19 +70,19 @@ flutter:
   # list giving the asset and other descriptors for the font. For
   # example:
 
-  #fonts:
-   #  - family: SFProDispaly
-    #   fonts:
-     #    - asset: fonts/SFProDispaly-Regular.ttf
-      #   - asset: assets/fonts/SFProDispaly-Black.ttf
-       #  - asset: assets/fonts/SFProDispaly-Blod.ttf
-            #weight: 700
-        # - asset: assets/fonts/SFProDispaly-Heavy.ttf
-         #- asset: assets/fonts/SFProDispaly-Light.ttf
-         #- asset: assets/fonts/SFProDispaly-Medium.ttf
-         #- asset: assets/fonts/SFProDispaly-semibold.ttf
-        # - asset: assets/fonts/SFProDispaly-Thin.ttf
-         #- asset: assets/fonts/SFProDispaly-Ultralight.ttf
+fonts:
+  fonts:
+    - asset: assets/fonts/SFProDispaly-Regular.ttf
+    - asset: assets/fonts/SFProDisplay-Black.ttf
+    - asset: assets/fonts/SFProDisplay-Blod.ttf
+      weight: 700
+    - asset: assets/fonts/SFProDisplay-Heavy.ttf
+    - asset: assets/fonts/SFProDisplay-Light.ttf
+      weight: 300
+    - asset: assets/fonts/SFProDisplay-Medium.ttf
+    - asset: assets/fonts/SFProDisplay-semibold.ttf
+    - asset: assets/fonts/SFProDisplay-Thin.ttf
+    - asset: assets/fonts/SFProDisplay-Ultralight.ttf
   #       - asset: fonts/Schyler-Italic.ttf
   #         style: italic
   # For details regarding fonts from package dependencies,

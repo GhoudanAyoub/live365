@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:live365/home/home_screen.dart';
+
 import '../constants.dart';
 import '../enums.dart';
 
@@ -42,11 +44,11 @@ class CustomBottomNavBar extends StatelessWidget {
                       ? kPrimaryColor
                       : inActiveIconColor,
                 ),
-                onPressed: () =>{}
-                   // Navigator.pushNamed(context, HomeScreen.routeName),
+                onPressed: () =>
+                    Navigator.pushNamed(context, HomeScreen.routeName),
               ),
               IconButton(
-                icon: SvgPicture.asset("assets/icons/Heart Icon.svg"),
+                icon: SvgPicture.asset("assets/icons/Search Icon.svg"),
                 onPressed: () {},
               ),
               IconButton(
@@ -60,7 +62,7 @@ class CustomBottomNavBar extends StatelessWidget {
                       ? kPrimaryColor
                       : inActiveIconColor,
                 ),
-                onPressed: () =>{}
+                onPressed: () => {},
               ),
             ],
           )),
