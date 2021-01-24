@@ -13,7 +13,8 @@ class Body extends StatelessWidget {
       child: SizedBox(
         width: double.infinity,
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: getProportionateScreenWidth(20)),
+          padding:
+              EdgeInsets.symmetric(horizontal: getProportionateScreenWidth(20)),
           child: SingleChildScrollView(
             child: Column(
               children: [
@@ -32,20 +33,27 @@ class Body extends StatelessWidget {
                     SocalCard(
                       icon: "assets/icons/google-icon.svg",
                       press: () async {
-                        dynamic result = await FirebaseService.signInWithGoogle(context);
+                        dynamic result =
+                            await FirebaseService.signInWithGoogle(context);
 
-                        if(result!=null){
+                        if (result != null) {
                           //Navigator.pushNamed(context, HomeScreen.routeName);
                         }
                       },
                     ),
                     SocalCard(
                       icon: "assets/icons/facebook-2.svg",
-                      press: () {Scaffold.of(context).showSnackBar(SnackBar(content: Text("Coming Soon")));},
+                      press: () {
+                        Scaffold.of(context).showSnackBar(
+                            SnackBar(content: Text("Coming Soon")));
+                      },
                     ),
                     SocalCard(
                       icon: "assets/icons/twitter.svg",
-                      press: () {Scaffold.of(context).showSnackBar(SnackBar(content: Text("Coming Soon")));},
+                      press: () {
+                        Scaffold.of(context).showSnackBar(
+                            SnackBar(content: Text("Coming Soon")));
+                      },
                     ),
                   ],
                 ),
@@ -53,7 +61,6 @@ class Body extends StatelessWidget {
                 Text(
                   'By continuing your confirm that you agree \nwith our Term and Condition',
                   textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.caption,
                 )
               ],
             ),

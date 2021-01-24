@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:live365/components/custom_surfix_icon.dart';
 import 'package:live365/components/default_button.dart';
@@ -7,7 +6,7 @@ import 'package:live365/firebaseService/FirebaseService.dart';
 
 import '../../SizeConfig.dart';
 import '../../constants.dart';
-
+import '../../theme.dart';
 
 class SignUpForm extends StatefulWidget {
   @override
@@ -54,12 +53,13 @@ class _SignUpFormState extends State<SignUpForm> {
           DefaultButton(
             text: "Continue",
             press: () async {
-
               if (_formKey.currentState.validate()) {
-                dynamic result =  await FirebaseService.create(_emailContoller.text,_passwordController.text,context);
-                if (result != null){
-                 // Navigator.pushNamed(context, CompleteProfileScreen.routeName);
-                  Scaffold.of(context).showSnackBar(SnackBar(content: Text('Congratulation Your Account Created')));
+                dynamic result = await FirebaseService.create(
+                    _emailContoller.text, _passwordController.text, context);
+                if (result != null) {
+                  // Navigator.pushNamed(context, CompleteProfileScreen.routeName);
+                  Scaffold.of(context).showSnackBar(SnackBar(
+                      content: Text('Congratulation Your Account Created')));
                 }
               }
             },
@@ -71,6 +71,7 @@ class _SignUpFormState extends State<SignUpForm> {
 
   TextFormField buildConformPassFormField() {
     return TextFormField(
+      style: TextStyle(color: Colors.white),
       obscureText: true,
       onSaved: (newValue) => conform_password = newValue,
       onChanged: (value) {
@@ -94,8 +95,8 @@ class _SignUpFormState extends State<SignUpForm> {
       decoration: InputDecoration(
         labelText: "Confirm Password",
         hintText: "Re-enter your password",
-        // If  you are using latest version of flutter then lable text and hint text shown like this
-        // if you r using flutter less then 1.20.* then maybe this is not working properly
+        labelStyle: textTheme().bodyText2,
+        hintStyle: textTheme().bodyText2,
         floatingLabelBehavior: FloatingLabelBehavior.always,
         suffixIcon: CustomSurffixIcon(svgIcon: "assets/icons/Lock.svg"),
       ),
@@ -104,6 +105,7 @@ class _SignUpFormState extends State<SignUpForm> {
 
   TextFormField buildPasswordFormField() {
     return TextFormField(
+      style: TextStyle(color: Colors.white),
       controller: _passwordController,
       obscureText: true,
       onSaved: (newValue) => password = newValue,
@@ -128,8 +130,8 @@ class _SignUpFormState extends State<SignUpForm> {
       decoration: InputDecoration(
         labelText: "Password",
         hintText: "Enter your password",
-        // If  you are using latest version of flutter then lable text and hint text shown like this
-        // if you r using flutter less then 1.20.* then maybe this is not working properly
+        labelStyle: textTheme().bodyText2,
+        hintStyle: textTheme().bodyText2,
         floatingLabelBehavior: FloatingLabelBehavior.always,
         suffixIcon: CustomSurffixIcon(svgIcon: "assets/icons/Lock.svg"),
       ),
@@ -138,6 +140,7 @@ class _SignUpFormState extends State<SignUpForm> {
 
   TextFormField buildEmailFormField() {
     return TextFormField(
+      style: TextStyle(color: Colors.white),
       controller: _emailContoller,
       keyboardType: TextInputType.emailAddress,
       onSaved: (newValue) => email = newValue,
@@ -160,14 +163,13 @@ class _SignUpFormState extends State<SignUpForm> {
         return null;
       },
       decoration: InputDecoration(
+        labelStyle: textTheme().bodyText2,
+        hintStyle: textTheme().bodyText2,
         labelText: "Email",
         hintText: "Enter your email",
-        // If  you are using latest version of flutter then lable text and hint text shown like this
-        // if you r using flutter less then 1.20.* then maybe this is not working properly
         floatingLabelBehavior: FloatingLabelBehavior.always,
         suffixIcon: CustomSurffixIcon(svgIcon: "assets/icons/Mail.svg"),
       ),
     );
   }
-
 }

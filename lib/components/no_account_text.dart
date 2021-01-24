@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:live365/SignUp/sign_up_screen.dart';
 
-import '../constants.dart';
 import '../SizeConfig.dart';
+import '../constants.dart';
 
 class NoAccountText extends StatelessWidget {
   const NoAccountText({

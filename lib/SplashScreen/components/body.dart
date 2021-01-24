@@ -1,10 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:live365/SignIn/sign_in_screen.dart';
-import 'package:live365/components/default_button.dart';
 
-// This is the best practice
-import '../../SizeConfig.dart';
 import '../../constants.dart';
 import '../components/splash_content.dart';
 
@@ -16,74 +13,30 @@ class Body extends StatefulWidget {
 class _BodyState extends State<Body> {
   int currentPage = 0;
   List<Map<String, String>> splashData = [
-    {
-      "text": "Welcome to Live Shop, Let’s shop!",
-      "image": ""
-    },
-    {
-      "text":
-          "We help people conect with store \naround United State of America",
-      "image": ""
-    },
-    {
-      "text": "We show the easy way to shop. \nJust stay at home with us",
-      "image": ""
-    },
+    {"text": "Welcome to Live 365. ", "image": ""},
   ];
+
+  @override
+  void initState() {
+    new Future.delayed(Duration(seconds: 3), () {
+      if (FirebaseAuth.instance.currentUser == null) {
+        Navigator.pushNamed(context, SignInScreen.routeName);
+      } else {
+        // Navigator.pushNamed(context, HomeScreen.routeName);
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: SizedBox(
         width: double.infinity,
-        child: Column(
-          children: <Widget>[
-            Expanded(
-              flex: 3,
-              child: PageView.builder(
-                onPageChanged: (value) {
-                  setState(() {
-                    currentPage = value;
-                  });
-                },
-                itemCount: splashData.length,
-                itemBuilder: (context, index) => SplashContent(
-                  image: splashData[index]["image"],
-                  text: splashData[index]['text'],
-                ),
-              ),
-            ),
-            Expanded(
-              flex: 2,
-              child: Padding(
-                padding: EdgeInsets.symmetric(
-                    horizontal: getProportionateScreenWidth(20)),
-                child: Column(
-                  children: <Widget>[
-                    Spacer(),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(
-                        splashData.length,
-                        (index) => buildDot(index: index),
-                      ),
-                    ),
-                    Spacer(flex: 3),
-                    DefaultButton(
-                      text: "Continue",
-                      press: ()  {
-                        if(FirebaseAuth.instance.currentUser==null){
-                          Navigator.pushNamed(context, SignInScreen.routeName);
-                        }else{
-                         // Navigator.pushNamed(context, HomeScreen.routeName);
-                        }
-                      },
-                    ),
-                    Spacer(),
-                  ],
-                ),
-              ),
-            ),
-          ],
+        child: Center(
+          child: SplashContent(
+            image: splashData[0]["image"],
+            text: splashData[0]['text'],
+          ),
         ),
       ),
     );

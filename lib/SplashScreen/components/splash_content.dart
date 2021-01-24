@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../SizeConfig.dart';
 import '../../constants.dart';
 
@@ -12,28 +13,30 @@ class SplashContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        Spacer(),
-        Text(
-          "Live 365",
-          style: TextStyle(
-            fontSize: getProportionateScreenWidth(36),
-            color: kPrimaryColor,
-            fontWeight: FontWeight.bold,
+    return Center(
+      child: Column(
+        children: <Widget>[
+          Spacer(),
+          Text(
+            "Live 365",
+            style: TextStyle(
+              fontSize: getProportionateScreenWidth(36),
+              color: GTextColorWhite,
+              fontWeight: FontWeight.bold,
+            ),
           ),
-        ),
-        Text(
-          text,
-          textAlign: TextAlign.center,
-        ),
-        Spacer(flex: 2),
-        Image.asset(
-          image,
-          height: getProportionateScreenHeight(265),
-          width: getProportionateScreenWidth(235),
-        ),
-      ],
+          Text(
+            text,
+            textAlign: TextAlign.center,
+          ),
+          Image.asset(
+            "assets/images/logo.png",
+            height: getProportionateScreenHeight(265),
+            width: getProportionateScreenWidth(235),
+          ),
+          Spacer(),
+        ],
+      ),
     );
   }
 }

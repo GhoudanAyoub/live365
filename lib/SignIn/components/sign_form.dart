@@ -1,5 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:live365/components/custom_surfix_icon.dart';
 import 'package:live365/components/default_button.dart';
@@ -10,6 +8,7 @@ import 'package:live365/helper/keyboard.dart';
 
 import '../../SizeConfig.dart';
 import '../../constants.dart';
+import '../../theme.dart';
 
 class SignForm extends StatefulWidget {
   @override
@@ -38,9 +37,9 @@ class _SignFormState extends State<SignForm> {
       });
   }
 
-
   TextFormField buildPasswordFormField() {
     return TextFormField(
+      style: TextStyle(color: Colors.white),
       controller: _passwordController,
       obscureText: true,
       onChanged: (value) {
@@ -62,7 +61,9 @@ class _SignFormState extends State<SignForm> {
         return null;
       },
       decoration: InputDecoration(
+        labelStyle: textTheme().bodyText2,
         labelText: "Password",
+        hintStyle: textTheme().bodyText2,
         hintText: "Enter your password",
         floatingLabelBehavior: FloatingLabelBehavior.always,
         suffixIcon: CustomSurffixIcon(svgIcon: "assets/icons/Lock.svg"),
@@ -72,6 +73,7 @@ class _SignFormState extends State<SignForm> {
 
   TextFormField buildEmailFormField() {
     return TextFormField(
+      style: TextStyle(color: Colors.white),
       controller: _emailContoller,
       keyboardType: TextInputType.emailAddress,
       onChanged: (value) {
@@ -93,6 +95,8 @@ class _SignFormState extends State<SignForm> {
         return null;
       },
       decoration: InputDecoration(
+        hintStyle: textTheme().bodyText2,
+        labelStyle: textTheme().bodyText2,
         labelText: "Email",
         hintText: "Enter your email",
         floatingLabelBehavior: FloatingLabelBehavior.always,
@@ -125,7 +129,8 @@ class _SignFormState extends State<SignForm> {
               Text("Remember me"),
               Spacer(),
               GestureDetector(
-                onTap: () => Navigator.pushNamed(context, ForgotPasswordScreen.routeName),
+                onTap: () => Navigator.pushNamed(
+                    context, ForgotPasswordScreen.routeName),
                 child: Text(
                   "Forgot Password",
                   style: TextStyle(decoration: TextDecoration.underline),
@@ -141,10 +146,12 @@ class _SignFormState extends State<SignForm> {
               if (_formKey.currentState.validate()) {
                 KeyboardUtil.hideKeyboard(context);
 
-                dynamic result = await FirebaseService.sign(_emailContoller.text,_passwordController.text,context);
-                if(result!=null){
+                dynamic result = await FirebaseService.sign(
+                    _emailContoller.text, _passwordController.text, context);
+                if (result != null) {
                   FirebaseService.checkClientData(context);
-                  Scaffold.of(context).showSnackBar(SnackBar(content: Text('your Logged IN')));
+                  Scaffold.of(context)
+                      .showSnackBar(SnackBar(content: Text('your Logged IN')));
                 }
               }
             },

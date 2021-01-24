@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:live365/components/no_account_text.dart';
 import 'package:live365/components/socal_card.dart';
 import 'package:live365/firebaseService/FirebaseService.dart';
+
 import '../../SizeConfig.dart';
 import 'sign_form.dart';
 
@@ -21,7 +22,7 @@ class Body extends StatelessWidget {
                 Text(
                   "Welcome Back",
                   style: TextStyle(
-                    color: Colors.black,
+                    color: Colors.white,
                     fontSize: getProportionateScreenWidth(28),
                     fontWeight: FontWeight.bold,
                   ),
@@ -39,21 +40,27 @@ class Body extends StatelessWidget {
                     SocalCard(
                       icon: "assets/icons/google-icon.svg",
                       press: () async {
+                        dynamic result =
+                            await FirebaseService.signInWithGoogle(context);
 
-                        dynamic result = await FirebaseService.signInWithGoogle(context);
-
-                        if(result!=null){
-                         // Navigator.pushNamed(context, HomeScreen.routeName);
+                        if (result != null) {
+                          // Navigator.pushNamed(context, HomeScreen.routeName);
                         }
                       },
                     ),
                     SocalCard(
                       icon: "assets/icons/facebook-2.svg",
-                      press: () {Scaffold.of(context).showSnackBar(SnackBar(content: Text("Coming Soon")));},
+                      press: () {
+                        Scaffold.of(context).showSnackBar(
+                            SnackBar(content: Text("Coming Soon")));
+                      },
                     ),
                     SocalCard(
                       icon: "assets/icons/twitter.svg",
-                      press: () {Scaffold.of(context).showSnackBar(SnackBar(content: Text("Coming Soon")));},
+                      press: () {
+                        Scaffold.of(context).showSnackBar(
+                            SnackBar(content: Text("Coming Soon")));
+                      },
                     ),
                   ],
                 ),
