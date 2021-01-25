@@ -3,6 +3,7 @@ import 'package:live365/components/custom_surfix_icon.dart';
 import 'package:live365/components/default_button.dart';
 import 'package:live365/components/form_error.dart';
 import 'package:live365/firebaseService/FirebaseService.dart';
+import 'package:live365/home/home_screen.dart';
 
 import '../../SizeConfig.dart';
 import '../../constants.dart';
@@ -57,7 +58,8 @@ class _SignUpFormState extends State<SignUpForm> {
                 dynamic result = await FirebaseService.create(
                     _emailContoller.text, _passwordController.text, context);
                 if (result != null) {
-                  // Navigator.pushNamed(context, CompleteProfileScreen.routeName);
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => HomeScreen()));
                   Scaffold.of(context).showSnackBar(SnackBar(
                       content: Text('Congratulation Your Account Created')));
                 }

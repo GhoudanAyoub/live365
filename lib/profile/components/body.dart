@@ -39,7 +39,7 @@ class Body extends StatelessWidget {
           )),
           ProfilePic(),
           SizedBox(height: 20),
-          Text("ayoub",
+          Text("Mr X",
               style: TextStyle(
                 fontSize: getProportionateScreenWidth(22),
                 color: GTextColorWhite,

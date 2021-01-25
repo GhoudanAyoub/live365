@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:live365/Inbox/inbox_page.dart';
 import 'package:live365/components/cam_icon.dart';
 import 'package:live365/profile/profile_screen.dart';
 
@@ -17,7 +18,10 @@ class _State extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: getBody(),
+      body: new WillPopScope(
+        onWillPop: () async => false,
+        child: getBody(),
+      ),
       bottomNavigationBar: getFooter(),
     );
   }
@@ -41,13 +45,7 @@ class _State extends State<HomeScreen> {
                 color: white, fontSize: 20, fontWeight: FontWeight.bold),
           ),
         ),
-        Center(
-          child: Text(
-            "Messaging",
-            style: TextStyle(
-                color: white, fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-        ),
+        Inbox(),
         ProfileScreen(),
       ],
     );

@@ -11,6 +11,11 @@ const secondary = Color(0xFF19D5F1);
 const white = Color(0xFFFFFFFF);
 const black = Color(0xFF000000);
 const orange = Color(0xFFFF7643);
+const deepOrange = Colors.deepOrange;
+const online = Color(0xFF66BB6A);
+const red = Colors.red;
+const blue_story = Colors.blueAccent;
+const grey_toWhite = Color(0xFFe9eaec);
 const GTextColorWhite = Colors.white;
 const GBottomNav = Color.fromARGB(225, 33, 37, 49);
 const kPrimaryColor = Color(0xFFFF4444);
@@ -59,4 +64,69 @@ OutlineInputBorder outlineInputBorder() {
     borderRadius: BorderRadius.circular(getProportionateScreenWidth(15)),
     borderSide: BorderSide(color: kTextColor),
   );
+}
+
+//Function from stuck overflow
+getMessageType(isMe, messageType) {
+  if (isMe) {
+    // start message
+    if (messageType == 1) {
+      return BorderRadius.only(
+          topRight: Radius.circular(30),
+          bottomRight: Radius.circular(5),
+          topLeft: Radius.circular(30),
+          bottomLeft: Radius.circular(30));
+    }
+    // middle message
+    else if (messageType == 2) {
+      return BorderRadius.only(
+          topRight: Radius.circular(5),
+          bottomRight: Radius.circular(5),
+          topLeft: Radius.circular(30),
+          bottomLeft: Radius.circular(30));
+    }
+    // end message
+    else if (messageType == 3) {
+      return BorderRadius.only(
+          topRight: Radius.circular(5),
+          bottomRight: Radius.circular(30),
+          topLeft: Radius.circular(30),
+          bottomLeft: Radius.circular(30));
+    }
+    // standalone message
+    else {
+      return BorderRadius.all(Radius.circular(30));
+    }
+  }
+  // for sender bubble
+  else {
+    // start message
+    if (messageType == 1) {
+      return BorderRadius.only(
+          topLeft: Radius.circular(30),
+          bottomLeft: Radius.circular(5),
+          topRight: Radius.circular(30),
+          bottomRight: Radius.circular(30));
+    }
+    // middle message
+    else if (messageType == 2) {
+      return BorderRadius.only(
+          topLeft: Radius.circular(5),
+          bottomLeft: Radius.circular(5),
+          topRight: Radius.circular(30),
+          bottomRight: Radius.circular(30));
+    }
+    // end message
+    else if (messageType == 3) {
+      return BorderRadius.only(
+          topLeft: Radius.circular(5),
+          bottomLeft: Radius.circular(30),
+          topRight: Radius.circular(30),
+          bottomRight: Radius.circular(30));
+    }
+    // standalone message
+    else {
+      return BorderRadius.all(Radius.circular(30));
+    }
+  }
 }

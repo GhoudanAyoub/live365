@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:live365/components/picture_card.dart';
 import 'package:live365/home/components/header_home_page.dart';
 
 import '../../SizeConfig.dart';
@@ -13,7 +14,10 @@ class Body extends StatelessWidget {
             SizedBox(height: getProportionateScreenHeight(20)),
             HeaderHomePage(),
             SizedBox(height: getProportionateScreenWidth(10)),
-
+            PictureCard(
+              image: "assets/images/image.jpg",
+              press: () {},
+            ),
             /*
             DiscountBanner(),
             Categories(),

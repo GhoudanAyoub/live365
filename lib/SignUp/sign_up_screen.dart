@@ -9,10 +9,10 @@ class SignUpScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     SizeConfig().init(context);
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Sign Up"),
+      body: new WillPopScope(
+        onWillPop: () async => false,
+        child: Body(),
       ),
-      body: Body(),
     );
   }
 }

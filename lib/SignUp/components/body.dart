@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:live365/components/got_account_text.dart';
 import 'package:live365/components/socal_card.dart';
 import 'package:live365/firebaseService/FirebaseService.dart';
 import 'package:live365/home/home_screen.dart';
@@ -62,6 +63,7 @@ class Body extends StatelessWidget {
                   ],
                 ),
                 SizedBox(height: getProportionateScreenHeight(20)),
+                GotAccountText(),
                 Text(
                   'By continuing your confirm that you agree \nwith our Term and Condition',
                   textAlign: TextAlign.center,

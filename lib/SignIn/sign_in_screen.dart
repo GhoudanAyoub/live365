@@ -10,7 +10,10 @@ class SignInScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text("Sign In"),
       ),
-      body: Body(),
+      body: new WillPopScope(
+        onWillPop: () async => false,
+        child: Body(),
+      ),
     );
   }
 }
