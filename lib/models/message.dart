@@ -7,14 +7,16 @@ class MessageField {
 }
 
 class messages {
-  final String idUser;
+  final String sender;
+  final String receiver;
   final String urlAvatar;
   final String username;
   final String message;
   final DateTime createdAt;
 
   const messages({
-    @required this.idUser,
+    @required this.sender,
+    @required this.receiver,
     @required this.urlAvatar,
     @required this.username,
     @required this.message,
@@ -22,7 +24,8 @@ class messages {
   });
 
   static messages fromJson(Map<String, dynamic> json) => messages(
-        idUser: json['idUser'],
+        sender: json['sender'],
+        receiver: json['receiver'],
         urlAvatar: json['urlAvatar'],
         username: json['username'],
         message: json['message'],
@@ -30,7 +33,8 @@ class messages {
       );
 
   Map<String, dynamic> toJson() => {
-        'idUser': idUser,
+        'sender': sender,
+        'receiver': receiver,
         'urlAvatar': urlAvatar,
         'username': username,
         'message': message,

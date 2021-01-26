@@ -2,6 +2,7 @@ import 'package:LIVE365/components/IconBtnWithCounter.dart';
 import 'package:LIVE365/firebaseService/FirebaseService.dart';
 import 'package:LIVE365/models/message.dart';
 import 'package:LIVE365/models/message_list.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../../SizeConfig.dart';
@@ -92,13 +93,13 @@ class ChatDetailPage extends StatelessWidget {
           ),
         ],*/
       ),
-      body: Messages(Messagelist.id),
+      body: Messages(),
       bottomSheet: newshit(),
     );
   }
 
   void sendMessage() async {
-    await FirebaseService.uploadMessage(
+    await FirebaseService.uploadMessage(FirebaseAuth.instance.currentUser.uid,
         Messagelist.id, _sendMessageController.text);
     _sendMessageController.clear();
   }
@@ -247,8 +248,8 @@ class ChatDetailPage extends StatelessWidget {
     );
   }
 
-  Widget Messages(idUser) => StreamBuilder<List<messages>>(
-        stream: FirebaseService.getMessages(idUser),
+  Widget Messages() => StreamBuilder<List<messages>>(
+        stream: FirebaseService.getMessages(),
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.waiting:
@@ -266,6 +267,9 @@ class ChatDetailPage extends StatelessWidget {
                             right: 20, left: 20, top: 20, bottom: 80),
                         children: List.generate(messages.length, (index) {
                           final message = messages[index];
+                          if (message.receiver !=
+                              FirebaseAuth.instance.currentUser.uid)
+                            buildText('Say Hi..');
                           return ChatBubble(
                               isMe: true,
                               message: message.message,

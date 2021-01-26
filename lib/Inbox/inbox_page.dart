@@ -2,7 +2,6 @@ import 'package:LIVE365/firebaseService/FirebaseService.dart';
 import 'package:LIVE365/models/message_list.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:line_icons/line_icons.dart';
 
 import '../constants.dart';
 import 'components/chat_detail_page.dart';
@@ -38,21 +37,22 @@ class Inbox extends StatelessWidget {
         SizedBox(
           height: 10,
         ),
-        Container(
-          width: double.infinity,
-          height: 40,
-          decoration: BoxDecoration(
-              color: grey_toWhite, borderRadius: BorderRadius.circular(15)),
-          child: TextField(
-            cursorColor: black,
-            controller: _searchController,
-            decoration: InputDecoration(
-                prefixIcon: Icon(
-                  LineIcons.search,
-                  color: black.withOpacity(0.5),
-                ),
-                hintText: "Search",
-                border: InputBorder.none),
+        Padding(
+          padding: EdgeInsets.only(left: 15.0, right: 15.0),
+          child: Material(
+            elevation: 5.0,
+            borderRadius: BorderRadius.circular(50.0),
+            child: TextFormField(
+                cursorColor: black,
+                controller: _searchController,
+                decoration: InputDecoration(
+                    border: InputBorder.none,
+                    prefixIcon:
+                        Icon(Icons.search, color: GBottomNav, size: 30.0),
+                    contentPadding: EdgeInsets.only(left: 15.0, top: 15.0),
+                    hintText: 'Search',
+                    hintStyle: TextStyle(
+                        color: Colors.grey, fontFamily: 'SFProDisplay-Black'))),
           ),
         ),
         SizedBox(

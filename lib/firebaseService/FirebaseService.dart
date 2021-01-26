@@ -40,23 +40,21 @@ class FirebaseService {
       .transform(Utils.transformer(users.fromJson));
 
   // MESSAGE DATA
-  static Future addRandomUsers(List<MessageList> messageList) async {
-    final refMessageList = FirebaseFirestore.instance
+  static Future addRandomUsers(users user, String img) async {
+    await FirebaseFirestore.instance
         .collection("Message")
         .doc(FirebaseAuth.instance.currentUser.displayName)
-        .collection('users');
-
-    final allUsers = await refMessageList.get();
-    if (allUsers.size != 0) {
-      return;
-    } else {
-      for (final MessageList in messageList) {
-        final messageListDoc = refMessageList.doc();
-        final newUser = MessageList.copyWith(id: messageListDoc.id);
-
-        await messageListDoc.set(newUser.toJson());
-      }
-    }
+        .collection('users')
+        .doc()
+        .set({
+      'id': user.id,
+      'name': user.name,
+      'img': img,
+      'online': true,
+      'live': false,
+      'message': "",
+      'created_at': DateTime.now()
+    });
   }
 
   static Stream<List<MessageList>> getUsers() => FirebaseFirestore.instance
@@ -67,34 +65,26 @@ class FirebaseService {
       .snapshots()
       .transform(Utils.transformer(MessageList.fromJson));
 
-  static Future uploadMessage(String idUser, String message) async {
-    final refMessages =
-        FirebaseFirestore.instance.collection('chats/$idUser/messages');
+  static Future uploadMessage(
+      String sender, final String receiver, String message) async {
+    final refMessages = FirebaseFirestore.instance.collection('chats');
 
     final newMessage = messages(
-      idUser: idUser,
+      sender: sender,
+      receiver: receiver,
       urlAvatar: FirebaseAuth.instance.currentUser.photoURL,
       username: FirebaseAuth.instance.currentUser.displayName,
       message: message,
       createdAt: DateTime.now(),
     );
     await refMessages.add(newMessage.toJson());
-
-    final refUsers = FirebaseFirestore.instance
-        .collection("Message")
-        .doc(FirebaseAuth.instance.currentUser.displayName)
-        .collection('users');
-    await refUsers
-        .doc(idUser)
-        .update({MessageListField.lastMessageTime: DateTime.now()});
   }
 
-  static Stream<List<messages>> getMessages(String idUser) =>
-      FirebaseFirestore.instance
-          .collection('chats/$idUser/messages')
-          .orderBy(MessageField.createdAt, descending: true)
-          .snapshots()
-          .transform(Utils.transformer(messages.fromJson));
+  static Stream<List<messages>> getMessages() => FirebaseFirestore.instance
+      .collection('chats')
+      .orderBy(MessageField.createdAt, descending: true)
+      .snapshots()
+      .transform(Utils.transformer(messages.fromJson));
 
   // GET UID
   Future<String> getCurrentUID() async {

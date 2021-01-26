@@ -1,6 +1,7 @@
 import 'package:LIVE365/Inbox/inbox_page.dart';
 import 'package:LIVE365/Upload/CameraAccessScreen.dart';
 import 'package:LIVE365/components/cam_icon.dart';
+import 'package:LIVE365/discover/discover_screen.dart';
 import 'package:LIVE365/profile/profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -32,13 +33,7 @@ class _State extends State<HomeScreen> {
       index: pageIndex,
       children: <Widget>[
         Body(),
-        Center(
-          child: Text(
-            "Discover",
-            style: TextStyle(
-                color: white, fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-        ),
+        DiscoverScreen(),
         CameraAccessScreen(),
         Inbox(),
         ProfileScreen(),

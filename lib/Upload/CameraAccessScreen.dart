@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../constants.dart';
+
 class CameraAccessScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -12,7 +14,7 @@ class CameraAccessScreen extends StatelessWidget {
             fit: BoxFit.cover,
           ),
           Positioned(
-            bottom: MediaQuery.of(context).size.height * 0.15,
+            bottom: MediaQuery.of(context).size.height * 0.1,
             left: MediaQuery.of(context).size.width * 0.3,
             right: MediaQuery.of(context).size.width * 0.3,
             child: Container(
@@ -26,7 +28,7 @@ class CameraAccessScreen extends StatelessWidget {
                 ],
               ),
               child: FlatButton(
-                color: Color(0xFFED72AD),
+                color: GBottomNav,
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(50)),
                 onPressed: () {},
