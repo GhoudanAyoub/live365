@@ -1,18 +1,19 @@
+import 'package:LIVE365/components/IconBtnWithCounter.dart';
+import 'package:LIVE365/firebaseService/FirebaseService.dart';
+import 'package:LIVE365/models/message.dart';
+import 'package:LIVE365/models/message_list.dart';
 import 'package:flutter/material.dart';
-import 'package:live365/models/UserMessages.dart';
 
 import '../../SizeConfig.dart';
 import '../../constants.dart';
 import '../../theme.dart';
 import 'chat_bubble.dart';
 
-class ChatDetailPage extends StatefulWidget {
-  @override
-  _ChatDetailPageState createState() => _ChatDetailPageState();
-}
-
-class _ChatDetailPageState extends State<ChatDetailPage> {
+class ChatDetailPage extends StatelessWidget {
   TextEditingController _sendMessageController = new TextEditingController();
+  final MessageList Messagelist;
+
+  ChatDetailPage({Key key, this.Messagelist}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,9 +36,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
               decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   image: DecorationImage(
-                      image: NetworkImage(
-                          "https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60"),
-                      fit: BoxFit.cover)),
+                      image: NetworkImage(Messagelist.img), fit: BoxFit.cover)),
             ),
             SizedBox(
               width: 15,
@@ -46,7 +45,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Text(
-                  "Tyler Nix",
+                  Messagelist.name,
                   style: TextStyle(
                       fontSize: 18, fontWeight: FontWeight.bold, color: white),
                 ),
@@ -93,9 +92,15 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
           ),
         ],*/
       ),
-      body: Body(),
-      bottomSheet: Bottom(),
+      body: Messages(Messagelist.id),
+      bottomSheet: newshit(),
     );
+  }
+
+  void sendMessage() async {
+    await FirebaseService.uploadMessage(
+        Messagelist.id, _sendMessageController.text);
+    _sendMessageController.clear();
   }
 
   Widget Bottom() {
@@ -136,19 +141,82 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                     width: getProportionateScreenWidth(10),
                   ),
                   Container(
-                    width: getProportionateScreenWidth(230),
-                    height: getProportionateScreenHeight(50),
+                    width: getProportionateScreenWidth(170),
                     decoration: BoxDecoration(
                         color: white, borderRadius: BorderRadius.circular(20)),
                     child: Padding(
                       padding: const EdgeInsets.only(left: 0.2),
-                      child: buildMsgFormField(),
+                      child: buildMsg2FormField(),
                     ),
+                  ),
+                  SizedBox(
+                    width: getProportionateScreenWidth(10),
+                  ),
+                  IconBtnWithCounter(
+                    svgSrc: "assets/icons/Chat bubble Icon.svg",
+                    numOfitem: 0,
+                    press: _sendMessageController.text.trim().isEmpty
+                        ? null
+                        : sendMessage,
                   ),
                 ],
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget newshit() => Container(
+        color: GBottomNav,
+        padding: EdgeInsets.all(8),
+        child: Row(
+          children: <Widget>[
+            Expanded(
+              child: TextField(
+                controller: _sendMessageController,
+                textCapitalization: TextCapitalization.sentences,
+                autocorrect: true,
+                enableSuggestions: true,
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Colors.grey[100],
+                  labelText: 'Type your message',
+                  border: OutlineInputBorder(
+                    borderSide: BorderSide(width: 0),
+                    gapPadding: 10,
+                    borderRadius: BorderRadius.circular(25),
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(width: 20),
+            IconButton(
+              padding: EdgeInsets.all(8),
+              icon: Icon(Icons.send, color: Colors.white),
+              onPressed: sendMessage,
+            ),
+          ],
+        ),
+      );
+  Widget buildMsg2FormField() {
+    return Expanded(
+      child: TextField(
+        style: TextStyle(color: Colors.black),
+        controller: _sendMessageController,
+        textCapitalization: TextCapitalization.sentences,
+        autocorrect: true,
+        enableSuggestions: true,
+        decoration: InputDecoration(
+          filled: true,
+          fillColor: Colors.grey[100],
+          hintText: "Text",
+          border: OutlineInputBorder(
+            borderSide: BorderSide(width: 0),
+            gapPadding: 10,
+            borderRadius: BorderRadius.circular(25),
+          ),
         ),
       ),
     );
@@ -179,16 +247,52 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
     );
   }
 
-  Widget Body() {
-    return ListView(
-      padding: EdgeInsets.only(right: 20, left: 20, top: 20, bottom: 80),
-      children: List.generate(messages.length, (index) {
-        return ChatBubble(
-            isMe: messages[index]['isMe'],
-            messageType: messages[index]['messageType'],
-            message: messages[index]['message'],
-            profileImg: messages[index]['profileImg']);
-      }),
-    );
-  }
+  Widget Messages(idUser) => StreamBuilder<List<messages>>(
+        stream: FirebaseService.getMessages(idUser),
+        builder: (context, snapshot) {
+          switch (snapshot.connectionState) {
+            case ConnectionState.waiting:
+              return Center(child: CircularProgressIndicator());
+            default:
+              if (snapshot.hasError) {
+                return buildText('Something Went Wrong Try later');
+              } else {
+                final messages = snapshot.data;
+
+                return messages.isEmpty
+                    ? buildText('Say Hi..')
+                    : ListView(
+                        padding: EdgeInsets.only(
+                            right: 20, left: 20, top: 20, bottom: 80),
+                        children: List.generate(messages.length, (index) {
+                          final message = messages[index];
+                          return ChatBubble(
+                              isMe: true,
+                              message: message.message,
+                              profileImg: message.urlAvatar);
+                        }),
+                      );
+                /*ListView.builder(
+                        physics: BouncingScrollPhysics(),
+                        reverse: true,
+                        itemCount: messages.length,
+                        itemBuilder: (context, index) {
+                          final message = messages[index];
+
+                          return MessageWidget(
+                            message: message,
+                            isMe: message.idUser == myId,
+                          );
+                        },
+                      );*/
+              }
+          }
+        },
+      );
+  Widget buildText(String text) => Center(
+        child: Text(
+          text,
+          style: TextStyle(fontSize: 24),
+        ),
+      );
 }

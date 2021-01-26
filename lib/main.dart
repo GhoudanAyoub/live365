@@ -1,8 +1,7 @@
+import 'package:LIVE365/routes.dart';
+import 'package:LIVE365/theme.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:live365/SizeConfig.dart';
-import 'package:live365/routes.dart';
-import 'package:live365/theme.dart';
 
 import 'SplashScreen/splash_screen.dart';
 
@@ -11,9 +10,10 @@ void main() async {
   await Firebase.initializeApp();
   runApp(MyApp());
 }
+
 class MyApp extends StatelessWidget {
   @override
-  Widget build(BuildContext context)  {
+  Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Live 365',

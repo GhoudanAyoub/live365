@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.ghoudan.live365">
    <application
-        android:label="live365"
+        android:label="LIVE 365"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"

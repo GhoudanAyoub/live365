@@ -6,7 +6,7 @@ List userMessages = [
     "img":
         "https://images.unsplash.com/photo-1571741140674-8949ca7df2a7?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60",
     "online": true,
-    "live": true,
+    "story": true,
     "message": "How are you doing?",
     "created_at": "1:00 pm"
   },
@@ -16,7 +16,7 @@ List userMessages = [
     "img":
         "https://images.unsplash.com/photo-1467272046618-f2d1703715b1?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60",
     "online": false,
-    "live": false,
+    "story": false,
     "message": "Long time no see!!",
     "created_at": "12:00 am"
   },
@@ -26,7 +26,7 @@ List userMessages = [
     "img":
         "https://images.unsplash.com/photo-1517070208541-6ddc4d3efbcb?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=3319&q=80",
     "online": false,
-    "live": true,
+    "story": true,
     "message": "Glad to know you in person!",
     "created_at": "3:30 pm"
   },
@@ -36,7 +36,7 @@ List userMessages = [
     "img":
         "https://images.unsplash.com/photo-1536763843054-126cc2d9d3b0?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60",
     "online": false,
-    "live": false,
+    "story": false,
     "message": "I'm doing fine and how about you?",
     "created_at": "9:00 am"
   },
@@ -46,7 +46,7 @@ List userMessages = [
     "img":
         "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=934&q=80",
     "online": true,
-    "live": false,
+    "story": false,
     "message": "What is your real name?",
     "created_at": "11:25 am"
   },
@@ -56,7 +56,7 @@ List userMessages = [
     "img":
         "https://images.unsplash.com/photo-1523264939339-c89f9dadde2e?ixlib=rb-1.2.1&auto=format&fit=crop&w=934&q=80",
     "online": true,
-    "live": true,
+    "story": true,
     "message": "I'm happy to be your friend",
     "created_at": "10:00 am"
   },
@@ -66,7 +66,7 @@ List userMessages = [
     "img":
         "https://images.unsplash.com/photo-1458696352784-ffe1f47c2edc?ixlib=rb-1.2.1&auto=format&fit=crop&w=1951&q=80",
     "online": false,
-    "live": false,
+    "story": false,
     "message": "Thanks for your help.",
     "created_at": "2:34 pm"
   },
@@ -76,12 +76,11 @@ List userMessages = [
     "img":
         "https://images.unsplash.com/photo-1519531591569-b84b8174b508?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60",
     "online": false,
-    "live": true,
+    "story": true,
     "message": "I just arrived home.",
     "created_at": "1:12 am"
   }
 ];
-
 // list of messages
 List messages = [
   {

@@ -19,7 +19,7 @@ class ProfileBoxData extends StatelessWidget {
         onPressed: () {},
         child: Row(
           children: [
-            SizedBox(width: getProportionateScreenWidth(25)),
+            SizedBox(width: getProportionateScreenWidth(30)),
             Column(
               children: [
                 Text("LIKES",
@@ -42,7 +42,7 @@ class ProfileBoxData extends StatelessWidget {
                     )),
               ],
             ),
-            SizedBox(width: getProportionateScreenWidth(25)),
+            SizedBox(width: getProportionateScreenWidth(30)),
             Column(
               children: [
                 Text("FOLLOWING",
@@ -65,7 +65,7 @@ class ProfileBoxData extends StatelessWidget {
                     )),
               ],
             ),
-            SizedBox(width: getProportionateScreenWidth(25)),
+            SizedBox(width: getProportionateScreenWidth(30)),
             Column(
               children: [
                 Text("FOLLOWERS",

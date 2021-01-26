@@ -1,9 +1,9 @@
+import 'package:LIVE365/components/custom_surfix_icon.dart';
+import 'package:LIVE365/components/default_button.dart';
+import 'package:LIVE365/components/form_error.dart';
+import 'package:LIVE365/components/no_account_text.dart';
+import 'package:LIVE365/firebaseService/FirebaseService.dart';
 import 'package:flutter/material.dart';
-import 'package:live365/components/custom_surfix_icon.dart';
-import 'package:live365/components/default_button.dart';
-import 'package:live365/components/form_error.dart';
-import 'package:live365/components/no_account_text.dart';
-import 'package:live365/firebaseService/FirebaseService.dart';
 
 import '../../SizeConfig.dart';
 import '../../constants.dart';
@@ -106,7 +106,11 @@ class _ForgotPassFormState extends State<ForgotPassForm> {
             text: "Continue",
             press: () {
               if (_formKey.currentState.validate()) {
-                FirebaseService.FogetPassword(_emailContoller.text, context);
+                final auth = FirebaseService();
+                auth.sendPasswordResetEmail(_emailContoller.text);
+                Scaffold.of(context).showSnackBar(SnackBar(
+                    content: Text(
+                        'A password reset link has been sent to ${_emailContoller.text}')));
               }
             },
           ),

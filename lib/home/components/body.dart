@@ -1,6 +1,6 @@
+import 'package:LIVE365/components/picture_card.dart';
+import 'package:LIVE365/home/components/header_home_page.dart';
 import 'package:flutter/material.dart';
-import 'package:live365/components/picture_card.dart';
-import 'package:live365/home/components/header_home_page.dart';
 
 import '../../SizeConfig.dart';
 

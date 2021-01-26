@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 
 class ProfilePic extends StatelessWidget {
-  const ProfilePic({
-    Key key,
-  }) : super(key: key);
+  const ProfilePic({Key key, this.image}) : super(key: key);
+  final String image;
 
   @override
   Widget build(BuildContext context) {
@@ -15,8 +14,10 @@ class ProfilePic extends StatelessWidget {
         overflow: Overflow.visible,
         children: [
           CircleAvatar(
-            backgroundImage: AssetImage("assets/images/Profile Image.png"),
-          ),
+            radius: 30.0,
+            backgroundImage: NetworkImage(image),
+            backgroundColor: Colors.transparent,
+          )
         ],
       ),
     );

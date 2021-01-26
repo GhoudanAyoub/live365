@@ -1,5 +1,5 @@
+import 'package:LIVE365/SignUp/sign_up_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:live365/SignUp/sign_up_screen.dart';
 
 import '../SizeConfig.dart';
 import '../constants.dart';

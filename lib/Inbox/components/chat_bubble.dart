@@ -6,13 +6,11 @@ class ChatBubble extends StatelessWidget {
   final bool isMe;
   final String profileImg;
   final String message;
-  final int messageType;
   const ChatBubble({
     Key key,
     this.isMe,
     this.profileImg,
     this.message,
-    this.messageType,
   }) : super(key: key);
 
   @override
@@ -26,8 +24,7 @@ class ChatBubble extends StatelessWidget {
             Flexible(
               child: Container(
                 decoration: BoxDecoration(
-                    color: deepOrange,
-                    borderRadius: getMessageType(isMe, messageType)),
+                    color: deepOrange, borderRadius: getMessageType(isMe, 2)),
                 child: Padding(
                   padding: const EdgeInsets.all(13.0),
                   child: Text(
@@ -60,8 +57,7 @@ class ChatBubble extends StatelessWidget {
             Flexible(
               child: Container(
                 decoration: BoxDecoration(
-                    color: grey_toWhite,
-                    borderRadius: getMessageType(isMe, messageType)),
+                    color: grey_toWhite, borderRadius: getMessageType(isMe, 2)),
                 child: Padding(
                   padding: const EdgeInsets.all(13.0),
                   child: Text(

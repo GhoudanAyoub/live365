@@ -1,6 +1,8 @@
+import 'package:LIVE365/firebaseService/FirebaseService.dart';
+import 'package:LIVE365/models/message_list.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:line_icons/line_icons.dart';
-import 'package:live365/models/UserMessages.dart';
 
 import '../constants.dart';
 import 'components/chat_detail_page.dart';
@@ -8,6 +10,9 @@ import 'components/header_inbox_page.dart';
 
 class Inbox extends StatelessWidget {
   TextEditingController _searchController = new TextEditingController();
+  final auth = FirebaseService();
+  var fireStore = FirebaseFirestore.instance;
+  List ListUserMessage = [];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,9 +25,15 @@ class Inbox extends StatelessWidget {
         child: ListView(
       padding: EdgeInsets.only(left: 20, right: 20, top: 15),
       children: <Widget>[
-        InboxHeader(
-          image:
-              "https://images.unsplash.com/photo-1571741140674-8949ca7df2a7?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60",
+        FutureBuilder(
+          future: auth.getCurrentUser(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.done) {
+              return DisplayUserInformation(context, snapshot);
+            } else {
+              return CircularProgressIndicator();
+            }
+          },
         ),
         SizedBox(
           height: 10,
@@ -47,12 +58,69 @@ class Inbox extends StatelessWidget {
         SizedBox(
           height: 30,
         ),
+        StreamBuilder<List<MessageList>>(
+          stream: FirebaseService.getUsers(),
+          builder: (context, snapshot) {
+            switch (snapshot.connectionState) {
+              case ConnectionState.waiting:
+                return Center(child: CircularProgressIndicator());
+              default:
+                if (snapshot.hasError) {
+                  print(snapshot.error);
+                  return buildText('Something Went Wrong Try later');
+                } else {
+                  final MessageList = snapshot.data;
+
+                  if (MessageList.isEmpty) {
+                    return buildText('No Message Found');
+                  } else
+                    return Column(
+                      children: [DisplayUsersMessage(context, MessageList)],
+                    );
+                }
+            }
+          },
+        ),
+        /*
+        StreamBuilder(
+          stream: FirebaseFirestore.instance
+              .collection("Message")
+              .doc(FirebaseAuth.instance.currentUser.displayName)
+              .collection("users")
+              .snapshots(),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return DisplayUsersMessage(context, snapshot);
+            } else {
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+          },
+        ),
+
+         */
+      ],
+    ));
+  }
+
+  Widget DisplayUsersMessage(context, MessageList) {
+    /*
+    ListUserMessage.add(MessageList(m["id"], m['name'], m['img'], m['online'],
+        m['live'], m['message'], m['created_at']));*/
+
+    return Column(
+      children: <Widget>[
         Column(
-          children: List.generate(userMessages.length, (index) {
+          children: List.generate(MessageList.length, (index) {
             return InkWell(
               onTap: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (_) => ChatDetailPage()));
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => ChatDetailPage(
+                              Messagelist: MessageList[index],
+                            )));
               },
               child: Padding(
                 padding: const EdgeInsets.only(bottom: 20),
@@ -63,7 +131,7 @@ class Inbox extends StatelessWidget {
                       height: 75,
                       child: Stack(
                         children: <Widget>[
-                          userMessages[index]['online']
+                          MessageList[index].online
                               ? Container(
                                   decoration: BoxDecoration(
                                       shape: BoxShape.circle,
@@ -77,7 +145,7 @@ class Inbox extends StatelessWidget {
                                           shape: BoxShape.circle,
                                           image: DecorationImage(
                                               image: NetworkImage(
-                                                  userMessages[index]['img']),
+                                                  MessageList[index].img),
                                               fit: BoxFit.cover)),
                                     ),
                                   ),
@@ -89,10 +157,10 @@ class Inbox extends StatelessWidget {
                                       shape: BoxShape.circle,
                                       image: DecorationImage(
                                           image: NetworkImage(
-                                              userMessages[index]['img']),
+                                              MessageList[index].img),
                                           fit: BoxFit.cover)),
                                 ),
-                          userMessages[index]['online']
+                          MessageList[index].online
                               ? Positioned(
                                   top: 48,
                                   left: 52,
@@ -117,7 +185,7 @@ class Inbox extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
                         Text(
-                          userMessages[index]['name'],
+                          MessageList[index].name,
                           style: TextStyle(
                               color: white,
                               fontSize: 17,
@@ -129,9 +197,11 @@ class Inbox extends StatelessWidget {
                         SizedBox(
                           width: MediaQuery.of(context).size.width - 135,
                           child: Text(
-                            userMessages[index]['message'] +
-                                " - " +
-                                userMessages[index]['created_at'],
+                            MessageList[index].message == null
+                                ? ""
+                                : MessageList[index].message +
+                                    " - " +
+                                    MessageList[index].created_at.toString(),
                             style: TextStyle(
                                 fontSize: 15,
                                 color: grey_toWhite.withOpacity(0.8)),
@@ -145,8 +215,25 @@ class Inbox extends StatelessWidget {
               ),
             );
           }),
-        )
+        ),
       ],
-    ));
+    );
+  }
+
+  Widget buildText(String text) => Center(
+        child: Text(
+          text,
+          style: TextStyle(fontSize: 24, color: Colors.white),
+        ),
+      );
+  Widget DisplayUserInformation(BuildContext context, AsyncSnapshot snapshot) {
+    final authData = snapshot.data;
+    return Column(
+      children: <Widget>[
+        InboxHeader(
+          image: auth.getProfileImage(),
+        ),
+      ],
+    );
   }
 }

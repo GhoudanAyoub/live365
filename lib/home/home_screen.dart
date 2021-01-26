@@ -1,8 +1,9 @@
+import 'package:LIVE365/Inbox/inbox_page.dart';
+import 'package:LIVE365/Upload/CameraAccessScreen.dart';
+import 'package:LIVE365/components/cam_icon.dart';
+import 'package:LIVE365/profile/profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:live365/Inbox/inbox_page.dart';
-import 'package:live365/components/cam_icon.dart';
-import 'package:live365/profile/profile_screen.dart';
 
 import '../constants.dart';
 import 'components/body.dart';
@@ -38,13 +39,7 @@ class _State extends State<HomeScreen> {
                 color: white, fontSize: 20, fontWeight: FontWeight.bold),
           ),
         ),
-        Center(
-          child: Text(
-            "Upload",
-            style: TextStyle(
-                color: white, fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-        ),
+        CameraAccessScreen(),
         Inbox(),
         ProfileScreen(),
       ],

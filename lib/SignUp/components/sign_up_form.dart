@@ -1,9 +1,9 @@
+import 'package:LIVE365/components/custom_surfix_icon.dart';
+import 'package:LIVE365/components/default_button.dart';
+import 'package:LIVE365/components/form_error.dart';
+import 'package:LIVE365/firebaseService/FirebaseService.dart';
+import 'package:LIVE365/home/home_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:live365/components/custom_surfix_icon.dart';
-import 'package:live365/components/default_button.dart';
-import 'package:live365/components/form_error.dart';
-import 'package:live365/firebaseService/FirebaseService.dart';
-import 'package:live365/home/home_screen.dart';
 
 import '../../SizeConfig.dart';
 import '../../constants.dart';
@@ -16,6 +16,7 @@ class SignUpForm extends StatefulWidget {
 
 class _SignUpFormState extends State<SignUpForm> {
   final _formKey = GlobalKey<FormState>();
+  TextEditingController _namentoller = TextEditingController();
   TextEditingController _emailContoller = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
   String email;
@@ -44,6 +45,8 @@ class _SignUpFormState extends State<SignUpForm> {
       key: _formKey,
       child: Column(
         children: [
+          buildENameFormField(),
+          SizedBox(height: getProportionateScreenHeight(30)),
           buildEmailFormField(),
           SizedBox(height: getProportionateScreenHeight(30)),
           buildPasswordFormField(),
@@ -54,9 +57,12 @@ class _SignUpFormState extends State<SignUpForm> {
           DefaultButton(
             text: "Continue",
             press: () async {
+              final auth = FirebaseService();
               if (_formKey.currentState.validate()) {
-                dynamic result = await FirebaseService.create(
-                    _emailContoller.text, _passwordController.text, context);
+                dynamic result = await auth.createUserWithEmailAndPassword(
+                    _emailContoller.text,
+                    _passwordController.text,
+                    _namentoller.text);
                 if (result != null) {
                   Navigator.push(context,
                       MaterialPageRoute(builder: (context) => HomeScreen()));
@@ -171,6 +177,35 @@ class _SignUpFormState extends State<SignUpForm> {
         hintText: "Enter your email",
         floatingLabelBehavior: FloatingLabelBehavior.always,
         suffixIcon: CustomSurffixIcon(svgIcon: "assets/icons/Mail.svg"),
+      ),
+    );
+  }
+
+  TextFormField buildENameFormField() {
+    return TextFormField(
+      style: TextStyle(color: Colors.white),
+      controller: _namentoller,
+      keyboardType: TextInputType.name,
+      onChanged: (value) {
+        if (value.isNotEmpty) {
+          removeError(error: kNameNullError);
+        }
+        return null;
+      },
+      validator: (value) {
+        if (value.isEmpty) {
+          addError(error: kNameNullError);
+          return "";
+        }
+        return null;
+      },
+      decoration: InputDecoration(
+        labelStyle: textTheme().bodyText2,
+        hintStyle: textTheme().bodyText2,
+        labelText: "Name",
+        hintText: "Enter your name",
+        floatingLabelBehavior: FloatingLabelBehavior.always,
+        suffixIcon: CustomSurffixIcon(svgIcon: "assets/icons/User.svg"),
       ),
     );
   }

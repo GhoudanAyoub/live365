@@ -1,6 +1,6 @@
+import 'package:LIVE365/models/UserMessages.dart';
 import 'package:flutter/material.dart';
 import 'package:line_icons/line_icons.dart';
-import 'package:live365/models/UserMessages.dart';
 
 import '../../constants.dart';
 import 'chat_detail_page.dart';

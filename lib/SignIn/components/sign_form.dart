@@ -1,11 +1,11 @@
+import 'package:LIVE365/components/custom_surfix_icon.dart';
+import 'package:LIVE365/components/default_button.dart';
+import 'package:LIVE365/components/form_error.dart';
+import 'package:LIVE365/firebaseService/FirebaseService.dart';
+import 'package:LIVE365/forgot_password/forgot_password_screen.dart';
+import 'package:LIVE365/helper/keyboard.dart';
+import 'package:LIVE365/home/home_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:live365/components/custom_surfix_icon.dart';
-import 'package:live365/components/default_button.dart';
-import 'package:live365/components/form_error.dart';
-import 'package:live365/firebaseService/FirebaseService.dart';
-import 'package:live365/forgot_password/forgot_password_screen.dart';
-import 'package:live365/helper/keyboard.dart';
-import 'package:live365/home/home_screen.dart';
 
 import '../../SizeConfig.dart';
 import '../../constants.dart';
@@ -146,15 +146,15 @@ class _SignFormState extends State<SignForm> {
             press: () async {
               if (_formKey.currentState.validate()) {
                 KeyboardUtil.hideKeyboard(context);
+                final auth = FirebaseService();
 
-                dynamic result = await FirebaseService.sign(
-                    _emailContoller.text, _passwordController.text, context);
+                dynamic result = await auth.signInWithEmailAndPassword(
+                    _emailContoller.text, _passwordController.text);
                 if (result != null) {
-                  FirebaseService.checkClientData(context);
                   Navigator.push(context,
                       MaterialPageRoute(builder: (context) => HomeScreen()));
                   Scaffold.of(context)
-                      .showSnackBar(SnackBar(content: Text('your Logged IN')));
+                      .showSnackBar(SnackBar(content: Text('Welcome Back')));
                 }
               }
             },
