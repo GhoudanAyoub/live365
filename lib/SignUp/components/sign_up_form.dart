@@ -63,18 +63,92 @@ class _SignUpFormState extends State<SignUpForm> {
                     _emailContoller.text,
                     _passwordController.text,
                     _namentoller.text);
-                if (result != null) {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => HomeScreen()));
-                  Scaffold.of(context).showSnackBar(SnackBar(
-                      content: Text('Congratulation Your Account Created')));
+                switch (result) {
+                  case 1:
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => HomeScreen()));
+                    Scaffold.of(context).showSnackBar(SnackBar(
+                        content: Text('Congratulation Your Account Created')));
+                    break;
+                  case -1:
+                    emailExists();
+                    break;
                 }
+                if (result != null) {}
               }
             },
           ),
         ],
       ),
     );
+  }
+
+  void emailExists() {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return Dialog(
+            backgroundColor: Colors.transparent,
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(4.0),
+                color: Colors.grey[800],
+              ),
+              height: 190,
+              child: Column(
+                children: [
+                  Container(
+                    height: 140,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: <Widget>[
+                        Padding(
+                          padding: const EdgeInsets.only(left: 30, right: 30),
+                          child: Text(
+                            'This Email is on Another Account',
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(
+                              left: 30, right: 25, top: 15),
+                          child: Text(
+                            "You can log into the account associated with that email.",
+                            style: TextStyle(color: Colors.white60),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Divider(
+                    color: Colors.grey,
+                    thickness: 0,
+                    height: 0,
+                  ),
+                  SizedBox(
+                    width: double.infinity,
+                    child: FlatButton(
+                      onPressed: () {
+                        Navigator.popUntil(
+                            context, ModalRoute.withName('/HomeScreen'));
+                      },
+                      child: Text(
+                        'Log in to Existing Account',
+                        style: TextStyle(color: Colors.lightBlue[400]),
+                      ),
+                    ),
+                  )
+                ],
+              ),
+            ),
+          );
+        });
   }
 
   TextFormField buildConformPassFormField() {

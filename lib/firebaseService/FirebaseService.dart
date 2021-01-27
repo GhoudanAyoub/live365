@@ -14,7 +14,7 @@ class FirebaseService {
   static String Client_displayName = FirebaseAuth.instance.currentUser.email;
 
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
-  final _fireStore = FirebaseFirestore.instance;
+  static final _fireStore = FirebaseFirestore.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
 
   Stream<String> get onAuthStateChanged => _firebaseAuth.authStateChanges().map(
@@ -23,7 +23,7 @@ class FirebaseService {
 
   // USER DATA
   static Future addUsers(User user) async {
-    FirebaseFirestore.instance.collection("Users").add({
+    FirebaseFirestore.instance.collection("Users").doc(user.displayName).set({
       'id': user.uid,
       'name': user.displayName,
       'email': user.email,
@@ -105,17 +105,29 @@ class FirebaseService {
   }
 
   // Email & Password Sign Up
-  Future<String> createUserWithEmailAndPassword(
+  Future createUserWithEmailAndPassword(
       String email, String password, String name) async {
     final authResult = await _firebaseAuth.createUserWithEmailAndPassword(
       email: email,
       password: password,
     );
 
+    var userNameExists = await checkUsername(username: name);
+    if (!userNameExists) {
+      return -1;
+    }
     // Update the username
     await updateUserName(name, authResult.user);
     addUsers(authResult.user);
-    return authResult.user.uid;
+    return 1;
+  }
+
+  static Future<bool> checkUsername({username}) async {
+    final snapShot = await _fireStore.collection("users").doc(username).get();
+    if (snapShot.exists) {
+      return false;
+    }
+    return true;
   }
 
   Future updateUserName(String name, User currentUser) async {

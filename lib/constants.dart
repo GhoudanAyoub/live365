@@ -1,9 +1,6 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'SizeConfig.dart';
-
-final String CurrentClient = FirebaseAuth.instance.currentUser.uid;
 
 const appBgColor = Color(0xFF000000);
 const primary = Color(0xFFFC2D55);
