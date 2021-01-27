@@ -1,3 +1,4 @@
+import 'package:LIVE365/Settings/setting_screen.dart';
 import 'package:LIVE365/components/IconBtnWithCounter.dart';
 import 'package:LIVE365/components/profile_box_data.dart';
 import 'package:LIVE365/firebaseService/FirebaseService.dart';
@@ -26,7 +27,13 @@ class Body extends StatelessWidget {
                 IconBtnWithCounter(
                   svgSrc: "assets/icons/icons8-settings.svg",
                   numOfitem: 0,
-                  press: () {},
+                  press: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => SettingScreen(),
+                        ));
+                  },
                 ),
                 SizedBox(
                   width: getProportionateScreenWidth(260),
