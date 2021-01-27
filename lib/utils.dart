@@ -7,7 +7,7 @@ class Utils {
           T Function(Map<String, dynamic> json) fromJson) =>
       StreamTransformer<QuerySnapshot, List<T>>.fromHandlers(
         handleData: (QuerySnapshot data, EventSink<List<T>> sink) {
-          final snaps = data.map((doc) => doc.data()).toList();
+          final snaps = data.docs.map((doc) => doc.data()).toList();
           final MessageList = snaps.map((json) => fromJson(json)).toList();
 
           sink.add(MessageList);

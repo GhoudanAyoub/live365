@@ -15,8 +15,10 @@ class LiveCardInfoShow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      width: getProportionateScreenWidth(20),
+      alignment: Alignment.bottomRight,
       decoration: BoxDecoration(
-          color: Colors.grey.withOpacity(0.5),
+          color: Colors.grey.withOpacity(0.2),
           borderRadius: BorderRadius.circular(50.0)),
       child: Row(
         children: [
@@ -31,6 +33,7 @@ class LiveCardInfoShow extends StatelessWidget {
           ),
           SizedBox(width: getProportionateScreenWidth(5)),
           Column(
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
               SizedBox(height: getProportionateScreenHeight(10)),
               buildText(name),

@@ -9,6 +9,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import '../utils.dart';
 
 class FirebaseService {
+  static final liveCollection = 'liveuser';
   static final CollectionReference userCollection =
       FirebaseFirestore.instance.collection('LIVE365Users');
   static String Client_displayName = FirebaseAuth.instance.currentUser.email;
@@ -20,6 +21,27 @@ class FirebaseService {
   Stream<String> get onAuthStateChanged => _firebaseAuth.authStateChanges().map(
         (User user) => user?.uid,
       );
+
+  //USER LIVE
+  static void createLiveUser({name, id, time, image}) async {
+    final snapShot =
+        await _fireStore.collection(liveCollection).doc(name).get();
+    if (snapShot.exists) {
+      await _fireStore
+          .collection(liveCollection)
+          .doc(name)
+          .update({'name': name, 'channel': id, 'time': time, 'image': image});
+    } else {
+      await _fireStore
+          .collection(liveCollection)
+          .doc(name)
+          .set({'name': name, 'channel': id, 'time': time, 'image': image});
+    }
+  }
+
+  static void deleteUser({username}) async {
+    await _fireStore.collection('liveuser').doc(username).delete();
+  }
 
   // USER DATA
   static Future addUsers(User user) async {
@@ -94,6 +116,11 @@ class FirebaseService {
   // GET CURRENT USER
   Future getCurrentUser() async {
     return _firebaseAuth.currentUser;
+  }
+
+  // GET CURRENT USER name
+  String getCurrentUserName() {
+    return _firebaseAuth.currentUser.displayName;
   }
 
   getProfileImage() {

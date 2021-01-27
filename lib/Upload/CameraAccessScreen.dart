@@ -1,8 +1,18 @@
+import 'package:LIVE365/Upload/composents/host.dart';
+import 'package:LIVE365/firebaseService/FirebaseService.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '../constants.dart';
 
-class CameraAccessScreen extends StatelessWidget {
+class CameraAccessScreen extends StatefulWidget {
+  @override
+  _CameraAccessScreenState createState() => _CameraAccessScreenState();
+}
+
+class _CameraAccessScreenState extends State<CameraAccessScreen> {
+  final auth = FirebaseService();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,9 +41,11 @@ class CameraAccessScreen extends StatelessWidget {
                 color: GBottomNav,
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(50)),
-                onPressed: () {},
+                onPressed: () => onCreate(
+                    username: auth.getCurrentUserName(),
+                    image: auth.getProfileImage()),
                 child: Text(
-                  "Allow".toUpperCase(),
+                  "Start Live".toUpperCase(),
                   style: TextStyle(color: Colors.white),
                 ),
               ),
@@ -41,6 +53,30 @@ class CameraAccessScreen extends StatelessWidget {
           )
         ],
       ),
+    );
+  }
+
+  Future<void> onCreate({username, image}) async {
+    // await for camera and mic permissions before pushing video page
+    await _handleCameraAndMic();
+    var date = DateTime.now();
+    var currentTime = '${DateFormat("dd-MM-yyyy hh:mm:ss").format(date)}';
+    // push video page with given channel name
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CallPage(
+          channelName: username,
+          time: currentTime,
+          image: image,
+        ),
+      ),
+    );
+  }
+
+  Future<void> _handleCameraAndMic() async {
+    await PermissionHandler().requestPermissions(
+      [PermissionGroup.camera, PermissionGroup.microphone],
     );
   }
 }

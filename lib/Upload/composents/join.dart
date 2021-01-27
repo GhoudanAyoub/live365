@@ -1,18 +1,18 @@
 import 'dart:async';
 import 'dart:math' as math;
 
+import 'package:LIVE365/Upload/composents/Loading.dart';
+import 'package:LIVE365/firebaseService/FirebaseService.dart';
+import 'package:LIVE365/models/comments.dart';
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:agora_rtm/agora_rtm.dart';
-import 'package:agorartm/firebaseDB/firestoreDB.dart';
-import 'package:agorartm/models/message.dart';
-import 'package:agorartm/screen/HearAnim.dart';
-import 'package:agorartm/screen/Loading.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:wakelock/wakelock.dart';
 
 import '../../utils/setting.dart';
+import '../composents/HearAnim.dart';
 
 class JoinPage extends StatefulWidget {
   /// non-modifiable channel name of the page
@@ -37,6 +37,7 @@ class JoinPage extends StatefulWidget {
 }
 
 class _JoinPageState extends State<JoinPage> {
+  final auth = FirebaseService();
   bool loading = true;
   bool completed = false;
   static final _users = <int>[];
@@ -51,7 +52,7 @@ class _JoinPageState extends State<JoinPage> {
 
   final _channelMessageController = TextEditingController();
 
-  final _infoStrings = <Message>[];
+  final _infoStrings = <comments>[];
 
   AgoraRtmClient _client;
   AgoraRtmChannel _channel;
@@ -865,7 +866,7 @@ class _JoinPageState extends State<JoinPage> {
     _client =
         await AgoraRtmClient.createInstance('b42ce8d86225475c9558e478f1ed4e8e');
     _client.onMessageReceived = (AgoraRtmMessage message, String peerId) async {
-      var img = await FireStoreClass.getImage(username: peerId);
+      var img = await auth.getProfileImage();
       userMap.putIfAbsent(peerId, () => img);
       _log(user: peerId, info: message.text, type: 'message');
     };
@@ -893,7 +894,7 @@ class _JoinPageState extends State<JoinPage> {
   Future<AgoraRtmChannel> _createChannel(String name) async {
     AgoraRtmChannel channel = await _client.createChannel(name);
     channel.onMemberJoined = (AgoraRtmMember member) async {
-      var img = await FireStoreClass.getImage(username: member.userId);
+      var img = await auth.getProfileImage();
       userMap.putIfAbsent(member.userId, () => img);
 
       _channel.getMembers().then((value) {
@@ -916,7 +917,7 @@ class _JoinPageState extends State<JoinPage> {
     };
     channel.onMessageReceived =
         (AgoraRtmMessage message, AgoraRtmMember member) async {
-      var img = await FireStoreClass.getImage(username: member.userId);
+      var img = await auth.getProfileImage();
       userMap.putIfAbsent(member.userId, () => img);
       _log(user: member.userId, info: message.text, type: 'message');
     };
@@ -929,7 +930,7 @@ class _JoinPageState extends State<JoinPage> {
     } else if (type == 'message' && info.contains('E1m2I3l4i5E6')) {
       stopFunction();
     } else {
-      Message m;
+      comments m;
       var image = userMap[user];
       if (info.contains('d1a2v3i4s5h6')) {
         var mess = info.split(' ');
@@ -942,7 +943,7 @@ class _JoinPageState extends State<JoinPage> {
           });
         }
       } else {
-        m = new Message(message: info, type: type, user: user, image: image);
+        m = new comments(message: info, type: type, user: user, image: image);
         setState(() {
           _infoStrings.insert(0, m);
         });
