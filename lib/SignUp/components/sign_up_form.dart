@@ -16,6 +16,7 @@ class SignUpForm extends StatefulWidget {
 
 class _SignUpFormState extends State<SignUpForm> {
   final _formKey = GlobalKey<FormState>();
+  var submitted = false;
   TextEditingController _namentoller = TextEditingController();
   TextEditingController _emailContoller = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
@@ -29,6 +30,7 @@ class _SignUpFormState extends State<SignUpForm> {
     if (!errors.contains(error))
       setState(() {
         errors.add(error);
+        submitted = false;
       });
   }
 
@@ -56,8 +58,10 @@ class _SignUpFormState extends State<SignUpForm> {
           SizedBox(height: getProportionateScreenHeight(40)),
           DefaultButton(
             text: "Continue",
+            submitted: submitted,
             press: () async {
               final auth = FirebaseService();
+              submitted = true;
               if (_formKey.currentState.validate()) {
                 dynamic result = await auth.createUserWithEmailAndPassword(
                     _emailContoller.text,
@@ -72,6 +76,7 @@ class _SignUpFormState extends State<SignUpForm> {
                     break;
                   case -1:
                     emailExists();
+                    submitted = false;
                     break;
                 }
                 if (result != null) {}

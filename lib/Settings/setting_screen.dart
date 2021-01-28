@@ -9,52 +9,53 @@ class SettingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text("Settings"),
-        ),
-        body: new WillPopScope(
-          onWillPop: () async => false,
-          child: SingleChildScrollView(
-            padding: EdgeInsets.symmetric(vertical: 20),
-            child: Column(
-              children: [
-                ProfileMenu(
-                  text: "My Account",
-                  icon: "assets/icons/User Icon.svg",
-                  press: () => {},
-                ),
-                ProfileMenu(
-                  text: "Contact Us",
-                  icon: "assets/icons/Bell.svg",
-                  press: _launchURL4,
-                ),
-                ProfileMenu(
-                  text: "Rate Us",
-                  icon: "assets/icons/Question mark.svg",
-                  press: _launchURL3,
-                ),
-                ProfileMenu(
-                  text: "Terms and Conditions",
-                  icon: "assets/icons/Question mark.svg",
-                  press: _launchURL,
-                ),
-                ProfileMenu(
-                  text: "Privacy Policy for LIVE365",
-                  icon: "assets/icons/Question mark.svg",
-                  press: _launchURL2,
-                ),
-                ProfileMenu(
-                  text: "Log Out",
-                  icon: "assets/icons/Log out.svg",
-                  press: () async {
-                    FirebaseService().signOut();
-                    Navigator.pushNamed(context, SignInScreen.routeName);
-                  },
-                ),
-              ],
-            ),
+      appBar: AppBar(
+        title: Text("Settings"),
+      ),
+      body: Center(
+          child: new WillPopScope(
+        child: SingleChildScrollView(
+          padding: EdgeInsets.symmetric(vertical: 20),
+          child: Column(
+            children: [
+              ProfileMenu(
+                text: "My Account",
+                icon: "assets/icons/User Icon.svg",
+                press: () => {},
+              ),
+              ProfileMenu(
+                text: "Contact Us",
+                icon: "assets/icons/Bell.svg",
+                press: _launchURL4,
+              ),
+              ProfileMenu(
+                text: "Rate Us",
+                icon: "assets/icons/Question mark.svg",
+                press: _launchURL3,
+              ),
+              ProfileMenu(
+                text: "Terms and Conditions",
+                icon: "assets/icons/Question mark.svg",
+                press: _launchURL,
+              ),
+              ProfileMenu(
+                text: "Privacy Policy for LIVE365",
+                icon: "assets/icons/Question mark.svg",
+                press: _launchURL2,
+              ),
+              ProfileMenu(
+                text: "Log Out",
+                icon: "assets/icons/Log out.svg",
+                press: () async {
+                  FirebaseService().signOut();
+                  Navigator.pushNamed(context, SignInScreen.routeName);
+                },
+              ),
+            ],
           ),
-        ));
+        ),
+      )),
+    );
   }
 
   _launchURL() async {

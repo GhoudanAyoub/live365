@@ -53,6 +53,7 @@ class _ForgotPassFormState extends State<ForgotPassForm> {
   TextEditingController _emailContoller = TextEditingController();
   List<String> errors = [];
   String email;
+  var submitted = false;
   @override
   Widget build(BuildContext context) {
     return Form(
@@ -104,8 +105,10 @@ class _ForgotPassFormState extends State<ForgotPassForm> {
           SizedBox(height: SizeConfig.screenHeight * 0.1),
           DefaultButton(
             text: "Continue",
+            submitted: submitted,
             press: () {
               if (_formKey.currentState.validate()) {
+                submitted = true;
                 final auth = FirebaseService();
                 auth.sendPasswordResetEmail(_emailContoller.text);
                 Scaffold.of(context).showSnackBar(SnackBar(

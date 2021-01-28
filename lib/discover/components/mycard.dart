@@ -3,14 +3,14 @@ import 'package:flutter/material.dart';
 import '../../SizeConfig.dart';
 import '../../constants.dart';
 
-class UserCards extends StatelessWidget {
+class Mycard extends StatelessWidget {
   final String id;
   final String image;
   final String name;
   final String status;
   final int cardIndex;
 
-  const UserCards(
+  const Mycard(
       {Key key, this.id, this.image, this.name, this.status, this.cardIndex})
       : super(key: key);
 
@@ -83,7 +83,7 @@ class UserCards extends StatelessWidget {
                         width: getProportionateScreenWidth(157.5),
                         child: Center(
                           child: Text(
-                            'Request',
+                            'Account',
                             style: TextStyle(
                                 color: Colors.white, fontFamily: 'Quicksand'),
                           ),

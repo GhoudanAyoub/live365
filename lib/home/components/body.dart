@@ -115,9 +115,11 @@ class _BodyState extends State<Body> {
   }
 
   Widget buildText(String text) => Center(
-        child: Text(
-          text,
-          style: TextStyle(fontSize: 24, color: Colors.white),
+        child: Center(
+          child: Text(
+            text,
+            style: TextStyle(fontSize: 24, color: Colors.white),
+          ),
         ),
       );
   Future<void> onJoin(

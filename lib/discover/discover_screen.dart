@@ -1,12 +1,32 @@
-import 'package:LIVE365/models/UserMessages.dart';
+import 'package:LIVE365/discover/components/mycard.dart';
+import 'package:LIVE365/firebaseService/FirebaseService.dart';
+import 'package:LIVE365/models/users.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import 'file:///C:/Users/ayoub/StudioProjects/live365/lib/discover/components/user_cards.dart';
 
 import '../constants.dart';
+import '../utils.dart';
 
-class DiscoverScreen extends StatelessWidget {
+class DiscoverScreen extends StatefulWidget {
+  @override
+  _DiscoverScreenState createState() => _DiscoverScreenState();
+}
+
+class _DiscoverScreenState extends State<DiscoverScreen> {
   TextEditingController _searchController = new TextEditingController();
+  users user;
+  List<users> list = [];
+  final auth = FirebaseService();
+
+  @override
+  void initState() {
+    super.initState();
+    list = [];
+    DbChangeList();
+  }
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -15,7 +35,7 @@ class DiscoverScreen extends StatelessWidget {
         child: Column(
           children: [
             SizedBox(
-              height: 5,
+              height: 10,
             ),
             Padding(
               padding: EdgeInsets.only(left: 15.0, right: 15.0),
@@ -47,17 +67,25 @@ class DiscoverScreen extends StatelessWidget {
               shrinkWrap: true,
               children: <Widget>[
                 ...List.generate(
-                  userMessages.length,
+                  list.length,
                   (index) {
                     return index.isNegative
                         ? Center(child: CircularProgressIndicator())
-                        : UserCards(
-                            id: userMessages[index]["id"].toString(),
-                            name: userMessages[index]["name"],
-                            image: userMessages[index]["img"],
-                            cardIndex: 1,
-                            status: userMessages[index]["status"],
-                          );
+                        : list[index].name == auth.getCurrentUserName()
+                            ? Mycard(
+                                id: list[index].id,
+                                name: list[index].name,
+                                image: list[index].img,
+                                cardIndex: 1,
+                                status: 'online',
+                              )
+                            : UserCards(
+                                id: list[index].id,
+                                name: list[index].name,
+                                image: list[index].img,
+                                cardIndex: 1,
+                                status: 'Away',
+                              );
                   },
                 ),
               ],
@@ -67,4 +95,46 @@ class DiscoverScreen extends StatelessWidget {
       ),
     );
   }
+
+  void DbChangeList() {
+    FirebaseFirestore.instance
+        .collection("Users")
+        .orderBy("followers", descending: true)
+        .snapshots()
+        .transform(Utils.transformer(users.fromJson))
+        .listen((result) {
+      setState(() {
+        list = [];
+        user = new users(
+            id: auth.getCurrentUID(),
+            name: auth.getCurrentUserName(),
+            img: auth.getProfileImage());
+        list.add(user);
+      });
+      if (result == null) {
+        print(result.error);
+        return buildText('Something Went Wrong Try later');
+      } else {
+        final userList = result.data;
+        if (userList.isEmpty) {
+          return Center(
+            child: buildText('No User Found'),
+          );
+        } else {
+          for (users u in userList) {
+            setState(() {
+              list.add(u);
+            });
+          }
+        }
+      }
+    });
+  }
+
+  Widget buildText(String text) => Center(
+        child: Text(
+          text,
+          style: TextStyle(fontSize: 24, color: Colors.white),
+        ),
+      );
 }

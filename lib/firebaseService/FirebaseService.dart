@@ -49,9 +49,12 @@ class FirebaseService {
       'id': user.uid,
       'name': user.displayName,
       'email': user.email,
+      'img': FirebaseAuth.instance.currentUser.photoURL,
       'like': 0,
       'following': 0,
       'followers': 0,
+      'quot': '',
+      'subName': ''
     });
   }
 
@@ -60,6 +63,33 @@ class FirebaseService {
       .orderBy("followers", descending: true)
       .snapshots()
       .transform(Utils.transformer(users.fromJson));
+
+  //Friend data
+
+  static Future addFriendUsers(users user, String img) async {
+    await FirebaseFirestore.instance
+        .collection("Users")
+        .doc(FirebaseAuth.instance.currentUser.displayName)
+        .collection('Friend')
+        .doc()
+        .set({
+      'id': user.id,
+      'name': user.name,
+      'img': img,
+      'online': true,
+      'live': false,
+      'message': "",
+      'created_at': DateTime.now()
+    });
+  }
+
+  static Stream<List<MessageList>> getFriends() => FirebaseFirestore.instance
+      .collection("Users")
+      .doc(FirebaseAuth.instance.currentUser.displayName)
+      .collection('Friend')
+      .orderBy(MessageListField.lastMessageTime, descending: true)
+      .snapshots()
+      .transform(Utils.transformer(MessageList.fromJson));
 
   // MESSAGE DATA
   static Future addRandomUsers(users user, String img) async {
@@ -109,7 +139,7 @@ class FirebaseService {
       .transform(Utils.transformer(messages.fromJson));
 
   // GET UID
-  Future<String> getCurrentUID() async {
+  String getCurrentUID() {
     return _firebaseAuth.currentUser.uid;
   }
 

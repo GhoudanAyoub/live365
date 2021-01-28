@@ -21,6 +21,7 @@ class LiveCardInfoShow extends StatelessWidget {
           color: Colors.grey.withOpacity(0.2),
           borderRadius: BorderRadius.circular(50.0)),
       child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
           SizedBox(width: getProportionateScreenWidth(2)),
           Container(

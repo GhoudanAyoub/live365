@@ -24,10 +24,14 @@ class _SignFormState extends State<SignForm> {
   bool remember = false;
   final List<String> errors = [];
 
+  var submitted = false;
+  var buttonText = "Continue";
+
   void addError({String error}) {
     if (!errors.contains(error))
       setState(() {
         errors.add(error);
+        submitted = false;
       });
   }
 
@@ -142,9 +146,11 @@ class _SignFormState extends State<SignForm> {
           FormError(errors: errors),
           SizedBox(height: getProportionateScreenHeight(20)),
           DefaultButton(
-            text: "Continue",
+            text: buttonText,
+            submitted: submitted,
             press: () async {
               if (_formKey.currentState.validate()) {
+                submitted = true;
                 KeyboardUtil.hideKeyboard(context);
                 final auth = FirebaseService();
 
@@ -155,6 +161,11 @@ class _SignFormState extends State<SignForm> {
                       MaterialPageRoute(builder: (context) => HomeScreen()));
                   Scaffold.of(context)
                       .showSnackBar(SnackBar(content: Text('Welcome Back')));
+                } else {
+                  setState(() {
+                    buttonText = "Check Your Email/Password";
+                    submitted = false;
+                  });
                 }
               }
             },
