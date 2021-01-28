@@ -4,7 +4,9 @@ import 'dart:math' as math;
 import 'package:LIVE365/Upload/composents/Loading.dart';
 import 'package:LIVE365/firebaseService/FirebaseService.dart';
 import 'package:LIVE365/models/comments.dart';
-import 'package:agora_rtc_engine/agora_rtc_engine.dart';
+import 'package:agora_rtc_engine/rtc_engine.dart';
+import 'package:agora_rtc_engine/rtc_local_view.dart' as RtcLocalView;
+import 'package:agora_rtc_engine/rtc_remote_view.dart' as RtcRemoteView;
 import 'package:agora_rtm/agora_rtm.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +23,7 @@ class JoinPage extends StatefulWidget {
   final String username;
   final String hostImage;
   final String userImage;
+  final ClientRole role;
 
   /// Creates a call page with given channel name.
   const JoinPage(
@@ -29,7 +32,8 @@ class JoinPage extends StatefulWidget {
       this.channelId,
       this.username,
       this.hostImage,
-      this.userImage})
+      this.userImage,
+      this.role})
       : super(key: key);
 
   @override
@@ -65,14 +69,17 @@ class _JoinPageState extends State<JoinPage> {
   var len;
   bool accepted = false;
   bool stop = false;
+  RtcEngine _engine;
+  final _infoString = <String>[];
 
   @override
   void dispose() {
     // clear users
     _users.clear();
     // destroy sdk
-    AgoraRtcEngine.leaveChannel();
-    AgoraRtcEngine.destroy();
+    // destroy sdk
+    _engine.leaveChannel();
+    _engine.destroy();
     super.dispose();
   }
 
@@ -86,74 +93,75 @@ class _JoinPageState extends State<JoinPage> {
   }
 
   Future<void> initialize() async {
+    if (APP_ID.isEmpty) {
+      setState(() {
+        _infoString.add(
+          'APP_ID missing, please provide your APP_ID in settings.dart',
+        );
+        _infoString.add('Agora Engine is not starting');
+      });
+      return;
+    }
+
     await _initAgoraRtcEngine();
     _addAgoraEventHandlers();
-    await AgoraRtcEngine.enableWebSdkInteroperability(true);
-    await AgoraRtcEngine.setParameters(
-        '''{\"che.video.lowBitRateStreamParameter\":{\"width\":320,\"height\":180,\"frameRate\":15,\"bitRate\":140}}''');
-    await AgoraRtcEngine.joinChannel(null, widget.channelName, null, 0);
+    await _engine.enableWebSdkInteroperability(true);
+    VideoEncoderConfiguration configuration = VideoEncoderConfiguration();
+    configuration.dimensions = VideoDimensions(1920, 1080);
+    await _engine.setVideoEncoderConfiguration(configuration);
+    await _engine.joinChannel(Token, widget.channelName, null, 0);
   }
 
   /// Create agora sdk instance and initialize
   Future<void> _initAgoraRtcEngine() async {
-    await AgoraRtcEngine.create(APP_ID);
-    await AgoraRtcEngine.enableVideo();
-    //await AgoraRtcEngine.muteLocalAudioStream(true);
-    await AgoraRtcEngine.enableLocalAudio(false);
-    await AgoraRtcEngine.enableLocalVideo(!muted);
+    _engine = await RtcEngine.create(APP_ID);
+    await _engine.enableVideo();
+    await _engine.setChannelProfile(ChannelProfile.LiveBroadcasting);
+    await _engine.setClientRole(widget.role);
+    await _engine.enableLocalAudio(true);
   }
 
   /// Add agora event handlers
   void _addAgoraEventHandlers() {
-    AgoraRtcEngine.onJoinChannelSuccess = (
-      String channel,
-      int uid,
-      int elapsed,
-    ) {
-      Wakelock.enable();
-    };
-
-    AgoraRtcEngine.onUserJoined = (int uid, int elapsed) {
+    _engine.setEventHandler(RtcEngineEventHandler(error: (code) {
       setState(() {
-        _users.add(uid);
+        final info = 'onError: $code';
+        _infoString.add(info);
       });
-    };
-
-    AgoraRtcEngine.onUserOffline = (int uid, int reason) {
-      if (uid == widget.channelId) {
-        setState(() {
-          completed = true;
-          Future.delayed(const Duration(milliseconds: 1500), () async {
-            await Wakelock.disable();
-            Navigator.pop(context);
-          });
-        });
-      }
-      _users.remove(uid);
-    };
+    }, joinChannelSuccess: (channel, uid, elapsed) {
+      setState(() {
+        final info = 'onJoinChannel: $channel, uid: $uid';
+        _infoString.add(info);
+      });
+    }, leaveChannel: (stats) {
+      setState(() {
+        _infoString.add('onLeaveChannel');
+        _users.clear();
+      });
+    }, userJoined: (uid, elapsed) {
+      Wakelock.enable();
+    }, userOffline: (uid, elapsed) {
+      setState(() async {
+        final info = 'userOffline: $uid';
+        _infoString.add(info);
+        _users.remove(uid);
+        await Wakelock.disable();
+      });
+    }, firstRemoteVideoFrame: (uid, width, height, elapsed) {
+      setState(() {
+        final info = 'firstRemoteVideo: $uid ${width}x $height';
+        _infoString.add(info);
+      });
+    }));
   }
 
   /// Helper function to get list of native views
   List<Widget> _getRenderViews() {
-    final List<AgoraRenderWidget> list = [];
-    //user.add(widget.channelId);
-    _users.forEach((int uid) {
-      if (uid == widget.channelId) {
-        list.add(AgoraRenderWidget(uid));
-      }
-    });
-    if (accepted == true) {
-      list.add(AgoraRenderWidget(0, local: true, preview: true));
+    final List<StatefulWidget> list = [];
+    if (widget.role == ClientRole.Broadcaster) {
+      list.add(RtcLocalView.SurfaceView());
     }
-    if (list.isEmpty) {
-      setState(() {
-        loading = true;
-      });
-    } else {
-      setState(() {
-        loading = false;
-      });
-    }
+    _users.forEach((int uid) => list.add(RtcRemoteView.SurfaceView(uid: uid)));
 
     return list;
   }
@@ -371,8 +379,8 @@ class _JoinPageState extends State<JoinPage> {
     await Wakelock.disable();
     _leaveChannel();
     _logout();
-    AgoraRtcEngine.leaveChannel();
-    AgoraRtcEngine.destroy();
+    _engine.leaveChannel();
+    _engine.destroy();
     return true;
     // return true if the route to be popped
   }
@@ -414,7 +422,7 @@ class _JoinPageState extends State<JoinPage> {
               Container(
                 decoration: BoxDecoration(
                     gradient: LinearGradient(
-                      colors: <Color>[Colors.indigo, Colors.blue],
+                      colors: [Colors.indigo, Colors.blue],
                     ),
                     borderRadius: BorderRadius.all(Radius.circular(4.0))),
                 child: Padding(
@@ -634,8 +642,8 @@ class _JoinPageState extends State<JoinPage> {
                 elevation: 2.0,
                 color: Colors.blue[400],
                 onPressed: () async {
-                  await AgoraRtcEngine.enableLocalVideo(true);
-                  await AgoraRtcEngine.enableLocalAudio(true);
+                  await _engine.enableLocalVideo(true);
+                  await _engine.enableLocalAudio(true);
                   await _channel.sendMessage(
                       AgoraRtmMessage.fromText('k1r2i3s4t5i6e7 confirming'));
                   setState(() {
@@ -674,8 +682,8 @@ class _JoinPageState extends State<JoinPage> {
   }
 
   void stopFunction() async {
-    await AgoraRtcEngine.enableLocalVideo(!muted);
-    await AgoraRtcEngine.enableLocalAudio(!muted);
+    await _engine.enableLocalVideo(!muted);
+    await _engine.enableLocalAudio(!muted);
     setState(() {
       accepted = false;
     });

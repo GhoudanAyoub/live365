@@ -4,7 +4,9 @@ import 'dart:math' as math;
 import 'package:LIVE365/firebaseService/FirebaseService.dart';
 import 'package:LIVE365/home/home_screen.dart';
 import 'package:LIVE365/models/comments.dart';
-import 'package:agora_rtc_engine/agora_rtc_engine.dart';
+import 'package:agora_rtc_engine/rtc_engine.dart';
+import 'package:agora_rtc_engine/rtc_local_view.dart' as RtcLocalView;
+import 'package:agora_rtc_engine/rtc_remote_view.dart' as RtcRemoteView;
 import 'package:agora_rtm/agora_rtm.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
@@ -22,8 +24,10 @@ class CallPage extends StatefulWidget {
   final String image;
   final time;
 
+  final ClientRole role;
+
   /// Creates a call page with given channel name.
-  const CallPage({Key key, this.channelName, this.time, this.image})
+  const CallPage({Key key, this.channelName, this.time, this.image, this.role})
       : super(key: key);
 
   @override
@@ -61,14 +65,17 @@ class _CallPageState extends State<CallPage> {
   int _numConfetti = 5;
   int guestID = -1;
   bool waiting = false;
+  bool muted = false;
+  RtcEngine _engine;
+  final _infoString = <String>[];
 
   @override
   void dispose() {
     // clear users
     _users.clear();
     // destroy sdk
-    AgoraRtcEngine.leaveChannel();
-    AgoraRtcEngine.destroy();
+    _engine.leaveChannel();
+    _engine.destroy();
     super.dispose();
   }
 
@@ -82,72 +89,84 @@ class _CallPageState extends State<CallPage> {
   }
 
   Future<void> initialize() async {
+    if (APP_ID.isEmpty) {
+      setState(() {
+        _infoString.add(
+          'APP_ID missing, please provide your APP_ID in settings.dart',
+        );
+        _infoString.add('Agora Engine is not starting');
+      });
+      return;
+    }
+
     await _initAgoraRtcEngine();
     _addAgoraEventHandlers();
-    await AgoraRtcEngine.enableWebSdkInteroperability(true);
-    await AgoraRtcEngine.setParameters(
-        '''{\"che.video.lowBitRateStreamParameter\":{\"width\":320,\"height\":180,\"frameRate\":15,\"bitRate\":140}}''');
-    await AgoraRtcEngine.joinChannel(null, widget.channelName, null, 0);
+    await _engine.enableWebSdkInteroperability(true);
+    VideoEncoderConfiguration configuration = VideoEncoderConfiguration();
+    configuration.dimensions = VideoDimensions(1920, 1080);
+    await _engine.setVideoEncoderConfiguration(configuration);
+    await _engine.joinChannel(Token, widget.channelName, null, 0);
   }
 
   /// Create agora sdk instance and initialize
   Future<void> _initAgoraRtcEngine() async {
-    await AgoraRtcEngine.create(APP_ID);
-    await AgoraRtcEngine.enableVideo();
-    await AgoraRtcEngine.enableLocalAudio(true);
+    _engine = await RtcEngine.create(APP_ID);
+    await _engine.enableVideo();
+    await _engine.setChannelProfile(ChannelProfile.LiveBroadcasting);
+    await _engine.setClientRole(widget.role);
+    await _engine.enableLocalAudio(true);
   }
 
   /// Add agora event handlers
   void _addAgoraEventHandlers() {
-    AgoraRtcEngine.onJoinChannelSuccess = (
-      String channel,
-      int uid,
-      int elapsed,
-    ) async {
+    _engine.setEventHandler(RtcEngineEventHandler(error: (code) {
+      setState(() {
+        final info = 'onError: $code';
+        _infoString.add(info);
+      });
+    }, joinChannelSuccess: (channel, uid, elapsed) {
+      setState(() {
+        final info = 'onJoinChannel: $channel, uid: $uid';
+        _infoString.add(info);
+      });
+    }, leaveChannel: (stats) {
+      setState(() {
+        _infoString.add('onLeaveChannel');
+        _users.clear();
+      });
+    }, userJoined: (uid, elapsed) async {
+      setState(() {
+        final info = 'userJoined: $uid';
+        _infoString.add(info);
+        _users.add(uid);
+      });
       final documentId = widget.channelName;
       channelName = documentId;
       FirebaseService.createLiveUser(
           name: documentId, id: uid, time: widget.time, image: widget.image);
       await Wakelock.enable();
-    };
-
-    AgoraRtcEngine.onLeaveChannel = () {
+    }, userOffline: (uid, elapsed) {
       setState(() {
-        _users.clear();
-      });
-    };
-
-    AgoraRtcEngine.onUserJoined = (int uid, int elapsed) {
-      setState(() {
-        _users.add(uid);
-      });
-    };
-
-    AgoraRtcEngine.onUserOffline = (int uid, int reason) {
-      if (uid == guestID) {
-        setState(() {
-          accepted = false;
-        });
-      }
-      setState(() {
+        final info = 'userOffline: $uid';
+        _infoString.add(info);
         _users.remove(uid);
       });
-    };
+    }, firstRemoteVideoFrame: (uid, width, height, elapsed) {
+      setState(() {
+        final info = 'firstRemoteVideo: $uid ${width}x $height';
+        _infoString.add(info);
+      });
+    }));
   }
 
   /// Helper function to get list of native views
   List<Widget> _getRenderViews() {
-    final list = [
-      AgoraRenderWidget(0, local: true, preview: true),
-    ];
-    if (accepted == true) {
-      _users.forEach((int uid) {
-        if (uid != 0) {
-          guestID = uid;
-        }
-        list.add(AgoraRenderWidget(uid));
-      });
+    final List<StatefulWidget> list = [];
+    if (widget.role == ClientRole.Broadcaster) {
+      list.add(RtcLocalView.SurfaceView());
     }
+    _users.forEach((int uid) => list.add(RtcRemoteView.SurfaceView(uid: uid)));
+
     return list;
   }
 
@@ -364,7 +383,7 @@ class _CallPageState extends State<CallPage> {
   }
 
   void _onSwitchCamera() {
-    AgoraRtcEngine.switchCamera();
+    _engine.switchCamera();
   }
 
   Future<bool> _willPopCallback() async {
@@ -391,7 +410,7 @@ class _CallPageState extends State<CallPage> {
             Container(
               decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: <Color>[Colors.indigo, Colors.blue],
+                    colors: [Colors.indigo, Colors.blue],
                   ),
                   borderRadius: BorderRadius.all(Radius.circular(4.0))),
               child: Padding(
@@ -481,8 +500,8 @@ class _CallPageState extends State<CallPage> {
                         await Wakelock.disable();
                         _logout();
                         _leaveChannel();
-                        AgoraRtcEngine.leaveChannel();
-                        AgoraRtcEngine.destroy();
+                        _engine.leaveChannel();
+                        _engine.destroy();
                         FirebaseService.deleteUser(username: channelName);
                         Navigator.push(
                             context,
@@ -1037,20 +1056,6 @@ class _CallPageState extends State<CallPage> {
     }
   }
 
-  void _toggleSendChannelMessage() async {
-    String text = _channelMessageController.text;
-    if (text.isEmpty) {
-      return;
-    }
-    try {
-      _channelMessageController.clear();
-      await _channel.sendMessage(AgoraRtmMessage.fromText(text));
-      _log(user: widget.channelName, info: text, type: 'message');
-    } catch (errorCode) {
-      //_log(info: 'Send channel message error: ' + errorCode.toString(), type: 'error');
-    }
-  }
-
   void _sendMessage(text) async {
     if (text.isEmpty) {
       return;
@@ -1060,13 +1065,14 @@ class _CallPageState extends State<CallPage> {
       await _channel.sendMessage(AgoraRtmMessage.fromText(text));
       _log(user: widget.channelName, info: text, type: 'message');
     } catch (errorCode) {
-      // _log('Send channel message error: ' + errorCode.toString());
+      _log(
+          info: 'Send channel message error: ' + errorCode.toString(),
+          type: 'error');
     }
   }
 
   void _createClient() async {
-    _client =
-        await AgoraRtmClient.createInstance('b42ce8d86225475c9558e478f1ed4e8e');
+    _client = await AgoraRtmClient.createInstance(APP_ID);
     _client.onMessageReceived = (AgoraRtmMessage message, String peerId) {
       _log(user: peerId, info: message.text, type: 'message');
     };
@@ -1079,7 +1085,7 @@ class _CallPageState extends State<CallPage> {
         });
       }
     };
-    await _client.login(null, widget.channelName);
+    await _client.login(Token, widget.channelName);
     _channel = await _createChannel(widget.channelName);
     await _channel.join();
   }
@@ -1142,16 +1148,6 @@ class _CallPageState extends State<CallPage> {
       setState(() {
         waiting = false;
       });
-      /*FlutterToast.showToast(
-          msg: "Guest Declined",
-          toastLength: Toast.LENGTH_LONG,
-          gravity: ToastGravity.TOP,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.black,
-          textColor: Colors.white,
-          fontSize: 16.0
-      );*/
-
     } else {
       var image = userMap[user];
       comments m =
@@ -1160,6 +1156,56 @@ class _CallPageState extends State<CallPage> {
         _infoStrings.insert(0, m);
       });
     }
+  }
+
+  /// Info panel to show logs
+  Widget _panel() {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 48),
+      alignment: Alignment.bottomCenter,
+      child: FractionallySizedBox(
+        heightFactor: 0.5,
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 48),
+          child: ListView.builder(
+            reverse: true,
+            itemCount: _infoStrings.length,
+            itemBuilder: (BuildContext context, int index) {
+              if (_infoStrings.isEmpty) {
+                return null;
+              }
+              return Padding(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 3,
+                  horizontal: 10,
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Flexible(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 2,
+                          horizontal: 5,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.yellowAccent,
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                        child: Text(
+                          _infoString[index],
+                          style: TextStyle(color: Colors.blueGrey),
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              );
+            },
+          ),
+        ),
+      ),
+    );
   }
 }
 

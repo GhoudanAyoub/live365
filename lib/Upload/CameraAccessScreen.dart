@@ -1,5 +1,6 @@
 import 'package:LIVE365/Upload/composents/host.dart';
 import 'package:LIVE365/firebaseService/FirebaseService.dart';
+import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -33,7 +34,7 @@ class _CameraAccessScreenState extends State<CameraAccessScreen> {
                   BoxShadow(
                     offset: Offset(0, 13),
                     blurRadius: 25,
-                    color: Color(0xFF5666C2).withOpacity(0.17),
+                    color: GBottomNav.withOpacity(0.17),
                   ),
                 ],
               ),
@@ -66,9 +67,10 @@ class _CameraAccessScreenState extends State<CameraAccessScreen> {
       context,
       MaterialPageRoute(
         builder: (context) => CallPage(
-          channelName: username,
+          channelName: 'h',
           time: currentTime,
           image: image,
+          role: ClientRole.Broadcaster,
         ),
       ),
     );

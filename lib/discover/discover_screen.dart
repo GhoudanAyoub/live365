@@ -111,21 +111,16 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
             img: auth.getProfileImage());
         list.add(user);
       });
-      if (result == null) {
-        print(result.error);
-        return buildText('Something Went Wrong Try later');
+      final userList = result.data;
+      if (userList.isEmpty) {
+        return Center(
+          child: buildText('No User Found'),
+        );
       } else {
-        final userList = result.data;
-        if (userList.isEmpty) {
-          return Center(
-            child: buildText('No User Found'),
-          );
-        } else {
-          for (users u in userList) {
-            setState(() {
-              list.add(u);
-            });
-          }
+        for (users u in userList) {
+          setState(() {
+            list.add(u);
+          });
         }
       }
     });

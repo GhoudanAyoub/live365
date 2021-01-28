@@ -3,6 +3,7 @@ import 'package:LIVE365/components/picture_card.dart';
 import 'package:LIVE365/firebaseService/FirebaseService.dart';
 import 'package:LIVE365/home/components/header_home_page.dart';
 import 'package:LIVE365/models/live.dart';
+import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flare_flutter/flare_controls.dart';
 import 'package:flutter/material.dart';
@@ -94,21 +95,16 @@ class _BodyState extends State<Body> {
             image: auth.getProfileImage());
         list.add(liveUser);
       });
-      if (result.hasError) {
-        print(result.error);
-        return buildText('Something Went Wrong Try later');
+      final liveList = result.data;
+      if (liveList.isEmpty) {
+        return Center(
+          child: buildText('No Live Found'),
+        );
       } else {
-        final liveList = result.data;
-        if (liveList.isEmpty) {
-          return Center(
-            child: buildText('No Live Found'),
-          );
-        } else {
-          for (Live live in liveList) {
-            setState(() {
-              list.add(live);
-            });
-          }
+        for (Live live in liveList) {
+          setState(() {
+            list.add(live);
+          });
         }
       }
     });
@@ -136,6 +132,7 @@ class _BodyState extends State<Body> {
             username: username,
             hostImage: hostImage,
             userImage: userImage,
+            role: ClientRole.Audience,
           ),
         ),
       );
