@@ -67,7 +67,8 @@ class _CameraAccessScreenState extends State<CameraAccessScreen> {
       context,
       MaterialPageRoute(
         builder: (context) => CallPage(
-          channelName: 'h',
+          userName: auth.getCurrentUserName(),
+          channelName: 'Broadcaster',
           time: currentTime,
           image: image,
           role: ClientRole.Broadcaster,

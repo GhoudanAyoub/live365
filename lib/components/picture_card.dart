@@ -57,7 +57,7 @@ class PictureCard extends StatelessWidget {
                       child: LiveCardInfoShow(
                         image: image,
                         name: name,
-                        Views: Views,
+                        views: Views,
                         press: press,
                       ),
                     ),

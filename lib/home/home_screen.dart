@@ -58,11 +58,11 @@ class _State extends State<HomeScreen> {
       {"icon": "assets/icons/User Icon.svg", "label": "Me", "isIcon": true}
     ];
     return Container(
-      height: 80,
+      height: 65,
       width: double.infinity,
       decoration: BoxDecoration(color: GBottomNav),
       child: Padding(
-        padding: const EdgeInsets.only(left: 20, right: 20, top: 10),
+        padding: const EdgeInsets.only(left: 20, right: 20, bottom: 5),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,

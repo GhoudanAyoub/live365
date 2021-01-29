@@ -23,19 +23,27 @@ class FirebaseService {
       );
 
   //USER LIVE
-  static void createLiveUser({name, id, time, image}) async {
+  static void createLiveUser({username, name, id, time, image}) async {
     final snapShot =
         await _fireStore.collection(liveCollection).doc(name).get();
     if (snapShot.exists) {
-      await _fireStore
-          .collection(liveCollection)
-          .doc(name)
-          .update({'name': name, 'channel': id, 'time': time, 'image': image});
+      await _fireStore.collection(liveCollection).doc(name).update({
+        'username': username,
+        'channelName': name,
+        'channelId': id,
+        'time': time,
+        'hostImage': image,
+        'image': image
+      });
     } else {
-      await _fireStore
-          .collection(liveCollection)
-          .doc(name)
-          .set({'name': name, 'channel': id, 'time': time, 'image': image});
+      await _fireStore.collection(liveCollection).doc(name).set({
+        'username': username,
+        'channelName': name,
+        'channelId': id,
+        'time': time,
+        'hostImage': image,
+        'image': image
+      });
     }
   }
 
@@ -45,7 +53,7 @@ class FirebaseService {
 
   // USER DATA
   static Future addUsers(User user) async {
-    FirebaseFirestore.instance.collection("Users").doc(user.displayName).set({
+    FirebaseFirestore.instance.collection("Users").doc().set({
       'id': user.uid,
       'name': user.displayName,
       'email': user.email,

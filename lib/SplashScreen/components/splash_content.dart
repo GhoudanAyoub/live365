@@ -18,7 +18,7 @@ class SplashContent extends StatelessWidget {
         children: <Widget>[
           Spacer(),
           Text(
-            "Live 365",
+            "Live365",
             style: TextStyle(
               fontSize: getProportionateScreenWidth(36),
               color: GTextColorWhite,

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../SizeConfig.dart';
 import '../../constants.dart';
 
 class Mycard extends StatelessWidget {
@@ -69,28 +68,21 @@ class Mycard extends StatelessWidget {
             ),
             SizedBox(height: 15.0),
             Expanded(
-              child: IntrinsicHeight(
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Container(
-                        decoration: BoxDecoration(
-                          color: status == 'Away' ? Colors.grey : GBottomNav,
-                          borderRadius: BorderRadius.only(
-                              bottomLeft: Radius.circular(10.0),
-                              bottomRight: Radius.circular(10.0)),
-                        ),
-                        width: getProportionateScreenWidth(157.5),
-                        child: Center(
-                          child: Text(
-                            'Account',
-                            style: TextStyle(
-                                color: Colors.white, fontFamily: 'Quicksand'),
-                          ),
-                        ))
-                  ],
-                ),
-              ),
+              child: Container(
+                  decoration: BoxDecoration(
+                    color: status == 'Away' ? Colors.grey : GBottomNav,
+                    borderRadius: BorderRadius.only(
+                        bottomLeft: Radius.circular(10.0),
+                        bottomRight: Radius.circular(10.0)),
+                  ),
+                  width: double.infinity,
+                  child: Center(
+                    child: Text(
+                      'Account',
+                      style: TextStyle(
+                          color: Colors.white, fontFamily: 'Quicksand'),
+                    ),
+                  )),
             )
           ],
         ),

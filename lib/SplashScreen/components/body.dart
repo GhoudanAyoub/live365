@@ -13,7 +13,7 @@ class Body extends StatefulWidget {
 class _BodyState extends State<Body> {
   int currentPage = 0;
   List<Map<String, String>> splashData = [
-    {"text": "Welcome to Live 365. ", "image": ""},
+    {"text": "Welcome to Live365. ", "image": ""},
   ];
 
   @override

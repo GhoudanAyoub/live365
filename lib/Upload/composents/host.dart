@@ -20,6 +20,7 @@ import '../composents/HearAnim.dart';
 class CallPage extends StatefulWidget {
   /// non-modifiable channel name of the page
   final String channelName;
+  final String userName;
 
   final String image;
   final time;
@@ -27,7 +28,13 @@ class CallPage extends StatefulWidget {
   final ClientRole role;
 
   /// Creates a call page with given channel name.
-  const CallPage({Key key, this.channelName, this.time, this.image, this.role})
+  const CallPage(
+      {Key key,
+      this.userName,
+      this.channelName,
+      this.time,
+      this.image,
+      this.role})
       : super(key: key);
 
   @override
@@ -124,10 +131,19 @@ class _CallPageState extends State<CallPage> {
         final info = 'onError: $code';
         _infoString.add(info);
       });
-    }, joinChannelSuccess: (channel, uid, elapsed) {
-      setState(() {
+    }, joinChannelSuccess: (channel, uid, elapsed) async {
+      setState(() async {
         final info = 'onJoinChannel: $channel, uid: $uid';
         _infoString.add(info);
+        final documentId = widget.channelName;
+        channelName = documentId;
+        FirebaseService.createLiveUser(
+            username: widget.userName,
+            name: documentId,
+            id: uid,
+            time: widget.time,
+            image: widget.image);
+        await Wakelock.enable();
       });
     }, leaveChannel: (stats) {
       setState(() {
@@ -140,11 +156,6 @@ class _CallPageState extends State<CallPage> {
         _infoString.add(info);
         _users.add(uid);
       });
-      final documentId = widget.channelName;
-      channelName = documentId;
-      FirebaseService.createLiveUser(
-          name: documentId, id: uid, time: widget.time, image: widget.image);
-      await Wakelock.enable();
     }, userOffline: (uid, elapsed) {
       setState(() {
         final info = 'userOffline: $uid';
@@ -495,7 +506,7 @@ class _CallPageState extends State<CallPage> {
                         ),
                       ),
                       elevation: 2.0,
-                      color: Colors.blue,
+                      color: Colors.red,
                       onPressed: () async {
                         await Wakelock.disable();
                         _logout();
@@ -1156,56 +1167,6 @@ class _CallPageState extends State<CallPage> {
         _infoStrings.insert(0, m);
       });
     }
-  }
-
-  /// Info panel to show logs
-  Widget _panel() {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 48),
-      alignment: Alignment.bottomCenter,
-      child: FractionallySizedBox(
-        heightFactor: 0.5,
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 48),
-          child: ListView.builder(
-            reverse: true,
-            itemCount: _infoStrings.length,
-            itemBuilder: (BuildContext context, int index) {
-              if (_infoStrings.isEmpty) {
-                return null;
-              }
-              return Padding(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 3,
-                  horizontal: 10,
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Flexible(
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 2,
-                          horizontal: 5,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.yellowAccent,
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                        child: Text(
-                          _infoString[index],
-                          style: TextStyle(color: Colors.blueGrey),
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-              );
-            },
-          ),
-        ),
-      ),
-    );
   }
 }
 

@@ -27,14 +27,6 @@ class _BodyState extends State<Body> {
   @override
   void initState() {
     super.initState();
-    list = [];
-    liveUser = new Live(
-        username: auth.getCurrentUserName(),
-        me: true,
-        hostImage: auth.getProfileImage());
-    setState(() {
-      list.add(liveUser);
-    });
     dbChangeListen();
   }
 
@@ -58,14 +50,14 @@ class _BodyState extends State<Body> {
               (index) {
                 return index.isNegative
                     ? Center(child: CircularProgressIndicator())
-                    : list[index].me == true
-                        ? buildText("NO LIVE FOUND ")
+                    : list.isEmpty
+                        ? buildText("NO LIVE FOUND")
                         : PictureCard(
                             image: list[index].image,
                             name: list[index].username,
-                            Like: "4",
+                            Like: "0",
                             Comments: "0",
-                            Views: "1236",
+                            Views: "0",
                             press: () => onJoin(
                                 channelName: list[index].channelName,
                                 channelId: list[index].channelId,
@@ -87,35 +79,23 @@ class _BodyState extends State<Body> {
         .snapshots()
         .transform(Utils.transformer(Live.fromJson))
         .listen((result) {
-      setState(() {
-        list = [];
-        liveUser = new Live(
-            username: auth.getCurrentUserName(),
-            me: true,
-            image: auth.getProfileImage());
-        list.add(liveUser);
-      });
-      final liveList = result.data;
+      final liveList = result;
       if (liveList.isEmpty) {
         return Center(
           child: buildText('No Live Found'),
         );
       } else {
         for (Live live in liveList) {
-          setState(() {
-            list.add(live);
-          });
+          list.add(live);
         }
       }
     });
   }
 
   Widget buildText(String text) => Center(
-        child: Center(
-          child: Text(
-            text,
-            style: TextStyle(fontSize: 24, color: Colors.white),
-          ),
+        child: Text(
+          text,
+          style: TextStyle(fontSize: 24, color: Colors.white),
         ),
       );
   Future<void> onJoin(

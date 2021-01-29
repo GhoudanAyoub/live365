@@ -4,8 +4,6 @@ import 'package:LIVE365/models/users.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-import 'file:///C:/Users/ayoub/StudioProjects/live365/lib/discover/components/user_cards.dart';
-
 import '../constants.dart';
 import '../utils.dart';
 
@@ -19,7 +17,6 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
   users user;
   List<users> list = [];
   final auth = FirebaseService();
-
   @override
   void initState() {
     super.initState();
@@ -79,7 +76,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                                 cardIndex: 1,
                                 status: 'online',
                               )
-                            : UserCards(
+                            : Mycard(
                                 id: list[index].id,
                                 name: list[index].name,
                                 image: list[index].img,
@@ -103,24 +100,14 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
         .snapshots()
         .transform(Utils.transformer(users.fromJson))
         .listen((result) {
-      setState(() {
-        list = [];
-        user = new users(
-            id: auth.getCurrentUID(),
-            name: auth.getCurrentUserName(),
-            img: auth.getProfileImage());
-        list.add(user);
-      });
-      final userList = result.data;
-      if (userList.isEmpty) {
+      final liveList = result;
+      if (liveList.isEmpty) {
         return Center(
           child: buildText('No User Found'),
         );
       } else {
-        for (users u in userList) {
-          setState(() {
-            list.add(u);
-          });
+        for (users u in liveList) {
+          list.add(u);
         }
       }
     });

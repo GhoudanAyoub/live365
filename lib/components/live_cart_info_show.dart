@@ -5,11 +5,11 @@ import '../SizeConfig.dart';
 class LiveCardInfoShow extends StatelessWidget {
   final String image;
   final String name;
-  final String Views;
+  final String views;
   final Function press;
 
   const LiveCardInfoShow(
-      {Key key, this.image, this.name, this.Views, this.press})
+      {Key key, this.image, this.name, this.views, this.press})
       : super(key: key);
 
   @override
@@ -46,7 +46,7 @@ class LiveCardInfoShow extends StatelessWidget {
                     height: getProportionateScreenHeight(20),
                     width: getProportionateScreenWidth(20),
                   ),
-                  buildText(Views),
+                  buildText(views),
                 ],
               )
             ],
@@ -56,9 +56,9 @@ class LiveCardInfoShow extends StatelessWidget {
     );
   }
 
-  Widget buildText(String text) => Center(
+  Widget buildText(views) => Center(
         child: Text(
-          text,
+          views,
           style: TextStyle(color: Colors.white, fontSize: 12),
         ),
       );
