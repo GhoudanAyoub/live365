@@ -45,6 +45,10 @@ dependencies:
   flare_flutter:
   random_color: ^1.0.5
 
+  responsive_builder: ^0.2.0+2
+  marquee: ^1.5.2
+  camera: ^0.5.8+2
+  carousel_slider: ^2.2.1
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.1

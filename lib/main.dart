@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Live 365',
+      title: 'LIVE365',
       theme: theme(),
       initialRoute: SplashScreen.routeName,
       routes: routes,

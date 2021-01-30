@@ -19,7 +19,7 @@ class PictureCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+        padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 8.0),
         child: Center(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -27,13 +27,13 @@ class PictureCard extends StatelessWidget {
             children: <Widget>[
               ClipRRect(
                 borderRadius: BorderRadius.all(
-                  Radius.circular(10.0),
+                  Radius.circular(30.0),
                 ),
                 child: Stack(
                   children: <Widget>[
                     Container(
                       height: getProportionateScreenHeight(300),
-                      width: getProportionateScreenWidth(350),
+                      width: getProportionateScreenWidth(330),
                       child: CachedNetworkImage(
                         imageUrl: image,
                         fit: BoxFit.cover,

@@ -1,5 +1,6 @@
 import 'package:LIVE365/Inbox/inbox_page.dart';
 import 'package:LIVE365/Upload/CameraAccessScreen.dart';
+import 'package:LIVE365/camera/add_video_page.dart';
 import 'package:LIVE365/components/cam_icon.dart';
 import 'package:LIVE365/discover/discover_screen.dart';
 import 'package:LIVE365/firebaseService/FirebaseService.dart';
@@ -7,6 +8,7 @@ import 'package:LIVE365/profile/profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
+import '../SizeConfig.dart';
 import '../constants.dart';
 import 'components/body.dart';
 
@@ -39,7 +41,7 @@ class _State extends State<HomeScreen> {
   Widget getBody() {
     return IndexedStack(
       index: pageIndex,
-      children: <Widget>[
+      children: [
         Body(),
         DiscoverScreen(),
         CameraAccessScreen(),
@@ -66,7 +68,7 @@ class _State extends State<HomeScreen> {
       {"icon": "assets/icons/User Icon.svg", "label": "Me", "isIcon": true}
     ];
     return Container(
-      height: 80,
+      height: getProportionateScreenHeight(80),
       width: double.infinity,
       decoration: BoxDecoration(color: GBottomNav),
       child: Padding(
@@ -104,7 +106,12 @@ class _State extends State<HomeScreen> {
                   )
                 : InkWell(
                     onTap: () {
-                      selectedTab(index);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AddVideoPage(),
+                        ),
+                      );
                     },
                     child: CamIcon());
           }),
