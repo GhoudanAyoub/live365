@@ -1,3 +1,4 @@
+import 'package:LIVE365/firebaseService/FirebaseService.dart';
 import 'package:flutter/material.dart';
 
 import '../../constants.dart';
@@ -68,21 +69,37 @@ class Mycard extends StatelessWidget {
             ),
             SizedBox(height: 15.0),
             Expanded(
-              child: Container(
-                  decoration: BoxDecoration(
-                    color: status == 'Away' ? Colors.grey : GBottomNav,
-                    borderRadius: BorderRadius.only(
-                        bottomLeft: Radius.circular(10.0),
-                        bottomRight: Radius.circular(10.0)),
-                  ),
-                  width: double.infinity,
-                  child: Center(
-                    child: Text(
-                      'Account',
-                      style: TextStyle(
-                          color: Colors.white, fontFamily: 'Quicksand'),
-                    ),
-                  )),
+              child: name == FirebaseService().getCurrentUserName()
+                  ? Container(
+                      decoration: BoxDecoration(
+                        color: status == 'Away' ? Colors.grey : GBottomNav,
+                        borderRadius: BorderRadius.only(
+                            bottomLeft: Radius.circular(10.0),
+                            bottomRight: Radius.circular(10.0)),
+                      ),
+                      width: double.infinity,
+                      child: Center(
+                        child: Text(
+                          'Account',
+                          style: TextStyle(
+                              color: Colors.white, fontFamily: 'Quicksand'),
+                        ),
+                      ))
+                  : Container(
+                      decoration: BoxDecoration(
+                        color: status == 'Away' ? Colors.grey : GBottomNav,
+                        borderRadius: BorderRadius.only(
+                            bottomLeft: Radius.circular(10.0),
+                            bottomRight: Radius.circular(10.0)),
+                      ),
+                      width: double.infinity,
+                      child: Center(
+                        child: Text(
+                          'Request',
+                          style: TextStyle(
+                              color: Colors.white, fontFamily: 'Quicksand'),
+                        ),
+                      )),
             )
           ],
         ),

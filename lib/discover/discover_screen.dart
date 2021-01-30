@@ -68,21 +68,13 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                   (index) {
                     return index.isNegative
                         ? Center(child: CircularProgressIndicator())
-                        : list[index].name == auth.getCurrentUserName()
-                            ? Mycard(
-                                id: list[index].id,
-                                name: list[index].name,
-                                image: list[index].img,
-                                cardIndex: 1,
-                                status: 'online',
-                              )
-                            : Mycard(
-                                id: list[index].id,
-                                name: list[index].name,
-                                image: list[index].img,
-                                cardIndex: 1,
-                                status: 'Away',
-                              );
+                        : Mycard(
+                            id: list[index].id,
+                            name: list[index].name,
+                            image: list[index].img,
+                            cardIndex: 1,
+                            status: list[index].status,
+                          );
                   },
                 ),
               ],
@@ -96,7 +88,6 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
   void DbChangeList() {
     FirebaseFirestore.instance
         .collection("Users")
-        .orderBy("followers", descending: true)
         .snapshots()
         .transform(Utils.transformer(users.fromJson))
         .listen((result) {
@@ -107,7 +98,9 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
         );
       } else {
         for (users u in liveList) {
-          list.add(u);
+          setState(() {
+            list.add(u);
+          });
         }
       }
     });

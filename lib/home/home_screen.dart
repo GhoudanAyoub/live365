@@ -2,6 +2,7 @@ import 'package:LIVE365/Inbox/inbox_page.dart';
 import 'package:LIVE365/Upload/CameraAccessScreen.dart';
 import 'package:LIVE365/components/cam_icon.dart';
 import 'package:LIVE365/discover/discover_screen.dart';
+import 'package:LIVE365/firebaseService/FirebaseService.dart';
 import 'package:LIVE365/profile/profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -17,6 +18,13 @@ class HomeScreen extends StatefulWidget {
 
 class _State extends State<HomeScreen> {
   int pageIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    FirebaseService.changeStatus("Online");
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -58,7 +66,7 @@ class _State extends State<HomeScreen> {
       {"icon": "assets/icons/User Icon.svg", "label": "Me", "isIcon": true}
     ];
     return Container(
-      height: 65,
+      height: 80,
       width: double.infinity,
       decoration: BoxDecoration(color: GBottomNav),
       child: Padding(
@@ -80,6 +88,7 @@ class _State extends State<HomeScreen> {
                             bottomItems[index]['icon'],
                             color: white,
                           ),
+                          onPressed: () {},
                         ),
                         Center(
                           child: Text(
@@ -108,5 +117,16 @@ class _State extends State<HomeScreen> {
     setState(() {
       pageIndex = index;
     });
+  }
+
+  @override
+  void dispose() async {
+    FirebaseService.changeStatus("Away");
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    FirebaseService.changeStatus("Away");
   }
 }

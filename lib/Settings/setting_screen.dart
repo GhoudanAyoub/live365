@@ -13,7 +13,6 @@ class SettingScreen extends StatelessWidget {
         title: Text("Settings"),
       ),
       body: Center(
-          child: new WillPopScope(
         child: SingleChildScrollView(
           padding: EdgeInsets.symmetric(vertical: 20),
           child: Column(
@@ -54,7 +53,7 @@ class SettingScreen extends StatelessWidget {
             ],
           ),
         ),
-      )),
+      ),
     );
   }
 

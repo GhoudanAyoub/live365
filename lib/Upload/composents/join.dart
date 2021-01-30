@@ -118,7 +118,8 @@ class _JoinPageState extends State<JoinPage> {
     await _engine.enableVideo();
     await _engine.setChannelProfile(ChannelProfile.LiveBroadcasting);
     await _engine.setClientRole(widget.role);
-    await _engine.enableLocalAudio(true);
+    await _engine.enableLocalAudio(false);
+    await _engine.enableLocalVideo(!muted);
   }
 
   /// Add agora event handlers
@@ -139,13 +140,21 @@ class _JoinPageState extends State<JoinPage> {
         _users.clear();
       });
     }, userJoined: (uid, elapsed) {
-      Wakelock.enable();
+      setState(() {
+        _users.add(uid);
+      });
     }, userOffline: (uid, elapsed) {
       setState(() async {
         final info = 'userOffline: $uid';
-        _infoString.add(info);
+        if (uid == widget.channelId) {
+          _infoString.add(info);
+          completed = true;
+          Future.delayed(const Duration(milliseconds: 1500), () async {
+            await Wakelock.disable();
+            Navigator.pop(context);
+          });
+        }
         _users.remove(uid);
-        await Wakelock.disable();
       });
     }, firstRemoteVideoFrame: (uid, width, height, elapsed) {
       setState(() {
@@ -162,6 +171,19 @@ class _JoinPageState extends State<JoinPage> {
       list.add(RtcLocalView.SurfaceView());
     }
     _users.forEach((int uid) => list.add(RtcRemoteView.SurfaceView(uid: uid)));
+
+    if (accepted == true) {
+      list.add(RtcLocalView.SurfaceView());
+    }
+    if (list.isEmpty) {
+      setState(() {
+        loading = true;
+      });
+    } else {
+      setState(() {
+        loading = false;
+      });
+    }
 
     return list;
   }
@@ -499,7 +521,7 @@ class _JoinPageState extends State<JoinPage> {
               padding:
                   const EdgeInsets.symmetric(vertical: 5.0, horizontal: 8.0),
               child: Text(
-                '${widget.channelName}',
+                '${widget.username}',
                 style: TextStyle(
                     shadows: [
                       Shadow(
@@ -796,7 +818,7 @@ class _JoinPageState extends State<JoinPage> {
                 ),
                 shape: CircleBorder(),
                 elevation: 2.0,
-                color: Colors.blue[400],
+                color: Colors.grey[400].withOpacity(0.1),
                 padding: const EdgeInsets.all(12.0),
               ),
             ),

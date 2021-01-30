@@ -11,16 +11,9 @@ class PictureCard extends StatelessWidget {
   final String Views;
   final String Like;
   final String Comments;
-  final GestureTapCallback press;
 
   const PictureCard(
-      {Key key,
-      this.image,
-      this.name,
-      this.Views,
-      this.Like,
-      this.Comments,
-      this.press})
+      {Key key, this.image, this.name, this.Views, this.Like, this.Comments})
       : super(key: key);
 
   @override
@@ -55,11 +48,7 @@ class PictureCard extends StatelessWidget {
                       top: 10.0,
                       right: 10.0,
                       child: LiveCardInfoShow(
-                        image: image,
-                        name: name,
-                        views: Views,
-                        press: press,
-                      ),
+                          image: image, name: name, views: Views),
                     ),
                     Positioned(
                       left: 0.0,

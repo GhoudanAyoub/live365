@@ -27,6 +27,7 @@ class _BodyState extends State<Body> {
   @override
   void initState() {
     super.initState();
+    list = [];
     dbChangeListen();
   }
 
@@ -52,18 +53,21 @@ class _BodyState extends State<Body> {
                     ? Center(child: CircularProgressIndicator())
                     : list.isEmpty
                         ? buildText("NO LIVE FOUND")
-                        : PictureCard(
-                            image: list[index].image,
-                            name: list[index].username,
-                            Like: "0",
-                            Comments: "0",
-                            Views: "0",
-                            press: () => onJoin(
+                        : GestureDetector(
+                            onTap: () => onJoin(
                                 channelName: list[index].channelName,
                                 channelId: list[index].channelId,
                                 username: list[index].username,
                                 hostImage: list[index].hostImage,
-                                userImage: list[index].image));
+                                userImage: list[index].image),
+                            child: PictureCard(
+                              image: list[index].image,
+                              name: list[index].username,
+                              Like: "0",
+                              Comments: "0",
+                              Views: "0",
+                            ),
+                          );
               },
             ),
           ],
@@ -86,7 +90,9 @@ class _BodyState extends State<Body> {
         );
       } else {
         for (Live live in liveList) {
-          list.add(live);
+          setState(() {
+            list.add(live);
+          });
         }
       }
     });

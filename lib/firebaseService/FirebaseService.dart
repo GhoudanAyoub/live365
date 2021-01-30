@@ -1,5 +1,6 @@
 import 'package:LIVE365/models/message.dart';
 import 'package:LIVE365/models/message_list.dart';
+import 'package:LIVE365/models/post.dart';
 import 'package:LIVE365/models/users.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -21,6 +22,32 @@ class FirebaseService {
   Stream<String> get onAuthStateChanged => _firebaseAuth.authStateChanges().map(
         (User user) => user?.uid,
       );
+
+  static void changeStatus(String status) async {
+    var snapshots = FirebaseFirestore.instance.collection("Users").snapshots();
+    await snapshots.forEach((snapshot) async {
+      List<DocumentSnapshot> documents = snapshot.docs;
+      for (var document in documents) {
+        if (document.data()['email'] == FirebaseAuth.instance.currentUser.email)
+          await document.data().update("status", (value) => status);
+      }
+    });
+  }
+
+  //POST SYSTEM
+  static void createPost(String postUser, Post p) async {
+    await _fireStore
+        .collection('Post')
+        .doc(postUser)
+        .set({'name': p.name, 'email': p.email, 'img': p.img, 'desc': p.desc});
+  }
+
+  static Stream<List<Post>> getPostData(String postUser) =>
+      FirebaseFirestore.instance
+          .collection("Post")
+          .doc(postUser)
+          .snapshots()
+          .transform(Utils.transformer(Post.fromJson));
 
   //USER LIVE
   static void createLiveUser({username, name, id, time, image}) async {
@@ -62,6 +89,7 @@ class FirebaseService {
       'following': 0,
       'followers': 0,
       'quot': '',
+      'status': 'online',
       'subName': ''
     });
   }
@@ -73,7 +101,6 @@ class FirebaseService {
       .transform(Utils.transformer(users.fromJson));
 
   //Friend data
-
   static Future addFriendUsers(users user, String img) async {
     await FirebaseFirestore.instance
         .collection("Users")

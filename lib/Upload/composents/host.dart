@@ -137,12 +137,14 @@ class _CallPageState extends State<CallPage> {
         _infoString.add(info);
         final documentId = widget.channelName;
         channelName = documentId;
-        FirebaseService.createLiveUser(
-            username: widget.userName,
-            name: documentId,
-            id: uid,
-            time: widget.time,
-            image: widget.image);
+        if (widget.role == ClientRole.Broadcaster) {
+          FirebaseService.createLiveUser(
+              username: widget.userName,
+              name: documentId,
+              id: uid,
+              time: widget.time,
+              image: widget.image);
+        }
         await Wakelock.enable();
       });
     }, leaveChannel: (stats) {
@@ -157,6 +159,11 @@ class _CallPageState extends State<CallPage> {
         _users.add(uid);
       });
     }, userOffline: (uid, elapsed) {
+      if (uid == guestID) {
+        setState(() {
+          accepted = false;
+        });
+      }
       setState(() {
         final info = 'userOffline: $uid';
         _infoString.add(info);
@@ -176,8 +183,10 @@ class _CallPageState extends State<CallPage> {
     if (widget.role == ClientRole.Broadcaster) {
       list.add(RtcLocalView.SurfaceView());
     }
-    _users.forEach((int uid) => list.add(RtcRemoteView.SurfaceView(uid: uid)));
-
+    if (accepted == true) {
+      _users
+          .forEach((int uid) => list.add(RtcRemoteView.SurfaceView(uid: uid)));
+    }
     return list;
   }
 
@@ -965,6 +974,22 @@ class _CallPageState extends State<CallPage> {
               padding: const EdgeInsets.fromLTRB(4.0, 0, 0, 0),
               child: MaterialButton(
                 minWidth: 0,
+                onPressed: _toggleSendChannelMessage,
+                child: Icon(
+                  Icons.send,
+                  color: Colors.white,
+                  size: 20.0,
+                ),
+                shape: CircleBorder(),
+                elevation: 2.0,
+                color: Colors.grey[400].withOpacity(0.1),
+                padding: const EdgeInsets.all(12.0),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(4.0, 0, 0, 0),
+              child: MaterialButton(
+                minWidth: 0,
                 onPressed: _addGift,
                 child: Icon(
                   Icons.card_giftcard,
@@ -1067,6 +1092,20 @@ class _CallPageState extends State<CallPage> {
     }
   }
 
+  void _toggleSendChannelMessage() async {
+    String text = _channelMessageController.text;
+    if (text.isEmpty) {
+      return;
+    }
+    try {
+      _channelMessageController.clear();
+      await _channel.sendMessage(AgoraRtmMessage.fromText(text));
+      _log(user: widget.channelName, info: text, type: 'message');
+    } catch (errorCode) {
+      //_log(info: 'Send channel message error: ' + errorCode.toString(), type: 'error');
+    }
+  }
+
   void _sendMessage(text) async {
     if (text.isEmpty) {
       return;
@@ -1090,13 +1129,12 @@ class _CallPageState extends State<CallPage> {
     _client.onConnectionStateChanged = (int state, int reason) {
       if (state == 5) {
         _client.logout();
-        //_log('Logout.');
         setState(() {
           _isLogin = false;
         });
       }
     };
-    await _client.login(Token, widget.channelName);
+    await _client.login(null, widget.channelName);
     _channel = await _createChannel(widget.channelName);
     await _channel.join();
   }

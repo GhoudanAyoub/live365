@@ -6,17 +6,15 @@ class LiveCardInfoShow extends StatelessWidget {
   final String image;
   final String name;
   final String views;
-  final Function press;
 
-  const LiveCardInfoShow(
-      {Key key, this.image, this.name, this.views, this.press})
+  const LiveCardInfoShow({Key key, this.image, this.name, this.views})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Container(
       width: getProportionateScreenWidth(20),
-      alignment: Alignment.bottomRight,
+      alignment: Alignment.centerLeft,
       decoration: BoxDecoration(
           color: Colors.grey.withOpacity(0.2),
           borderRadius: BorderRadius.circular(50.0)),

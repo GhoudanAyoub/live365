@@ -5,6 +5,7 @@ class users {
   final String img;
   final String subName;
   final String quot;
+  final String status;
   final int like;
   final int following;
   final int followers;
@@ -18,7 +19,8 @@ class users {
       this.followers,
       this.img,
       this.subName,
-      this.quot});
+      this.quot,
+      this.status});
 
   static users fromJson(Map<String, dynamic> json) => users(
         id: json['id'],
@@ -29,6 +31,7 @@ class users {
         subName: json['subName'],
         quot: json['quot'],
         following: json['following'],
+        status: json['status'],
         followers: json['followers'],
       );
 
@@ -40,6 +43,7 @@ class users {
         'subName': subName,
         'quot': quot,
         'img': img,
+        'status': status,
         'following': following,
         'followers': followers,
       };

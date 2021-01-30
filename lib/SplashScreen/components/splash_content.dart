@@ -25,10 +25,6 @@ class SplashContent extends StatelessWidget {
               fontWeight: FontWeight.bold,
             ),
           ),
-          Text(
-            text,
-            textAlign: TextAlign.center,
-          ),
           Image.asset(
             "assets/images/logo.png",
             height: getProportionateScreenHeight(265),
