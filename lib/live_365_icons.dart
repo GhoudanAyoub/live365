@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class live365icons {
-  live365icons._();
+class Live365Icons {
+  Live365Icons._();
 
   static const _fontFamily = 'SFProDisplay_Black';
 

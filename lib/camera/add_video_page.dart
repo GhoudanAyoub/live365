@@ -1,8 +1,12 @@
+import 'dart:async';
+
 import 'package:LIVE365/Upload/CameraAccessScreen.dart';
 import 'package:LIVE365/models/FakeRepository.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:open_file/open_file.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:responsive_builder/responsive_builder.dart';
 
 class AddVideoPage extends StatefulWidget {
@@ -13,17 +17,35 @@ class AddVideoPage extends StatefulWidget {
 class _AddVideoPageState extends State<AddVideoPage> {
   CameraController _cameraController;
   List<CameraDescription> cameras;
+  int selectedCameraIndex;
 
   TextStyle _textStyle = TextStyle(color: Colors.white, fontSize: 11);
   Color color = Colors.white;
   int _pageSelectedIndex = 1;
   PageController controller = PageController();
   var currentPageValue = 0.0;
-
+  bool _isRecording = false;
+  String _filePath;
+  int time;
   @override
   void initState() {
-    _initializedCamera();
     super.initState();
+    time = 15;
+    availableCameras().then((availableCameras) {
+      cameras = availableCameras;
+
+      if (cameras.length > 0) {
+        setState(() {
+          selectedCameraIndex = 1;
+        });
+        _initCameraController(cameras[selectedCameraIndex]).then((void v) {});
+      } else {
+        print('No camera available');
+      }
+    }).catchError((err) {
+      print('Error :${err.code}Error message : ${err.message}');
+    });
+
     controller.addListener(() {
       setState(() {
         currentPageValue = controller.page;
@@ -31,16 +53,57 @@ class _AddVideoPageState extends State<AddVideoPage> {
     });
   }
 
-  _initializedCamera() async {
-    cameras = await availableCameras();
+  Future _initCameraController(CameraDescription cameraDescription) async {
+    if (_cameraController != null) {
+      await _cameraController.dispose();
+    }
     _cameraController =
-        CameraController(cameras[0], ResolutionPreset.ultraHigh);
-    _cameraController =
-        CameraController(cameras[1], ResolutionPreset.ultraHigh);
-    _cameraController.initialize().then((value) {
-      if (!mounted) return;
-      setState(() {});
+        CameraController(cameraDescription, ResolutionPreset.high);
+
+    _cameraController.addListener(() {
+      if (mounted) {
+        setState(() {});
+      }
+
+      if (_cameraController.value.hasError) {
+        print('Camera error ${_cameraController.value.errorDescription}');
+      }
     });
+
+    try {
+      await _cameraController.initialize();
+    } on CameraException catch (e) {
+      _showCameraException(e);
+    }
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  void _showCameraException(CameraException e) {
+    String errorText = 'Error:${e.code}\nError message : ${e.description}';
+    print(errorText);
+  }
+
+  void _onPlay() => OpenFile.open(_filePath);
+
+  Future<void> _onStop() async {
+    await _cameraController.stopVideoRecording();
+    setState(() => _isRecording = false);
+  }
+
+  Future<void> _onRecord() async {
+    var directory = await getTemporaryDirectory();
+    _filePath = directory.path + '/${DateTime.now()}.mp4';
+    _cameraController.startVideoRecording(_filePath);
+    setState(() => _isRecording = true);
+  }
+
+  void _onSwitchCamera() {
+    selectedCameraIndex =
+        selectedCameraIndex < cameras.length - 1 ? selectedCameraIndex + 1 : 0;
+    CameraDescription selectedCamera = cameras[selectedCameraIndex];
+    _initCameraController(selectedCamera);
   }
 
 /*
@@ -85,8 +148,8 @@ class _AddVideoPageState extends State<AddVideoPage> {
                       child: CameraPreview(_cameraController),
                     )
                   : Container(),
-              _topRowWidget(),
-              _rightColumnWidgets(),
+              _topRowWidget(context),
+              _rightColumnWidgets(context),
               _bottomRowWidget(),
               _bottomWidget(),
             ],
@@ -96,7 +159,7 @@ class _AddVideoPageState extends State<AddVideoPage> {
     );
   }
 
-  Widget _topRowWidget() {
+  Widget _topRowWidget(context) {
     return Positioned(
       top: 30,
       left: 10,
@@ -109,6 +172,7 @@ class _AddVideoPageState extends State<AddVideoPage> {
             InkWell(
                 onTap: () {
                   Navigator.pop(context);
+                  _cameraController.dispose();
                 },
                 child: Icon(
                   Icons.close,
@@ -129,15 +193,20 @@ class _AddVideoPageState extends State<AddVideoPage> {
               ),
             ),
             Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-                Icon(
-                  Icons.flip,
-                  color: color,
+                FlatButton.icon(
+                  onPressed: _onSwitchCamera,
+                  icon: Icon(
+                    CupertinoIcons.switch_camera,
+                    color: Colors.white,
+                    size: 24,
+                  ),
+                  label: Text(
+                    "flip",
+                    style: _textStyle,
+                  ),
                 ),
-                Text(
-                  "flip",
-                  style: _textStyle,
-                )
               ],
             ),
           ],
@@ -146,104 +215,25 @@ class _AddVideoPageState extends State<AddVideoPage> {
     );
   }
 
-  Widget _rightColumnWidgets() {
+  Widget _rightColumnWidgets(context) {
     return Positioned(
       right: 20,
-      top: 80,
+      top: 90,
       child: Column(
         children: <Widget>[
-          Container(
-            child: Column(
-              children: <Widget>[
-                Icon(
-                  Icons.shutter_speed,
-                  color: color,
-                ),
-                Text(
-                  "Speed",
-                  style: _textStyle,
-                )
-              ],
-            ),
-          ),
-          SizedBox(
-            height: 15,
-          ),
-          Container(
-            child: Column(
-              children: <Widget>[
-                Icon(
-                  Icons.filter_tilt_shift,
-                  color: color,
-                ),
-                Text(
-                  "filters",
-                  style: _textStyle,
-                )
-              ],
-            ),
-          ),
-          SizedBox(
-            height: 15,
-          ),
-          Container(
-            child: Column(
-              children: <Widget>[
-                Icon(
-                  Icons.color_lens,
-                  color: color,
-                ),
-                Text(
-                  "beautify",
-                  style: _textStyle,
-                )
-              ],
-            ),
-          ),
-          SizedBox(
-            height: 15,
-          ),
-          Container(
-            child: Column(
-              children: <Widget>[
-                Icon(
-                  Icons.av_timer,
-                  color: color,
-                ),
-                Text(
-                  "Timer",
-                  style: _textStyle,
-                )
-              ],
-            ),
-          ),
-          SizedBox(
-            height: 15,
-          ),
-          Container(
-            child: Column(
-              children: <Widget>[
-                Icon(
-                  Icons.flash_off,
-                  color: color,
-                ),
-                Text(
-                  "Flash",
-                  style: _textStyle,
-                )
-              ],
-            ),
-          ),
           SizedBox(
             height: 15,
           ),
           GestureDetector(
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => CameraAccessScreen(),
-              ),
-            ),
+            onTap: () => {
+              _cameraController.dispose(),
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => CameraAccessScreen(),
+                ),
+              )
+            },
             child: Container(
               child: Column(
                 children: <Widget>[
@@ -288,7 +278,7 @@ class _AddVideoPageState extends State<AddVideoPage> {
                       ]),
                       borderRadius: BorderRadius.all(Radius.circular(10)),
                     ),
-                    child: Image.asset("assets/effects.png"),
+                    child: Image.asset("assets/images/effects.png"),
                   ),
                   SizedBox(
                     height: 4,
@@ -300,23 +290,20 @@ class _AddVideoPageState extends State<AddVideoPage> {
                 ],
               ),
             ),
-            Container(
-              padding: EdgeInsets.all(10),
-              height: 80,
-              width: 80,
-              decoration: BoxDecoration(
-                color: Colors.red.withOpacity(.4),
-                borderRadius: BorderRadius.all(Radius.circular(50)),
-              ),
-              child: Container(
-                height: 60,
-                width: 60,
-                decoration: BoxDecoration(
-                  color: Colors.red,
-                  borderRadius: BorderRadius.all(Radius.circular(50)),
-                  border: Border.all(color: Colors.black, width: 1.5),
+            Column(
+              children: [
+                IconButton(
+                  icon: Icon(
+                    Icons.radio_button_checked,
+                    size: 40,
+                    color: Colors.red,
+                  ),
+                  onPressed: _isRecording ? null : _onRecord,
                 ),
-              ),
+                Center(
+                  child: Text(time.toString()),
+                )
+              ],
             ),
             Container(
               child: Column(
@@ -329,7 +316,7 @@ class _AddVideoPageState extends State<AddVideoPage> {
                       border: Border.all(color: Colors.white, width: 2),
                       borderRadius: BorderRadius.all(Radius.circular(10)),
                     ),
-                    child: Image.asset("assets/gallery.png"),
+                    child: Image.asset("assets/images/gallery.png"),
                   ),
                   SizedBox(
                     height: 4,
@@ -403,6 +390,7 @@ class _AddVideoPageState extends State<AddVideoPage> {
   @override
   void dispose() {
     _cameraController.dispose();
+    _isRecording ? _onStop : null;
     super.dispose();
   }
 }

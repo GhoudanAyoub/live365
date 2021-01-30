@@ -40,15 +40,12 @@ class FakeRepository {
     "https://www.yourteaminindia.com/blog/wp-content/uploads/2020/06/Online-Exclusive-3.jpg",
   ];
   static List<String> assetData = [
-    "assets/profile1.jpg",
-    "assets/profile2.jpeg",
-    "assets/profile3.jpeg",
-    "assets/profile1.jpg",
-    "assets/profile2.jpeg",
-    "assets/profile3.jpeg",
-    "assets/profile1.jpg",
-    "assets/profile2.jpeg",
-    "assets/profile3.jpeg",
+    "assets/images/image.jpg",
+    "assets/images/image.jpg",
+    "assets/images/image.jpg",
+    "assets/images/image.jpg",
+    "assets/images/image.jpg",
+    "assets/images/image.jpg",
   ];
   static List<String> imageData2 = [
     'https://images.unsplash.com/photo-1520342868574-5fa3804e551c?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=6ff92caffcdd63681a35134a6770ed3b&auto=format&fit=crop&w=1951&q=80',

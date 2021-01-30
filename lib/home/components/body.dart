@@ -1,11 +1,9 @@
 import 'dart:math' as math;
 
-import 'package:LIVE365/Upload/composents/join.dart';
 import 'package:LIVE365/components/picture_card.dart';
 import 'package:LIVE365/firebaseService/FirebaseService.dart';
 import 'package:LIVE365/models/FakeRepository.dart';
 import 'package:LIVE365/models/live.dart';
-import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flare_flutter/flare_controls.dart';
 import 'package:flutter/gestures.dart';
@@ -177,72 +175,7 @@ class _BodyState extends State<Body> with SingleTickerProviderStateMixin {
   homescreen() {
     if (liveButton) {
       _controller.pause();
-      return SingleChildScrollView(
-        child: Container(
-          padding: EdgeInsets.only(top: 80),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              /*Real One
-            ...List.generate(
-              list.length,
-                  (index) {
-                return index.isNegative
-                    ? Center(child: CircularProgressIndicator())
-                    : list.isEmpty
-                    ? buildText("NO LIVE FOUND")
-                    : PictureCard(
-                    image: list[index].image,
-                    name: list[index].username,
-                    Like: "0",
-                    Comments: "0",
-                    Views: "0",);
-              },
-            ),*/
-              ...List.generate(
-                5,
-                (index) {
-                  return index.isNegative
-                      ? Center(child: CircularProgressIndicator())
-                      : PictureCard(
-                          image: FakeRepository.videoList[0]["videos"]
-                              ["video$index"]["user_pic"],
-                          name: FakeRepository.videoList[0]["videos"]
-                              ["video$index"]["video_title"],
-                          Like: "0",
-                          Comments: "0",
-                          Views: "0",
-                        );
-                },
-              ),
-            ],
-          ),
-        ),
-      );
-      /*
-      *
-            ...List.generate(
-              list.length,
-              (index) {
-                return index.isNegative
-                    ? Center(child: CircularProgressIndicator())
-                    : list.isEmpty
-                        ? buildText("NO LIVE FOUND")
-                        : PictureCard(
-                            image: list[index].image,
-                            name: list[index].username,
-                            Like: "0",
-                            Comments: "0",
-                            Views: "0",
-                            press: () => onJoin(
-                                channelName: list[index].channelName,
-                                channelId: list[index].channelId,
-                                username: list[index].username,
-                                hostImage: list[index].hostImage,
-                                userImage: list[index].image));
-              },
-            ),
-      * */
+      return scrollFeed();
     }
     if (recommended) {
       _controller.pause();
@@ -574,24 +507,72 @@ class _BodyState extends State<Body> with SingleTickerProviderStateMixin {
         ),
       );
 
-  Future<void> onJoin(
-      {channelName, channelId, username, hostImage, userImage}) async {
-    // update input validation
-    if (channelName.isNotEmpty) {
-      // push video page with given channel name
-      await Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => JoinPage(
-            channelName: channelName,
-            channelId: channelId,
-            username: username,
-            hostImage: hostImage,
-            userImage: userImage,
-            role: ClientRole.Audience,
-          ),
+  Widget scrollFeed() {
+    return SingleChildScrollView(
+      child: Container(
+        padding: EdgeInsets.only(top: 80),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            /*Real One
+            ...List.generate(
+              list.length,
+                  (index) {
+                return index.isNegative
+                    ? Center(child: CircularProgressIndicator())
+                    : list.isEmpty
+                    ? buildText("NO LIVE FOUND")
+                    : PictureCard(
+                    image: list[index].image,
+                    name: list[index].username,
+                    Like: "0",
+                    Comments: "0",
+                    Views: "0",);
+              },
+            ),*/
+            ...List.generate(
+              5,
+              (index) {
+                return index.isNegative
+                    ? Center(child: CircularProgressIndicator())
+                    : PictureCard(
+                        image: FakeRepository.videoList[0]["videos"]
+                            ["video$index"]["user_pic"],
+                        name: FakeRepository.videoList[0]["videos"]
+                            ["video$index"]["video_title"],
+                        Like: "0",
+                        Comments: "0",
+                        Views: "0",
+                      );
+              },
+            ),
+          ],
         ),
-      );
-    }
+      ),
+    );
+    /*
+      *
+            ...List.generate(
+              list.length,
+              (index) {
+                return index.isNegative
+                    ? Center(child: CircularProgressIndicator())
+                    : list.isEmpty
+                        ? buildText("NO LIVE FOUND")
+                        : PictureCard(
+                            image: list[index].image,
+                            name: list[index].username,
+                            Like: "0",
+                            Comments: "0",
+                            Views: "0",
+                            press: () => onJoin(
+                                channelName: list[index].channelName,
+                                channelId: list[index].channelId,
+                                username: list[index].username,
+                                hostImage: list[index].hostImage,
+                                userImage: list[index].image));
+              },
+            ),
+      * */
   }
 }
