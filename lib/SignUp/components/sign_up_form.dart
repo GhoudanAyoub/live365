@@ -1,8 +1,8 @@
 import 'package:LIVE365/components/custom_surfix_icon.dart';
 import 'package:LIVE365/components/default_button.dart';
 import 'package:LIVE365/components/form_error.dart';
-import 'package:LIVE365/firebaseService/FirebaseService.dart';
 import 'package:LIVE365/home/home_screen.dart';
+import 'package:LIVE365/services/auth_service.dart';
 import 'package:flutter/material.dart';
 
 import '../../SizeConfig.dart';
@@ -17,13 +17,16 @@ class SignUpForm extends StatefulWidget {
 class _SignUpFormState extends State<SignUpForm> {
   final _formKey = GlobalKey<FormState>();
   var submitted = false;
+  GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   TextEditingController _namentoller = TextEditingController();
+  TextEditingController _countryContoller = TextEditingController();
   TextEditingController _emailContoller = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
   String email;
   String password;
   String conform_password;
   bool remember = false;
+  AuthService authService = AuthService();
   final List<String> errors = [];
 
   void addError({String error}) {
@@ -47,6 +50,8 @@ class _SignUpFormState extends State<SignUpForm> {
       key: _formKey,
       child: Column(
         children: [
+          buildECountryFormField(),
+          SizedBox(height: getProportionateScreenHeight(30)),
           buildENameFormField(),
           SizedBox(height: getProportionateScreenHeight(30)),
           buildEmailFormField(),
@@ -60,32 +65,38 @@ class _SignUpFormState extends State<SignUpForm> {
             text: "Continue",
             submitted: submitted,
             press: () async {
-              final auth = FirebaseService();
-              submitted = true;
-              if (_formKey.currentState.validate()) {
-                dynamic result = await auth.createUserWithEmailAndPassword(
-                    _emailContoller.text,
-                    _passwordController.text,
-                    _namentoller.text);
-                switch (result) {
-                  case 1:
+              try {
+                if (_formKey.currentState.validate()) {
+                  submitted = true;
+                  bool success = await authService.createUser(
+                    name: _namentoller.text,
+                    email: _emailContoller.text,
+                    password: _passwordController.text,
+                    country: _countryContoller.text,
+                  );
+                  print(success);
+                  if (success) {
                     Navigator.push(context,
                         MaterialPageRoute(builder: (context) => HomeScreen()));
                     Scaffold.of(context).showSnackBar(SnackBar(
                         content: Text('Congratulation Your Account Created')));
-                    break;
-                  case -1:
-                    emailExists();
-                    submitted = false;
-                    break;
+                  }
                 }
-                if (result != null) {}
+              } catch (e) {
+                print(e);
+                showInSnackBar(
+                    '${authService.handleFirebaseAuthError(e.toString())}');
               }
             },
           ),
         ],
       ),
     );
+  }
+
+  void showInSnackBar(String value) {
+    scaffoldKey.currentState.removeCurrentSnackBar();
+    scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(value)));
   }
 
   void emailExists() {
@@ -283,6 +294,35 @@ class _SignUpFormState extends State<SignUpForm> {
         hintStyle: textTheme().bodyText2,
         labelText: "Name",
         hintText: "Enter your name",
+        floatingLabelBehavior: FloatingLabelBehavior.always,
+        suffixIcon: CustomSurffixIcon(svgIcon: "assets/icons/User.svg"),
+      ),
+    );
+  }
+
+  TextFormField buildECountryFormField() {
+    return TextFormField(
+      style: TextStyle(color: Colors.white),
+      controller: _countryContoller,
+      keyboardType: TextInputType.name,
+      onChanged: (value) {
+        if (value.isNotEmpty) {
+          removeError(error: kCountryNullError);
+        }
+        return null;
+      },
+      validator: (value) {
+        if (value.isEmpty) {
+          addError(error: kCountryNullError);
+          return "";
+        }
+        return null;
+      },
+      decoration: InputDecoration(
+        labelStyle: textTheme().bodyText2,
+        hintStyle: textTheme().bodyText2,
+        labelText: "Country",
+        hintText: "Enter your Country",
         floatingLabelBehavior: FloatingLabelBehavior.always,
         suffixIcon: CustomSurffixIcon(svgIcon: "assets/icons/User.svg"),
       ),

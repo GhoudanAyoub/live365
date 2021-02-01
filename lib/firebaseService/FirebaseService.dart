@@ -1,7 +1,7 @@
 import 'package:LIVE365/models/message.dart';
 import 'package:LIVE365/models/message_list.dart';
-import 'package:LIVE365/models/post.dart';
 import 'package:LIVE365/models/users.dart';
+import 'package:LIVE365/utils/firebase.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -34,21 +34,6 @@ class FirebaseService {
     });
   }
 
-  //POST SYSTEM
-  static void createPost(String postUser, Post p) async {
-    await _fireStore
-        .collection('Post')
-        .doc(postUser)
-        .set({'name': p.name, 'email': p.email, 'img': p.img, 'desc': p.desc});
-  }
-
-  static Stream<List<Post>> getPostData(String postUser) =>
-      FirebaseFirestore.instance
-          .collection("Post")
-          .doc(postUser)
-          .snapshots()
-          .transform(Utils.transformer(Post.fromJson));
-
   //USER LIVE
   static void createLiveUser({username, name, id, time, image}) async {
     final snapShot =
@@ -80,17 +65,14 @@ class FirebaseService {
 
   // USER DATA
   static Future addUsers(User user) async {
-    FirebaseFirestore.instance.collection("Users").doc().set({
-      'id': user.uid,
-      'name': user.displayName,
+    usersRef.doc(user.uid).set({
+      'username': user.displayName,
       'email': user.email,
-      'img': FirebaseAuth.instance.currentUser.photoURL,
-      'like': 0,
-      'following': 0,
-      'followers': 0,
-      'quot': '',
-      'status': 'online',
-      'subName': ''
+      'time': Timestamp.now(),
+      'id': user.uid,
+      'bio': "",
+      'country': "",
+      'photoUrl': user.photoURL ?? ''
     });
   }
 
@@ -215,7 +197,7 @@ class FirebaseService {
   }
 
   static Future<bool> checkUsername({username}) async {
-    final snapShot = await _fireStore.collection("users").doc(username).get();
+    final snapShot = await usersRef.doc(username).get();
     if (snapShot.exists) {
       return false;
     }

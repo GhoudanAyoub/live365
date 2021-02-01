@@ -3,7 +3,7 @@ import 'dart:math' as math;
 
 import 'package:LIVE365/Upload/composents/Loading.dart';
 import 'package:LIVE365/firebaseService/FirebaseService.dart';
-import 'package:LIVE365/models/comments.dart';
+import 'package:LIVE365/models/live_comments.dart';
 import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:agora_rtc_engine/rtc_local_view.dart' as RtcLocalView;
 import 'package:agora_rtc_engine/rtc_remote_view.dart' as RtcRemoteView;

@@ -1,14 +1,54 @@
-class Post {
-  final String name;
-  final String email;
-  final String img;
-  final String desc;
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-  Post({this.name, this.email, this.img, this.desc});
+class PostModel {
+  String id;
+  String postId;
+  String ownerId;
+  String username;
+  String tags;
+  String description;
+  String mediaUrl;
+  // dynamic likesCount;
+  // dynamic likes;
+  Timestamp timestamp;
 
-  static Post fromJson(Map<String, dynamic> json) => Post(
-      name: json['name'],
-      email: json['email'],
-      img: json['img'],
-      desc: json['desc']);
+  PostModel({
+    this.id,
+    this.postId,
+    this.ownerId,
+    this.tags,
+    this.description,
+    this.mediaUrl,
+    // this.likesCount,
+    // this.likes,
+    this.username,
+    this.timestamp,
+  });
+  PostModel.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    postId = json['postId'];
+    ownerId = json['ownerId'];
+    tags = json['tags'];
+    username = json['username'];
+    description = json['description'];
+    mediaUrl = json['mediaUrl'];
+    // likesCount = json['likes'].length ?? 0;
+    // likes = json['likes'];
+    timestamp = json['timestamp'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = this.id;
+    data['postId'] = this.postId;
+    data['ownerId'] = this.ownerId;
+    data['tags'] = this.tags;
+    data['description'] = this.description;
+    data['mediaUrl'] = this.mediaUrl;
+    // data['likesCount']= this.likesCount;
+    // data['likes'] = this.likes;
+    data['timestamp'] = this.timestamp;
+    data['username'] = this.username;
+    return data;
+  }
 }

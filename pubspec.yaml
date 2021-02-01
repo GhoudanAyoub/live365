@@ -26,7 +26,7 @@ dependencies:
   firebase_core: "any"
   firebase_auth: "any"
   firebase_database: "any"
-  cloud_firestore: ^0.16.0
+  cloud_firestore: ^0.14.2
   firebase_storage: "any"
   google_sign_in: "^4.5.1"
   cached_network_image:
@@ -41,7 +41,7 @@ dependencies:
   url_launcher: ^5.7.10
   font_awesome_flutter: 8.8.1
   gradient_text: 1.0.2
-  image_picker: ^0.6.1
+  image_picker: ^0.6.7+12
   flare_flutter:
   random_color: ^1.0.5
 
@@ -70,6 +70,19 @@ dependencies:
   flutter_auth_buttons: ^0.5.0
   dio: ^3.0.10
   uuid: 2.0.1
+  timeago: ^2.0.28
+  like_button: ^1.0.4
+  image_cropper: ^1.3.1
+
+  flutter_icons: ^1.1.0
+  percent_indicator: ^2.1.8
+  fluttertoast: ^7.1.1
+  animations: ^1.1.2
+  image: ^2.1.18
+  google_fonts: ^1.1.1
+  provider: ^4.3.2+3
+  modal_progress_hud: ^0.1.3
+
 
 dev_dependencies:
   flutter_test:

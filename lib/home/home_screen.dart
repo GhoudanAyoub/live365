@@ -1,12 +1,15 @@
 import 'package:LIVE365/Inbox/inbox_page.dart';
 import 'package:LIVE365/Upload/CameraAccessScreen.dart';
+import 'package:LIVE365/Upload/composents/create_post.dart';
 import 'package:LIVE365/camera/add_video_page.dart';
 import 'package:LIVE365/components/cam_icon.dart';
 import 'package:LIVE365/discover/discover_screen.dart';
 import 'package:LIVE365/firebaseService/FirebaseService.dart';
 import 'package:LIVE365/profile/profile_screen.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '../SizeConfig.dart';
 import '../constants.dart';
@@ -106,12 +109,7 @@ class _State extends State<HomeScreen> {
                   )
                 : InkWell(
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => AddVideoPage(),
-                        ),
-                      );
+                      chooseUpload(context);
                     },
                     child: CamIcon());
           }),
@@ -126,6 +124,79 @@ class _State extends State<HomeScreen> {
     });
   }
 
+  chooseUpload(BuildContext context) {
+    return showModalBottomSheet(
+      backgroundColor: GBottomNav,
+      context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10.0),
+      ),
+      builder: (BuildContext context) {
+        return FractionallySizedBox(
+          heightFactor: .4,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(height: 10.0),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                child: Center(
+                  child: Text(
+                    'SELECT',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold, color: Colors.white),
+                  ),
+                ),
+              ),
+              Divider(
+                color: Colors.white,
+              ),
+              ListTile(
+                leading: Icon(
+                  CupertinoIcons.video_camera,
+                  color: Colors.white,
+                  size: 25.0,
+                ),
+                title: Text('Go Live',
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold, color: Colors.white)),
+                onTap: () async {
+                  ///Feature coming soon
+                  ///
+                  await _handleCameraAndMic();
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AddVideoPage(),
+                    ),
+                  );
+                },
+              ),
+              ListTile(
+                leading: Icon(
+                  CupertinoIcons.camera_on_rectangle,
+                  color: Colors.white,
+                  size: 25.0,
+                ),
+                title: Text('Make a Post',
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold, color: Colors.white)),
+                onTap: () {
+                  Navigator.pop(context);
+
+                  Navigator.of(context)
+                      .push(MaterialPageRoute(builder: (_) => CreatePost()));
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   void dispose() async {
     FirebaseService.changeStatus("Away");
@@ -135,5 +206,11 @@ class _State extends State<HomeScreen> {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     FirebaseService.changeStatus("Away");
+  }
+
+  Future<void> _handleCameraAndMic() async {
+    await PermissionHandler().requestPermissions(
+      [PermissionGroup.camera, PermissionGroup.microphone],
+    );
   }
 }

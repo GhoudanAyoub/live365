@@ -1,11 +1,19 @@
 import 'package:LIVE365/SignIn/sign_in_screen.dart';
 import 'package:LIVE365/firebaseService/FirebaseService.dart';
+import 'package:LIVE365/profile/components/edit_profile.dart';
 import 'package:LIVE365/profile/components/profile_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class SettingScreen extends StatelessWidget {
-  static String routeName = "/setting";
+class SettingScreen extends StatefulWidget {
+  final users;
+
+  const SettingScreen({Key key, this.users}) : super(key: key);
+  @override
+  _SettingScreenState createState() => _SettingScreenState();
+}
+
+class _SettingScreenState extends State<SettingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,7 +28,15 @@ class SettingScreen extends StatelessWidget {
               ProfileMenu(
                 text: "My Account",
                 icon: "assets/icons/User Icon.svg",
-                press: () => {},
+                press: () => {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => EditProfile(
+                        user: widget.users,
+                      ),
+                    ),
+                  )
+                },
               ),
               ProfileMenu(
                 text: "Contact Us",

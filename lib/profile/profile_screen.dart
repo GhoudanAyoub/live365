@@ -1,3 +1,4 @@
+import 'package:LIVE365/utils/firebase.dart';
 import 'package:flutter/material.dart';
 
 import 'components/body.dart';
@@ -5,8 +6,6 @@ import 'components/body.dart';
 class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Body(),
-    );
+    return Body(profileId: firebaseAuth.currentUser.uid);
   }
 }
