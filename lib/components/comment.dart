@@ -229,11 +229,10 @@ class _CommentsState extends State<Comments> {
       leading: buildUserDp(),
       title: Text(
         widget.post.username,
-        style: TextStyle(fontWeight: FontWeight.bold),
+        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
       ),
-      subtitle: Text(
-        widget.post.tags,
-      ),
+      subtitle: Text(widget.post.tags,
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.normal)),
     );
   }
 
@@ -375,6 +374,7 @@ class _CommentsState extends State<Comments> {
       child: Text(
         '$count likes',
         style: TextStyle(
+          color: Colors.white,
           fontWeight: FontWeight.bold,
           fontSize: 10.0,
         ),

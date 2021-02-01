@@ -21,7 +21,7 @@ class _CameraAccessScreenState extends State<CameraAccessScreen> {
         fit: StackFit.expand,
         children: [
           Image.asset(
-            "assets/images/21_No Camera Access.png",
+            "assets/images/golive.png",
             fit: BoxFit.cover,
           ),
           Positioned(
@@ -46,7 +46,7 @@ class _CameraAccessScreenState extends State<CameraAccessScreen> {
                     username: auth.getCurrentUserName(),
                     image: auth.getProfileImage()),
                 child: Text(
-                  "Start Live".toUpperCase(),
+                  "Ready".toUpperCase(),
                   style: TextStyle(color: Colors.white),
                 ),
               ),

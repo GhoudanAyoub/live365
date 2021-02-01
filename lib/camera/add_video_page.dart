@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:LIVE365/Upload/CameraAccessScreen.dart';
 import 'package:LIVE365/models/FakeRepository.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/cupertino.dart';
@@ -149,7 +148,6 @@ class _AddVideoPageState extends State<AddVideoPage> {
                     )
                   : Container(),
               _topRowWidget(context),
-              _rightColumnWidgets(context),
               _bottomRowWidget(),
               _bottomWidget(),
             ],
@@ -211,45 +209,6 @@ class _AddVideoPageState extends State<AddVideoPage> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _rightColumnWidgets(context) {
-    return Positioned(
-      right: 20,
-      top: 90,
-      child: Column(
-        children: <Widget>[
-          SizedBox(
-            height: 15,
-          ),
-          GestureDetector(
-            onTap: () => {
-              _cameraController.dispose(),
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => CameraAccessScreen(),
-                ),
-              )
-            },
-            child: Container(
-              child: Column(
-                children: <Widget>[
-                  Icon(
-                    Icons.live_tv,
-                    color: color,
-                  ),
-                  Text(
-                    "Live",
-                    style: _textStyle,
-                  )
-                ],
-              ),
-            ),
-          )
-        ],
       ),
     );
   }

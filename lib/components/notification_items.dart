@@ -1,4 +1,3 @@
-import 'package:LIVE365/components/view_notification_details.dart';
 import 'package:LIVE365/models/notification.dart';
 import 'package:LIVE365/utils/firebase.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -30,11 +29,13 @@ class _ActivityItemsState extends State<ActivityItems> {
             delete();
           },
           child: ListTile(
+            /*
             onTap: () {
+
               Navigator.of(context).push(MaterialPageRoute(
                 builder: (_) => ViewActivityDetails(activity: widget.activity),
               ));
-            },
+            },*/
             leading: CircleAvatar(
               radius: 25.0,
               backgroundImage: NetworkImage(widget.activity.userDp),
@@ -49,19 +50,26 @@ class _ActivityItemsState extends State<ActivityItems> {
                 children: [
                   TextSpan(
                     text: '${widget.activity.username} ',
-                    style:
-                        TextStyle(fontWeight: FontWeight.bold, fontSize: 10.0),
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: 10.0),
                   ),
                   TextSpan(
                     text: buildTextConfiguration(),
-                    style: TextStyle(fontSize: 10.0),
+                    style: TextStyle(
+                      fontSize: 10.0,
+                      color: Colors.white,
+                    ),
                   ),
                 ],
               ),
             ),
-            subtitle: Text(
-              timeago.format(widget.activity.timestamp.toDate()),
-            ),
+            subtitle: Text(timeago.format(widget.activity.timestamp.toDate()),
+                style: TextStyle(
+                    fontWeight: FontWeight.normal,
+                    color: Colors.white,
+                    fontSize: 8.0)),
             trailing: previewConfiguration(),
           ),
         ),

@@ -97,7 +97,7 @@ class _BodyState extends State<Body> with SingleTickerProviderStateMixin {
                                     fontFamily: "SFProDisplay-Regular",
                                     fontSize: 16))),
                     SizedBox(
-                      width: 8,
+                      width: getProportionateScreenWidth(5),
                     ),
                     Text(
                       ".",
@@ -109,7 +109,7 @@ class _BodyState extends State<Body> with SingleTickerProviderStateMixin {
                       ),
                     ),
                     SizedBox(
-                      width: 8,
+                      width: getProportionateScreenWidth(5),
                     ),
                     FlatButton(
                         onPressed: () {
@@ -125,13 +125,13 @@ class _BodyState extends State<Body> with SingleTickerProviderStateMixin {
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
                                     fontFamily: "SFProDisplay-Regular",
-                                    fontSize: 18)
+                                    fontSize: 16)
                                 : TextStyle(
                                     color: Colors.grey,
                                     fontFamily: "SFProDisplay-Regular",
                                     fontSize: 16))),
                     SizedBox(
-                      width: 8,
+                      width: getProportionateScreenWidth(5),
                     ),
                     Text(
                       ".",
@@ -143,7 +143,7 @@ class _BodyState extends State<Body> with SingleTickerProviderStateMixin {
                       ),
                     ),
                     SizedBox(
-                      width: 8,
+                      width: getProportionateScreenWidth(5),
                     ),
                     FlatButton(
                         onPressed: () {

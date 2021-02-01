@@ -137,18 +137,6 @@ class _EditProfileState extends State<EditProfile> {
               },
             ),
             SizedBox(height: 10.0),
-            TextFormBuilder(
-              initialValue: widget.user.country,
-              enabled: !viewModel.loading,
-              prefix: Feather.map_pin,
-              hintText: "Country",
-              textInputAction: TextInputAction.next,
-              validateFunction: Validations.validateName,
-              onSaved: (String val) {
-                viewModel.setCountry(val);
-              },
-            ),
-            SizedBox(height: 20.0),
             Text(
               "Bio",
               style: TextStyle(fontWeight: FontWeight.bold),

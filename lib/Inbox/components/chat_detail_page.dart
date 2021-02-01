@@ -271,9 +271,9 @@ class ChatDetailPage extends StatelessWidget {
                               FirebaseAuth.instance.currentUser.uid)
                             buildText('Say Hi..');
                           return ChatBubble(
-                              isMe: true,
-                              message: message.message,
-                              profileImg: message.urlAvatar);
+                            isMe: true,
+                            message: message.message,
+                          );
                         }),
                       );
                 /*ListView.builder(

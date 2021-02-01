@@ -44,7 +44,7 @@ dependencies:
   image_picker: ^0.6.7+12
   flare_flutter:
   random_color: ^1.0.5
-
+  ff_navigation_bar: ^0.1.5
   responsive_builder: ^0.2.0+2
   marquee: ^1.5.2
   camera: ^0.5.8+2

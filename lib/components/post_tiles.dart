@@ -56,8 +56,9 @@ class _PostTileState extends State<PostTile> {
         borderRadius: BorderRadius.circular(10.0),
       ),
       builder: (BuildContext context) {
-        return Scaffold(
-          body: Center(
+        return FractionallySizedBox(
+          heightFactor: 1.3,
+          child: Center(
             child: Column(
               children: [
                 buildImage(context),

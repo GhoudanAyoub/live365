@@ -1,75 +1,124 @@
+import 'package:LIVE365/components/text_time.dart';
+import 'package:LIVE365/models/enum/message_type.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
-import '../../constants.dart';
-
-class ChatBubble extends StatelessWidget {
-  final bool isMe;
-  final String profileImg;
+class ChatBubble extends StatefulWidget {
   final String message;
-  const ChatBubble({
-    Key key,
-    this.isMe,
-    this.profileImg,
-    this.message,
-  }) : super(key: key);
+  final MessageType type;
+  final Timestamp time;
+  final bool isMe;
+
+  ChatBubble({
+    @required this.message,
+    @required this.time,
+    @required this.isMe,
+    @required this.type,
+  });
+
+  @override
+  _ChatBubbleState createState() => _ChatBubbleState();
+}
+
+class _ChatBubbleState extends State<ChatBubble> {
+  Color chatBubbleColor() {
+    if (widget.isMe) {
+      return Theme.of(context).accentColor;
+    } else {
+      if (Theme.of(context).brightness == Brightness.dark) {
+        return Colors.grey[800];
+      } else {
+        return Colors.grey[200];
+      }
+    }
+  }
+
+  Color chatBubbleReplyColor() {
+    if (Theme.of(context).brightness == Brightness.dark) {
+      return Colors.grey[600];
+    } else {
+      return Colors.grey[50];
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    if (isMe) {
-      return Padding(
-        padding: const EdgeInsets.all(1.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: <Widget>[
-            Flexible(
-              child: Container(
-                decoration: BoxDecoration(
-                    color: deepOrange, borderRadius: getMessageType(isMe, 2)),
-                child: Padding(
-                  padding: const EdgeInsets.all(13.0),
-                  child: Text(
-                    message,
-                    style: TextStyle(color: white, fontSize: 17),
-                  ),
-                ),
+    final align =
+        widget.isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start;
+    final radius = widget.isMe
+        ? BorderRadius.only(
+            topLeft: Radius.circular(5.0),
+            bottomLeft: Radius.circular(5.0),
+            bottomRight: Radius.circular(10.0),
+          )
+        : BorderRadius.only(
+            topRight: Radius.circular(5.0),
+            bottomLeft: Radius.circular(10.0),
+            bottomRight: Radius.circular(5.0),
+          );
+    return Column(
+      crossAxisAlignment: align,
+      children: <Widget>[
+        Container(
+          margin: const EdgeInsets.all(3.0),
+          padding: const EdgeInsets.all(5.0),
+          decoration: BoxDecoration(
+            color: chatBubbleColor(),
+            borderRadius: radius,
+          ),
+          constraints: BoxConstraints(
+            maxWidth: MediaQuery.of(context).size.width / 1.3,
+            minWidth: 20.0,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: <Widget>[
+              Padding(
+                padding:
+                    EdgeInsets.all(widget.type == MessageType.TEXT ? 5 : 0),
+                child: widget.type == MessageType.TEXT
+                    ? Text(
+                        widget.message,
+                        style: TextStyle(
+                          color: widget.isMe
+                              ? Colors.white
+                              : Theme.of(context).textTheme.headline6.color,
+                        ),
+                      )
+                    : CachedNetworkImage(
+                        imageUrl: "${widget.message}",
+                        height: 200,
+                        width: MediaQuery.of(context).size.width / 1.3,
+                        fit: BoxFit.cover,
+                      ),
               ),
-            )
-          ],
+            ],
+          ),
         ),
-      );
-    } else {
-      return Padding(
-        padding: EdgeInsets.all(1.0),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Container(
-              width: 35,
-              height: 35,
-              decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  image: DecorationImage(
-                      image: NetworkImage(profileImg), fit: BoxFit.cover)),
-            ),
-            SizedBox(
-              width: 15,
-            ),
-            Flexible(
-              child: Container(
-                decoration: BoxDecoration(
-                    color: grey_toWhite, borderRadius: getMessageType(isMe, 2)),
-                child: Padding(
-                  padding: const EdgeInsets.all(13.0),
-                  child: Text(
-                    message,
-                    style: TextStyle(color: black, fontSize: 17),
-                  ),
+        Padding(
+          padding: widget.isMe
+              ? EdgeInsets.only(
+                  right: 10.0,
+                  bottom: 10.0,
+                )
+              : EdgeInsets.only(
+                  left: 10.0,
+                  bottom: 10.0,
                 ),
+          child: TextTime(
+            child: Text(
+              timeago.format(widget.time.toDate()),
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 10.0,
               ),
-            )
-          ],
+            ),
+          ),
         ),
-      );
-    }
+      ],
+    );
   }
 }

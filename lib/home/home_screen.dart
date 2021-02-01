@@ -1,4 +1,4 @@
-import 'package:LIVE365/Inbox/inbox_page.dart';
+import 'package:LIVE365/Notification/notification.dart';
 import 'package:LIVE365/Upload/CameraAccessScreen.dart';
 import 'package:LIVE365/Upload/composents/create_post.dart';
 import 'package:LIVE365/camera/add_video_page.dart';
@@ -6,6 +6,7 @@ import 'package:LIVE365/components/cam_icon.dart';
 import 'package:LIVE365/discover/discover_screen.dart';
 import 'package:LIVE365/firebaseService/FirebaseService.dart';
 import 'package:LIVE365/profile/profile_screen.dart';
+import 'package:ff_navigation_bar/ff_navigation_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -47,9 +48,45 @@ class _State extends State<HomeScreen> {
       children: [
         Body(),
         DiscoverScreen(),
-        CameraAccessScreen(),
-        Inbox(),
+        Container(),
+        Activities(),
         ProfileScreen(),
+      ],
+    );
+  }
+
+  Widget Footer2() {
+    return FFNavigationBar(
+      theme: FFNavigationBarTheme(
+        barBackgroundColor: GBottomNav,
+        selectedItemBorderColor: GBottomNav,
+        selectedItemBackgroundColor: Colors.orange,
+        selectedItemIconColor: Colors.white,
+        selectedItemLabelColor: Colors.white,
+      ),
+      selectedIndex: pageIndex,
+      onSelectTab: (index) {
+        setState(() {
+          pageIndex = index;
+        });
+      },
+      items: [
+        FFNavigationBarItem(
+          iconData: CupertinoIcons.device_phone_portrait,
+          label: 'Home',
+        ),
+        FFNavigationBarItem(
+          iconData: CupertinoIcons.search,
+          label: 'Search',
+        ),
+        FFNavigationBarItem(
+          iconData: CupertinoIcons.chat_bubble_text,
+          label: 'Inbox',
+        ),
+        FFNavigationBarItem(
+          iconData: CupertinoIcons.profile_circled,
+          label: 'Me',
+        ),
       ],
     );
   }
@@ -93,7 +130,6 @@ class _State extends State<HomeScreen> {
                             bottomItems[index]['icon'],
                             color: white,
                           ),
-                          onPressed: () {},
                         ),
                         Center(
                           child: Text(
@@ -133,7 +169,7 @@ class _State extends State<HomeScreen> {
       ),
       builder: (BuildContext context) {
         return FractionallySizedBox(
-          heightFactor: .4,
+          heightFactor: .6,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -159,6 +195,28 @@ class _State extends State<HomeScreen> {
                   size: 25.0,
                 ),
                 title: Text('Go Live',
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold, color: Colors.white)),
+                onTap: () async {
+                  ///Feature coming soon
+                  ///
+                  await _handleCameraAndMic();
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CameraAccessScreen(),
+                    ),
+                  );
+                },
+              ),
+              ListTile(
+                leading: Icon(
+                  CupertinoIcons.videocam_circle_fill,
+                  color: Colors.white,
+                  size: 25.0,
+                ),
+                title: Text('Make Video',
                     style: TextStyle(
                         fontWeight: FontWeight.bold, color: Colors.white)),
                 onTap: () async {

@@ -1,13 +1,19 @@
-import 'package:LIVE365/discover/components/mycard.dart';
-import 'package:LIVE365/firebaseService/FirebaseService.dart';
+import 'dart:async';
+
+import 'package:LIVE365/Inbox/components/conversation.dart';
+import 'package:LIVE365/SizeConfig.dart';
+import 'package:LIVE365/components/indicators.dart';
 import 'package:LIVE365/models/FakeRepository.dart';
-import 'package:LIVE365/models/users.dart';
+import 'package:LIVE365/models/User.dart';
+import 'package:LIVE365/profile/components/body.dart';
+import 'package:LIVE365/utils/firebase.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:responsive_builder/responsive_builder.dart';
 
 import '../constants.dart';
-import '../utils.dart';
 
 class DiscoverScreen extends StatefulWidget {
   @override
@@ -15,23 +21,130 @@ class DiscoverScreen extends StatefulWidget {
 }
 
 class _DiscoverScreenState extends State<DiscoverScreen> {
-  TextEditingController _searchController = new TextEditingController();
-  users user;
-  List<users> list = [];
-  final auth = FirebaseService();
+  User user;
+  TextEditingController searchController = TextEditingController();
+  FirebaseAuth auth = FirebaseAuth.instance;
+  FirebaseFirestore firestore = FirebaseFirestore.instance;
+  List<DocumentSnapshot> users = [];
+  List<DocumentSnapshot> filteredUsers = [];
+  bool loading = true;
+
+  currentUserId() {
+    return firebaseAuth.currentUser.uid;
+  }
+
+  getUsers() async {
+    QuerySnapshot snap = await usersRef.get();
+    List<DocumentSnapshot> doc = snap.docs;
+    users = doc;
+    filteredUsers = doc;
+    setState(() {
+      loading = false;
+    });
+  }
+
+  search(String query) {
+    if (query == "") {
+      filteredUsers = users;
+    } else {
+      List userSearch = users.where((userSnap) {
+        Map user = userSnap.data();
+        String userName = user['username'];
+        return userName.toLowerCase().contains(query.toLowerCase());
+      }).toList();
+
+      setState(() {
+        filteredUsers = userSearch;
+      });
+    }
+  }
+
+  removeFromList(index) {
+    filteredUsers.removeAt(index);
+  }
+
   @override
   void initState() {
+    getUsers();
     super.initState();
-    list = [];
-    DbChangeList();
   }
 
   @override
   Widget build(BuildContext context) {
-    return ResponsiveBuilder(
-      builder: (context, sizingInformation) {
-        return Scaffold(
-          body: SingleChildScrollView(
+    return PageView(
+      children: [
+        ResponsiveBuilder(
+          builder: (context, sizingInformation) {
+            return Scaffold(
+              body: SingleChildScrollView(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 5.0, vertical: 20.0),
+                child: Container(
+                  child: Column(
+                    children: [
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(left: 15.0, right: 15.0),
+                        child: Material(
+                          elevation: 5.0,
+                          borderRadius: BorderRadius.circular(50.0),
+                          child: TextFormField(
+                              cursorColor: black,
+                              controller: searchController,
+                              decoration: InputDecoration(
+                                  border: InputBorder.none,
+                                  prefixIcon: Icon(Icons.search,
+                                      color: GBottomNav, size: 30.0),
+                                  contentPadding:
+                                      EdgeInsets.only(left: 15.0, top: 15.0),
+                                  hintText: 'Search',
+                                  hintStyle: TextStyle(
+                                      color: Colors.white,
+                                      fontFamily: 'SFProDisplay-Black'))),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      _buildTrendHeading(sizingInformation,
+                          title: "PkCricketFever",
+                          range: "2.7b",
+                          descrition: "Trending Hashtag"),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      _buildListView(),
+                      SizedBox(height: 20),
+                      _buildTrendHeading(sizingInformation,
+                          title: "SportLover",
+                          range: "13.7b",
+                          descrition: "Trending Hashtag"),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      _buildListView(),
+                      SizedBox(height: 20),
+                      _buildTrendHeading(sizingInformation,
+                          title: "myOutFit",
+                          range: "7.7b",
+                          descrition: "Trending Hashtag"),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      _buildListView(),
+                      SizedBox(height: 20),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+        ResponsiveBuilder(builder: (context, sizingInformation) {
+          return Scaffold(
+              body: SingleChildScrollView(
             padding:
                 const EdgeInsets.symmetric(horizontal: 5.0, vertical: 20.0),
             child: Container(
@@ -47,7 +160,10 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                       borderRadius: BorderRadius.circular(50.0),
                       child: TextFormField(
                           cursorColor: black,
-                          controller: _searchController,
+                          controller: searchController,
+                          onChanged: (query) {
+                            search(query);
+                          },
                           decoration: InputDecoration(
                               border: InputBorder.none,
                               prefixIcon: Icon(Icons.search,
@@ -61,63 +177,89 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                     ),
                   ),
                   SizedBox(
-                    height: 20,
-                  ),
-                  _buildTrendHeading(sizingInformation,
-                      title: "PkCricketFever",
-                      range: "2.7b",
-                      descrition: "Trending Hashtag"),
-                  SizedBox(
                     height: 10,
                   ),
-                  _buildListView(),
-                  SizedBox(height: 20),
-                  _buildTrendHeading(sizingInformation,
-                      title: "SportLover",
-                      range: "13.7b",
-                      descrition: "Trending Hashtag"),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  _buildListView(),
-                  SizedBox(height: 20),
-                  _buildTrendHeading(sizingInformation,
-                      title: "myOutFit",
-                      range: "7.7b",
-                      descrition: "Trending Hashtag"),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  _buildListView(),
-                  SizedBox(height: 20),
+                  buildUsers()
                 ],
               ),
             ),
-          ),
-        );
-      },
+          ));
+        })
+      ],
     );
   }
 
-  void DbChangeList() {
-    FirebaseFirestore.instance
-        .collection("Users")
-        .snapshots()
-        .transform(Utils.transformer(users.fromJson))
-        .listen((result) {
-      final liveList = result;
-      if (liveList.isEmpty) {
+  buildUsers() {
+    if (!loading) {
+      if (filteredUsers.isEmpty) {
         return Center(
-          child: buildText('No User Found'),
+          child: Text("No User Found",
+              style: TextStyle(fontWeight: FontWeight.bold)),
         );
       } else {
-        for (users u in liveList) {
-          setState(() {
-            list.add(u);
-          });
-        }
+        return ListView.builder(
+          itemCount: filteredUsers.length,
+          scrollDirection: Axis.vertical,
+          shrinkWrap: true,
+          itemBuilder: (BuildContext context, int index) {
+            DocumentSnapshot doc = filteredUsers[index];
+            UserModel user = UserModel.fromJson(doc.data());
+            if (doc.id == currentUserId()) {
+              Timer(Duration(milliseconds: 500), () {
+                setState(() {
+                  removeFromList(index);
+                });
+              });
+            }
+            return Column(
+              children: [
+                ListTile(
+                  onTap: () => showProfile(context, profileId: user?.id),
+                  contentPadding: EdgeInsets.symmetric(horizontal: 25.0),
+                  leading: CircleAvatar(
+                    radius: 35.0,
+                    backgroundImage: NetworkImage(user?.photoUrl),
+                  ),
+                  title: Text(user?.username,
+                      style: TextStyle(
+                          color: Colors.white, fontWeight: FontWeight.bold)),
+                  subtitle: Text(user?.email,
+                      style: TextStyle(
+                          color: Colors.white, fontWeight: FontWeight.bold)),
+                  trailing: GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => Conversation(
+                              userId: doc.id,
+                              chatId: 'newChat',
+                            ),
+                          ));
+                    },
+                    child: Icon(CupertinoIcons.chat_bubble_fill,
+                        color: Colors.white),
+                  ),
+                ),
+                Divider(),
+              ],
+            );
+          },
+        );
       }
-    });
+    } else {
+      return Center(
+        child: circularProgress(context),
+      );
+    }
+  }
+
+  showProfile(BuildContext context, {String profileId}) {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => Body(profileId: profileId),
+        ));
   }
 
   Widget buildText(String text) => Center(
@@ -152,8 +294,8 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
         mainAxisSize: MainAxisSize.max,
         children: <Widget>[
           Container(
-            width: 40,
-            height: 40,
+            width: getProportionateScreenWidth(30),
+            height: getProportionateScreenHeight(40),
             alignment: Alignment.center,
             padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
             decoration: BoxDecoration(
@@ -196,32 +338,6 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
           )
         ],
       ),
-    );
-  }
-
-  void UserList() {
-    GridView.count(
-      crossAxisCount: 2,
-      primary: false,
-      crossAxisSpacing: 2.0,
-      mainAxisSpacing: 4.0,
-      shrinkWrap: true,
-      children: <Widget>[
-        ...List.generate(
-          list.length,
-          (index) {
-            return index.isNegative
-                ? Center(child: CircularProgressIndicator())
-                : Mycard(
-                    id: list[index].id,
-                    name: list[index].name,
-                    image: list[index].img,
-                    cardIndex: 1,
-                    status: list[index].status,
-                  );
-          },
-        ),
-      ],
     );
   }
 }

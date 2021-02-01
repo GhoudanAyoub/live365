@@ -13,6 +13,8 @@ import 'package:flutter_icons/flutter_icons.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:provider/provider.dart';
 
+import '../../SizeConfig.dart';
+
 class CreatePost extends StatefulWidget {
   @override
   _CreatePostState createState() => _CreatePostState();
@@ -177,7 +179,7 @@ class _CreatePostState extends State<CreatePost> {
       ),
       builder: (BuildContext context) {
         return FractionallySizedBox(
-          heightFactor: .4,
+          heightFactor: getProportionateScreenHeight(0.6),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

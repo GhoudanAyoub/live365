@@ -80,7 +80,7 @@ class _ViewActivityDetailsState extends State<ViewActivityDetails> {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(5.0),
         child: CachedNetworkImage(
-          imageUrl: widget.activity.mediaUrl,
+          imageUrl: widget.activity.mediaUrl ?? "",
           placeholder: (context, url) {
             return circularProgress(context);
           },

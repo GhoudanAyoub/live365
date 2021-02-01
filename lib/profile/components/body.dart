@@ -49,7 +49,7 @@ class _BodyState extends State<Body> {
 
   checkIfFollowing() async {
     DocumentSnapshot doc = await followersRef
-        .doc(FirebaseAuth.instance.currentUser.uid)
+        .doc(widget.profileId)
         .collection('userFollowers')
         .doc(currentUserId())
         .get();
@@ -67,9 +67,9 @@ class _BodyState extends State<Body> {
             automaticallyImplyLeading: false,
             pinned: true,
             floating: false,
-            toolbarHeight: 5.0,
-            collapsedHeight: 6.0,
-            expandedHeight: 380.0,
+            toolbarHeight: 4.0,
+            collapsedHeight: 5.0,
+            expandedHeight: 390.0,
             flexibleSpace: FlexibleSpaceBar(
               background: StreamBuilder(
                 stream: usersRef.doc(widget.profileId).snapshots(),
@@ -227,9 +227,7 @@ class _BodyState extends State<Body> {
     return StreamGridWrapper(
       shrinkWrap: true,
       padding: const EdgeInsets.symmetric(horizontal: 10.0),
-      stream: postRef
-          .where('ownerId', isEqualTo: FirebaseAuth.instance.currentUser.uid)
-          .snapshots(),
+      stream: postRef.where('ownerId', isEqualTo: widget.profileId).snapshots(),
       physics: NeverScrollableScrollPhysics(),
       itemBuilder: (_, DocumentSnapshot snapshot) {
         PostModel posts = PostModel.fromJson(snapshot.data());
@@ -244,7 +242,21 @@ class _BodyState extends State<Body> {
     //if isMe then display "edit profile"
     bool isMe = widget.profileId == firebaseAuth.currentUser.uid;
     if (isMe) {
-      return Container();
+      return FlatButton(
+        child: Text(
+          "Change Bio =>",
+          style: TextStyle(color: white),
+        ),
+        onPressed: () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => SettingScreen(
+                  users: user1,
+                ),
+              ));
+        },
+      );
       //if you are already following the user then "unfollow"
     } else if (isFollowing) {
       return buildButton(
@@ -347,15 +359,15 @@ class _BodyState extends State<Body> {
               begin: Alignment.topRight,
               end: Alignment.bottomLeft,
               colors: [
-                appBgColor,
-                GBottomNav,
+                Colors.white,
+                Colors.white,
               ],
             ),
           ),
           child: Center(
             child: Text(
               text,
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(color: Colors.black),
             ),
           ),
         ),
@@ -448,7 +460,7 @@ class _BodyState extends State<Body> {
                     child: Align(
                       alignment: Alignment.center,
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
                         child: FlatButton(
                           padding: EdgeInsets.all(10),
                           shape: RoundedRectangleBorder(
@@ -461,8 +473,7 @@ class _BodyState extends State<Body> {
                               StreamBuilder(
                                 stream: postRef
                                     .where('ownerId',
-                                        isEqualTo: FirebaseAuth
-                                            .instance.currentUser.uid)
+                                        isEqualTo: widget.profileId)
                                     .snapshots(),
                                 builder: (context,
                                     AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -486,7 +497,7 @@ class _BodyState extends State<Body> {
                               ),
                               StreamBuilder(
                                 stream: followersRef
-                                    .doc(FirebaseAuth.instance.currentUser.uid)
+                                    .doc(widget.profileId)
                                     .collection('userFollowers')
                                     .snapshots(),
                                 builder: (context,
@@ -511,7 +522,7 @@ class _BodyState extends State<Body> {
                               ),
                               StreamBuilder(
                                 stream: followingRef
-                                    .doc(FirebaseAuth.instance.currentUser.uid)
+                                    .doc(widget.profileId)
                                     .collection('userFollowing')
                                     .snapshots(),
                                 builder: (context,
