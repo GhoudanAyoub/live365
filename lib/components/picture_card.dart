@@ -1,20 +1,15 @@
 import 'package:LIVE365/components/live_cart_info_show.dart';
+import 'package:LIVE365/models/live.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 import '../SizeConfig.dart';
 
 class PictureCard extends StatelessWidget {
-  final String image;
-  final String name;
-  final String Views;
-  final String Like;
-  final String Comments;
+  final Live live;
 
-  const PictureCard(
-      {Key key, this.image, this.name, this.Views, this.Like, this.Comments})
-      : super(key: key);
+  const PictureCard({Key key, this.live}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +30,7 @@ class PictureCard extends StatelessWidget {
                       height: getProportionateScreenHeight(300),
                       width: getProportionateScreenWidth(330),
                       child: CachedNetworkImage(
-                        imageUrl: image,
+                        imageUrl: live.hostImage,
                         fit: BoxFit.cover,
                         fadeInDuration: Duration(milliseconds: 500),
                         fadeInCurve: Curves.easeIn,
@@ -48,7 +43,9 @@ class PictureCard extends StatelessWidget {
                       top: 10.0,
                       right: 10.0,
                       child: LiveCardInfoShow(
-                          image: image, name: name, views: Views),
+                          image: live.image,
+                          name: live.username,
+                          views: live.views),
                     ),
                     Positioned(
                       left: 0.0,
@@ -65,7 +62,7 @@ class PictureCard extends StatelessWidget {
                               Colors.black.withOpacity(0.1),
                             ])),
                       ),
-                    ),
+                    ), /*
                     Positioned(
                       left: 10.0,
                       bottom: 15.0,
@@ -103,7 +100,7 @@ class PictureCard extends StatelessWidget {
                           ),
                         ],
                       ),
-                    )
+                    )*/
                   ],
                 ),
               ),
@@ -111,5 +108,11 @@ class PictureCard extends StatelessWidget {
             ],
           ),
         ));
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(DiagnosticsProperty<Live>('live', live));
   }
 }

@@ -1,53 +1,66 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:video_player/video_player.dart';
 
 class Video {
   String id;
-  String user;
-  String userPic;
+  String videoId;
   String videoTitle;
+  String ownerId;
+  String username;
+  String userPic;
   String songName;
-  String likes;
-  String comments;
-  String url;
+  String tags;
+  String description;
+  String mediaUrl;
+  Timestamp timestamp;
 
   VideoPlayerController controller;
 
-  Video(
+  Video.name(
       {this.id,
-      this.user,
-      this.userPic,
+      this.videoId,
       this.videoTitle,
+      this.username,
+      this.ownerId,
+      this.userPic,
       this.songName,
-      this.likes,
-      this.comments,
-      this.url});
+      this.tags,
+      this.description,
+      this.mediaUrl,
+      this.timestamp});
 
   Video.fromJson(Map<dynamic, dynamic> json) {
     id = json['id'];
-    user = json['user'];
-    userPic = json['user_pic'];
-    videoTitle = json['video_title'];
-    songName = json['song_name'];
-    likes = json['likes'];
-    comments = json['comments'];
-    url = json['url'];
+    videoId = json['videoId'];
+    videoTitle = json['videoTitle'];
+    ownerId = json['ownerId'];
+    username = json['username'];
+    userPic = json['userPic'];
+    songName = json['songName'];
+    tags = json['tags'];
+    description = json['description'];
+    mediaUrl = json['mediaUrl'];
+    timestamp = json['timestamp'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['id'] = this.id;
-    data['user'] = this.user;
-    data['user_pic'] = this.userPic;
-    data['video_title'] = this.videoTitle;
-    data['song_name'] = this.songName;
-    data['likes'] = this.likes;
-    data['comments'] = this.comments;
-    data['url'] = this.url;
+    data['videoId'] = this.videoId;
+    data['videoTitle'] = this.videoTitle;
+    data['ownerId'] = this.ownerId;
+    data['username'] = this.username;
+    data['userPic'] = this.userPic;
+    data['songName'] = this.songName;
+    data['tags'] = this.tags;
+    data['description'] = this.description;
+    data['mediaUrl'] = this.mediaUrl;
+    data['timestamp'] = this.timestamp;
     return data;
   }
 
   Future<Null> loadController() async {
-    controller = VideoPlayerController.network(url);
+    controller = VideoPlayerController.network(mediaUrl);
     await controller.initialize();
     controller.setLooping(true);
   }

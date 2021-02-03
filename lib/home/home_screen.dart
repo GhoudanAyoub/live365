@@ -6,6 +6,7 @@ import 'package:LIVE365/components/cam_icon.dart';
 import 'package:LIVE365/discover/discover_screen.dart';
 import 'package:LIVE365/firebaseService/FirebaseService.dart';
 import 'package:LIVE365/profile/profile_screen.dart';
+import 'package:LIVE365/utils/firebase.dart';
 import 'package:ff_navigation_bar/ff_navigation_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -50,7 +51,9 @@ class _State extends State<HomeScreen> {
         DiscoverScreen(),
         Container(),
         Activities(),
-        ProfileScreen(),
+        ProfileScreen(
+          profileUID: firebaseAuth.currentUser.uid,
+        ),
       ],
     );
   }

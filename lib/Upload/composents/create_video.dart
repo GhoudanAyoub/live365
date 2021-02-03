@@ -1,26 +1,42 @@
-import 'package:LIVE365/Upload/composents/posts_view_model.dart';
-import 'package:LIVE365/components/custom_image.dart';
+import 'dart:io';
+
+import 'package:LIVE365/Upload/composents/video_view_model.dart';
 import 'package:LIVE365/components/indicators.dart';
-import 'package:LIVE365/constants.dart';
 import 'package:LIVE365/models/User.dart';
-import 'package:LIVE365/theme.dart';
 import 'package:LIVE365/utils/firebase.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:provider/provider.dart';
+import 'package:video_player/video_player.dart';
 
-import '../../SizeConfig.dart';
+import '../../constants.dart';
+import '../../theme.dart';
 
-class CreatePost extends StatefulWidget {
+class CreateVideo extends StatefulWidget {
+  final File filePath;
+
+  const CreateVideo({Key key, this.filePath}) : super(key: key);
   @override
-  _CreatePostState createState() => _CreatePostState();
+  _CreateVideoState createState() => _CreateVideoState();
 }
 
-class _CreatePostState extends State<CreatePost> {
+class _CreateVideoState extends State<CreateVideo> {
+  VideoPlayerController _videoPlayerController;
+  ImagePicker picker = ImagePicker();
+  File _video;
+  File file;
+  VideoViewModel viewModel;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     currentUserId() {
@@ -28,10 +44,32 @@ class _CreatePostState extends State<CreatePost> {
       return FirebaseAuth.instance.currentUser.uid;
     }
 
-    PostsViewModel viewModel = Provider.of<PostsViewModel>(context);
+    viewModel = Provider.of<VideoViewModel>(context);
+
+    if (widget.filePath != null) {
+      viewModel.setMediaUrl(widget.filePath);
+      _videoPlayerController = VideoPlayerController.file(widget.filePath)
+        ..initialize().then((_) {
+          setState(() {});
+          _videoPlayerController.play();
+          _videoPlayerController.setVolume(0);
+        });
+    }
+    _pickVideo() async {
+      file = await ImagePicker.pickVideo(source: ImageSource.gallery);
+      _video = File(file.path);
+      viewModel.setMediaUrl(_video);
+      _videoPlayerController = VideoPlayerController.file(_video)
+        ..initialize().then((_) {
+          setState(() {});
+          _videoPlayerController.play();
+          _videoPlayerController.setVolume(0);
+        });
+    }
+
     return WillPopScope(
       onWillPop: () async {
-        await viewModel.resetPost();
+        await viewModel.resetVedio();
         return true;
       },
       child: ModalProgressHUD(
@@ -43,7 +81,7 @@ class _CreatePostState extends State<CreatePost> {
             leading: IconButton(
               icon: Icon(Feather.x),
               onPressed: () {
-                viewModel.resetPost();
+                viewModel.resetVedio();
                 Navigator.pop(context);
               },
             ),
@@ -52,9 +90,9 @@ class _CreatePostState extends State<CreatePost> {
             actions: [
               GestureDetector(
                 onTap: () async {
-                  await viewModel.uploadPosts();
+                  await viewModel.uploadVideos();
                   Navigator.pop(context);
-                  viewModel.resetPost();
+                  viewModel.resetVedio();
                 },
                 child: Padding(
                   padding: const EdgeInsets.all(20.0),
@@ -98,7 +136,7 @@ class _CreatePostState extends State<CreatePost> {
                 },
               ),
               InkWell(
-                onTap: () => showImageChoices(context, viewModel),
+                onTap: () => {if (widget.filePath == null) _pickVideo()},
                 child: Container(
                   width: MediaQuery.of(context).size.width,
                   height: MediaQuery.of(context).size.width - 100,
@@ -111,28 +149,43 @@ class _CreatePostState extends State<CreatePost> {
                       color: Theme.of(context).accentColor,
                     ),
                   ),
-                  child: viewModel.imgLink != null
-                      ? CustomImage(
-                          imageUrl: viewModel.imgLink,
-                          width: MediaQuery.of(context).size.width,
-                          height: MediaQuery.of(context).size.width - 30,
-                          fit: BoxFit.cover,
-                        )
-                      : viewModel.mediaUrl == null
-                          ? Center(
-                              child: Text(
-                                'Upload a Photo',
-                                style: TextStyle(
-                                  color: Theme.of(context).accentColor,
-                                ),
-                              ),
+                  child: _video != null
+                      ? _videoPlayerController.value.initialized
+                          ? AspectRatio(
+                              aspectRatio:
+                                  _videoPlayerController.value.aspectRatio,
+                              child: VideoPlayer(_videoPlayerController),
                             )
-                          : Image.file(
-                              viewModel.mediaUrl,
-                              width: MediaQuery.of(context).size.width,
-                              height: MediaQuery.of(context).size.width - 30,
-                              fit: BoxFit.cover,
-                            ),
+                          : Container()
+                      : Container(),
+                ),
+              ),
+              SizedBox(height: 20.0),
+              TextFormField(
+                style: TextStyle(color: Colors.white),
+                initialValue: viewModel.description,
+                keyboardType: TextInputType.name,
+                onChanged: (val) => viewModel.setVideoTitle(val),
+                decoration: InputDecoration(
+                  labelStyle: textTheme().bodyText2,
+                  hintStyle: textTheme().bodyText2,
+                  labelText: "videoTitle",
+                  hintText: "Enter your videoTitle",
+                  floatingLabelBehavior: FloatingLabelBehavior.always,
+                ),
+              ),
+              SizedBox(height: 20.0),
+              TextFormField(
+                style: TextStyle(color: Colors.white),
+                initialValue: viewModel.description,
+                keyboardType: TextInputType.name,
+                onChanged: (val) => viewModel.setSongName(val),
+                decoration: InputDecoration(
+                  labelStyle: textTheme().bodyText2,
+                  hintStyle: textTheme().bodyText2,
+                  labelText: "songName",
+                  hintText: "Enter your songName",
+                  floatingLabelBehavior: FloatingLabelBehavior.always,
                 ),
               ),
               SizedBox(height: 20.0),
@@ -163,66 +216,11 @@ class _CreatePostState extends State<CreatePost> {
                   floatingLabelBehavior: FloatingLabelBehavior.always,
                 ),
               ),
+              SizedBox(height: 20.0),
             ],
           ),
         ),
       ),
-    );
-  }
-
-  showImageChoices(BuildContext context, PostsViewModel viewModel) {
-    showModalBottomSheet(
-      backgroundColor: GBottomNav,
-      context: context,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10.0),
-      ),
-      builder: (BuildContext context) {
-        return FractionallySizedBox(
-          heightFactor: getProportionateScreenHeight(0.6),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(height: 20.0),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                child: Text(
-                  'Select Image',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.white),
-                ),
-              ),
-              Divider(),
-              ListTile(
-                leading: Icon(
-                  Feather.camera,
-                  color: Colors.white,
-                ),
-                title: Text('Camera',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.white)),
-                onTap: () {
-                  Navigator.pop(context);
-                  viewModel.pickImage(camera: true);
-                },
-              ),
-              ListTile(
-                leading: Icon(
-                  Feather.image,
-                  color: Colors.white,
-                ),
-                title: Text('Gallery',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.white)),
-                onTap: () {
-                  Navigator.pop(context);
-                  viewModel.pickImage();
-                },
-              ),
-            ],
-          ),
-        );
-      },
     );
   }
 }

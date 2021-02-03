@@ -205,7 +205,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
             DocumentSnapshot doc = filteredUsers[index];
             UserModel user = UserModel.fromJson(doc.data());
             if (doc.id == currentUserId()) {
-              Timer(Duration(milliseconds: 500), () {
+              Timer(Duration(milliseconds: 50), () {
                 setState(() {
                   removeFromList(index);
                 });

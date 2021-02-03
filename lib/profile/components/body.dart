@@ -3,9 +3,11 @@ import 'package:LIVE365/components/post_tiles.dart';
 import 'package:LIVE365/components/post_view.dart';
 import 'package:LIVE365/components/stream_builder_wrapper.dart';
 import 'package:LIVE365/components/stream_grid_wrapper.dart';
+import 'package:LIVE365/components/video_view.dart';
 import 'package:LIVE365/firebaseService/FirebaseService.dart';
 import 'package:LIVE365/models/User.dart';
 import 'package:LIVE365/models/post.dart';
+import 'package:LIVE365/models/video.dart';
 import 'package:LIVE365/profile/components/profile_pic.dart';
 import 'package:LIVE365/utils/firebase.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -31,6 +33,7 @@ class _BodyState extends State<Body> {
   int followersCount = 0;
   int followingCount = 0;
   bool isToggle = true;
+  bool isVideo = false;
   bool isFollowing = false;
   UserModel users;
   UserModel user1;
@@ -96,6 +99,17 @@ class _BodyState extends State<Body> {
                       style: TextStyle(fontWeight: FontWeight.w900),
                     ),
                     Spacer(),
+                    IconButton(
+                        icon: Icon(
+                          Icons.video_collection_outlined,
+                          color: Colors.white,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            isToggle = false;
+                            isVideo = false;
+                          });
+                        }),
                     buildIcons(),
                   ],
                 ),
@@ -103,39 +117,6 @@ class _BodyState extends State<Body> {
               buildPostView()
             ]);
           })),
-          /*
-          GridView.count(
-            crossAxisCount: 2,
-            primary: false,
-            crossAxisSpacing: 2.0,
-            mainAxisSpacing: 4.0,
-            shrinkWrap: true,
-            children: [
-              ...List.generate(ImageList.length, (index) {
-                return index.isNegative
-                    ? Center(child: CircularProgressIndicator())
-                    : Card(
-                        color: Colors.white.withOpacity(0.2),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10.0)),
-                        elevation: 2.0,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                          child: CachedNetworkImage(
-                            imageUrl: ImageList[index]["image"],
-                            fit: BoxFit.cover,
-                            fadeInDuration: Duration(milliseconds: 500),
-                            fadeInCurve: Curves.easeIn,
-                            placeholder: (context, progressText) =>
-                                Center(child: CircularProgressIndicator()),
-                          ),
-                        ),
-                        margin: index.isEven
-                            ? EdgeInsets.fromLTRB(20.0, 0.0, 5.0, 5.0)
-                            : EdgeInsets.fromLTRB(5.0, 0.0, 20.0, 5.0));
-              })
-            ],
-          )*/
         ],
       ),
     );
@@ -158,6 +139,7 @@ class _BodyState extends State<Body> {
           onPressed: () {
             setState(() {
               isToggle = false;
+              isVideo = false;
             });
           });
     } else if (isToggle == false) {
@@ -169,6 +151,7 @@ class _BodyState extends State<Body> {
         onPressed: () {
           setState(() {
             isToggle = true;
+            isVideo = false;
           });
         },
       );
@@ -198,17 +181,40 @@ class _BodyState extends State<Body> {
   }
 
   buildPostView() {
-    if (isToggle == true) {
+    if (isToggle == true && isVideo == false) {
       return buildGridPost();
-    } else if (isToggle == false) {
+    } else if (isToggle == false && isVideo == false) {
       return buildPosts();
+    } else if (isToggle == false && isVideo == true) {
+      return buildVideos();
     }
+  }
+
+  buildVideos() {
+    return StreamBuilderWrapper(
+      shrinkWrap: true,
+      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      text: "No Posts For The Moment",
+      stream:
+          videoRef.where('ownerId', isEqualTo: widget.profileId).snapshots(),
+      physics: NeverScrollableScrollPhysics(),
+      itemBuilder: (_, DocumentSnapshot snapshot) {
+        Video video = Video.fromJson(snapshot.data());
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 15.0),
+          child: Videos(
+            video: video,
+          ),
+        );
+      },
+    );
   }
 
   buildPosts() {
     return StreamBuilderWrapper(
       shrinkWrap: true,
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      text: "No Posts For The Moment",
       stream: postRef.where('ownerId', isEqualTo: widget.profileId).snapshots(),
       physics: NeverScrollableScrollPhysics(),
       itemBuilder: (_, DocumentSnapshot snapshot) {
@@ -386,31 +392,35 @@ class _BodyState extends State<Body> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               SizedBox(width: getProportionateScreenWidth(10)),
-              IconButton(
-                  icon: Icon(
-                    Icons.settings_outlined,
-                    color: Colors.white,
-                  ),
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => SettingScreen(
-                            users: user1,
-                          ),
-                        ));
-                  }),
+              widget.profileId == firebaseAuth.currentUser.uid
+                  ? IconButton(
+                      icon: Icon(
+                        Icons.settings_outlined,
+                        color: Colors.white,
+                      ),
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => SettingScreen(
+                                users: user1,
+                              ),
+                            ));
+                      })
+                  : Container(),
               SizedBox(
                 width: getProportionateScreenWidth(260),
                 height: getProportionateScreenHeight(10),
               ),
-              IconButton(
-                  icon: Icon(
-                    Icons.search,
-                    color: Colors.white,
-                  ),
-                  onPressed: () {}),
-              SizedBox(width: getProportionateScreenWidth(10)),
+              widget.profileId == firebaseAuth.currentUser.uid
+                  ? IconButton(
+                      icon: Icon(
+                        Icons.search,
+                        color: Colors.white,
+                      ),
+                      onPressed: () {})
+                  : Container(),
+              SizedBox(width: getProportionateScreenWidth(10))
             ],
           ),
         )),

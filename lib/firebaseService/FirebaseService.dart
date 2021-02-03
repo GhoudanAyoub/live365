@@ -1,3 +1,4 @@
+import 'package:LIVE365/models/live.dart';
 import 'package:LIVE365/models/message.dart';
 import 'package:LIVE365/models/message_list.dart';
 import 'package:LIVE365/models/users.dart';
@@ -36,10 +37,13 @@ class FirebaseService {
 
   //USER LIVE
   static void createLiveUser({username, name, id, time, image}) async {
-    final snapShot =
-        await _fireStore.collection(liveCollection).doc(name).get();
+    final snapShot = await liveRef.doc(firebaseAuth.currentUser.uid).get();
+    Live live = Live.fromJson(snapShot.data());
+    var ref = liveRef.doc();
     if (snapShot.exists) {
-      await _fireStore.collection(liveCollection).doc(name).update({
+      await liveRef.doc(firebaseAuth.currentUser.uid).update({
+        'id': ref.id,
+        'ownerId': live.ownerId,
         'username': username,
         'channelName': name,
         'channelId': id,
@@ -48,7 +52,9 @@ class FirebaseService {
         'image': image
       });
     } else {
-      await _fireStore.collection(liveCollection).doc(name).set({
+      await liveRef.doc(firebaseAuth.currentUser.uid).set({
+        'id': ref.id,
+        'ownerId': firebaseAuth.currentUser.uid,
         'username': username,
         'channelName': name,
         'channelId': id,
@@ -60,7 +66,7 @@ class FirebaseService {
   }
 
   static void deleteUser({username}) async {
-    await _fireStore.collection('liveuser').doc(username).delete();
+    await liveRef.doc(firebaseAuth.currentUser.uid).delete();
   }
 
   // USER DATA

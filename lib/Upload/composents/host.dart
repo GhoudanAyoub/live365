@@ -1158,8 +1158,19 @@ class _CallPageState extends State<CallPage> {
         });
       });
 
+      final documentId = widget.channelName;
+      channelName = documentId;
+      if (widget.role == ClientRole.Broadcaster) {
+        FirebaseService.createLiveUser(
+            username: widget.userName,
+            name: documentId,
+            id: channel.channelId,
+            time: widget.time,
+            image: widget.image);
+      }
       _log(info: 'Member joined: ', user: member.userId, type: 'join');
     };
+
     channel.onMemberLeft = (AgoraRtmMember member) {
       var len;
       setState(() {

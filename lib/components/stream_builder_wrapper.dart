@@ -15,11 +15,13 @@ class StreamBuilderWrapper extends StatelessWidget {
   final bool shrinkWrap;
   final ScrollPhysics physics;
   final EdgeInsets padding;
+  final String text;
 
   const StreamBuilderWrapper({
     Key key,
     @required this.stream,
     @required this.itemBuilder,
+    this.text,
     this.scrollDirection = Axis.vertical,
     this.shrinkWrap = false,
     this.physics = const ClampingScrollPhysics(),
@@ -36,9 +38,9 @@ class StreamBuilderWrapper extends StatelessWidget {
           return list.length == 0
               ? Padding(
                   padding: const EdgeInsets.only(top: 100.0),
-                  child: Container(
-                    child: Center(
-                      child: Text('No Posts'),
+                  child: Center(
+                    child: Container(
+                      child: Text(text),
                     ),
                   ),
                 )
@@ -59,7 +61,9 @@ class StreamBuilderWrapper extends StatelessWidget {
                   ),
                 );
         } else {
-          return circularProgress(context);
+          return Center(
+            child: circularProgress(context),
+          );
         }
       },
     );

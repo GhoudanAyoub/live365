@@ -12,6 +12,8 @@ final Uuid uuid = Uuid();
 CollectionReference usersRef = firestore.collection('users');
 CollectionReference chatRef = firestore.collection("chats");
 CollectionReference postRef = firestore.collection('posts');
+CollectionReference videoRef = firestore.collection('videos');
+CollectionReference liveRef = firestore.collection('live');
 CollectionReference commentRef = firestore.collection('comments');
 CollectionReference notificationRef = firestore.collection('notifications');
 CollectionReference followersRef = firestore.collection('followers');
@@ -22,3 +24,4 @@ CollectionReference favUsersRef = firestore.collection('favoriteUsers');
 // Storage refs
 Reference profilePic = storage.ref().child('profilePic');
 Reference posts = storage.ref().child('posts');
+Reference videos = storage.ref().child('videos');

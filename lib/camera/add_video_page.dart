@@ -1,12 +1,23 @@
 import 'dart:async';
+import 'dart:io';
 
+import 'package:LIVE365/SizeConfig.dart';
+import 'package:LIVE365/Upload/composents/create_video.dart';
+import 'package:LIVE365/Upload/composents/video_view_model.dart';
+import 'package:LIVE365/camera/videoo.dart';
+import 'package:LIVE365/components/IconBtnWithCounter.dart';
+import 'package:LIVE365/components/default_button.dart';
+import 'package:LIVE365/constants.dart';
 import 'package:LIVE365/models/FakeRepository.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:responsive_builder/responsive_builder.dart';
+
+import '../theme.dart';
 
 class AddVideoPage extends StatefulWidget {
   @override
@@ -18,6 +29,7 @@ class _AddVideoPageState extends State<AddVideoPage> {
   List<CameraDescription> cameras;
   int selectedCameraIndex;
 
+  VideoViewModel viewModel;
   TextStyle _textStyle = TextStyle(color: Colors.white, fontSize: 11);
   Color color = Colors.white;
   int _pageSelectedIndex = 1;
@@ -26,6 +38,8 @@ class _AddVideoPageState extends State<AddVideoPage> {
   bool _isRecording = false;
   String _filePath;
   int time;
+  bool _isVideo = true;
+  bool submitted = false;
   @override
   void initState() {
     super.initState();
@@ -35,7 +49,7 @@ class _AddVideoPageState extends State<AddVideoPage> {
 
       if (cameras.length > 0) {
         setState(() {
-          selectedCameraIndex = 1;
+          selectedCameraIndex = 0;
         });
         _initCameraController(cameras[selectedCameraIndex]).then((void v) {});
       } else {
@@ -58,6 +72,7 @@ class _AddVideoPageState extends State<AddVideoPage> {
     }
     _cameraController =
         CameraController(cameraDescription, ResolutionPreset.high);
+    print('heloooo $cameraDescription');
 
     _cameraController.addListener(() {
       if (mounted) {
@@ -105,6 +120,190 @@ class _AddVideoPageState extends State<AddVideoPage> {
     _initCameraController(selectedCamera);
   }
 
+  String get buttonText => !_isVideo
+      ? "Take a photo"
+      : "${_cameraController != null && _cameraController.value.isRecordingVideo ? "Stop recording" : "Record video"}";
+
+  String _getTimestamp() => DateTime.now().millisecondsSinceEpoch.toString();
+
+  Future<void> _startVideoRecording() async {
+    final Directory extDir = await getApplicationDocumentsDirectory();
+    final String dirPath = '${extDir.path}/Movies/flutter_camera';
+    await Directory(dirPath).create(recursive: true);
+    final String filePath = '$dirPath/${_getTimestamp()}.mp4';
+
+    if (_cameraController.value.isRecordingVideo) {
+      return null;
+    }
+
+    try {
+      await _cameraController.startVideoRecording(filePath);
+      setState(() {
+        _filePath = filePath;
+      });
+    } on CameraException catch (e) {
+      print(e);
+    }
+  }
+
+  Future<void> _stopVideoRecording(BuildContext context) async {
+    if (!_cameraController.value.isRecordingVideo) {
+      return null;
+    }
+
+    try {
+      await _cameraController.stopVideoRecording();
+      setState(() {
+        _showBottomSheet(context);
+        viewModel.setMediaUrl(File(_filePath));
+      });
+    } on CameraException catch (e) {
+      print(e);
+    }
+  }
+
+  void _showBottomSheet(context) {
+    showModalBottomSheet(
+        context: context,
+        backgroundColor: GBottomNav,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        builder: (BuildContext bc) {
+          return FractionallySizedBox(
+            heightFactor: 2.3,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(30.0),
+                  ),
+                  child: Stack(
+                    children: [
+                      Center(
+                          child: Container(
+                        height: SizeConfig.screenHeight,
+                        width: SizeConfig.screenWidth,
+                        child: Video(File(_filePath)),
+                      )),
+                      Positioned(
+                        bottom: 100,
+                        right: 10,
+                        child: IconBtnWithCounter(
+                          svgSrc: 'assets/icons/arrow_right.svg',
+                          press: () {
+                            Navigator.pop(context);
+                            _showSaveSheet(context);
+                          },
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+        });
+  }
+
+  void _showSaveSheet(context) {
+    showModalBottomSheet(
+        context: context,
+        backgroundColor: GBottomNav,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        builder: (BuildContext bc) {
+          return FractionallySizedBox(
+            heightFactor: 2.3,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(30.0),
+                  ),
+                  child: Stack(
+                    children: [
+                      SizedBox(height: 20.0),
+                      TextFormField(
+                        style: TextStyle(color: Colors.white),
+                        initialValue: viewModel.description,
+                        keyboardType: TextInputType.name,
+                        onChanged: (val) => viewModel.setVideoTitle(val),
+                        decoration: InputDecoration(
+                          labelStyle: textTheme().bodyText2,
+                          hintStyle: textTheme().bodyText2,
+                          labelText: "videoTitle",
+                          hintText: "Enter your videoTitle",
+                          floatingLabelBehavior: FloatingLabelBehavior.always,
+                        ),
+                      ),
+                      SizedBox(height: 20.0),
+                      TextFormField(
+                        style: TextStyle(color: Colors.white),
+                        initialValue: viewModel.description,
+                        keyboardType: TextInputType.name,
+                        onChanged: (val) => viewModel.setSongName(val),
+                        decoration: InputDecoration(
+                          labelStyle: textTheme().bodyText2,
+                          hintStyle: textTheme().bodyText2,
+                          labelText: "songName",
+                          hintText: "Enter your songName",
+                          floatingLabelBehavior: FloatingLabelBehavior.always,
+                        ),
+                      ),
+                      SizedBox(height: 20.0),
+                      TextFormField(
+                        style: TextStyle(color: Colors.white),
+                        initialValue: viewModel.description,
+                        keyboardType: TextInputType.name,
+                        onChanged: (val) => viewModel.setDescription(val),
+                        decoration: InputDecoration(
+                          labelStyle: textTheme().bodyText2,
+                          hintStyle: textTheme().bodyText2,
+                          labelText: "Description",
+                          hintText: "Enter your Description",
+                          floatingLabelBehavior: FloatingLabelBehavior.always,
+                        ),
+                      ),
+                      SizedBox(height: 20.0),
+                      TextFormField(
+                        style: TextStyle(color: Colors.white),
+                        initialValue: viewModel.tags,
+                        keyboardType: TextInputType.name,
+                        onChanged: (val) => viewModel.setTags(val),
+                        decoration: InputDecoration(
+                          labelStyle: textTheme().bodyText2,
+                          hintStyle: textTheme().bodyText2,
+                          labelText: "Hashtags",
+                          hintText: "Enter your Hashtags",
+                          floatingLabelBehavior: FloatingLabelBehavior.always,
+                        ),
+                      ),
+                      SizedBox(height: 20.0),
+                      DefaultButton(
+                        text: "Upload",
+                        press: () async {
+                          await viewModel.uploadVideos();
+                          Navigator.pop(context);
+                          viewModel.resetVedio();
+                          submitted = true;
+                        },
+                        submitted: submitted,
+                      )
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+        });
+  }
+
 /*
   void onNewCameraSelected(CameraDescription cameraDescription) async {
     if (_cameraController != null) {
@@ -137,6 +336,7 @@ class _AddVideoPageState extends State<AddVideoPage> {
 */
   @override
   Widget build(BuildContext context) {
+    viewModel = Provider.of<VideoViewModel>(context);
     return ResponsiveBuilder(
       builder: (BuildContext context, SizingInformation sizingInformation) {
         return Scaffold(
@@ -251,14 +451,23 @@ class _AddVideoPageState extends State<AddVideoPage> {
             ),
             Column(
               children: [
-                IconButton(
+                Center(
+                    child: IconButton(
                   icon: Icon(
                     Icons.radio_button_checked,
                     size: 40,
-                    color: Colors.red,
+                    color: _cameraController.value.isRecordingVideo
+                        ? Colors.red
+                        : Colors.white,
                   ),
-                  onPressed: _isRecording ? null : _onRecord,
-                ),
+                  onPressed: () {
+                    if (_cameraController.value.isRecordingVideo) {
+                      _stopVideoRecording(context);
+                    } else {
+                      _startVideoRecording();
+                    }
+                  },
+                )),
                 Center(
                   child: Text(time.toString()),
                 )
@@ -267,15 +476,24 @@ class _AddVideoPageState extends State<AddVideoPage> {
             Container(
               child: Column(
                 children: <Widget>[
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 2, vertical: 2),
-                    height: 30,
-                    width: 30,
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.white, width: 2),
-                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => CreateVideo()),
+                      );
+                    },
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 2, vertical: 2),
+                      height: 30,
+                      width: 30,
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.white, width: 2),
+                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                      ),
+                      child: Image.asset("assets/images/gallery.png"),
                     ),
-                    child: Image.asset("assets/images/gallery.png"),
                   ),
                   SizedBox(
                     height: 4,
@@ -311,6 +529,10 @@ class _AddVideoPageState extends State<AddVideoPage> {
                 onPageChanged: (int index) {
                   setState(() {
                     _pageSelectedIndex = index;
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => CreateVideo()),
+                    );
                   });
                 },
                 scrollDirection: Axis.horizontal,
@@ -349,7 +571,9 @@ class _AddVideoPageState extends State<AddVideoPage> {
   @override
   void dispose() {
     _cameraController.dispose();
-    _isRecording ? _onStop : null;
+    _cameraController.value.isRecordingVideo
+        ? _stopVideoRecording(context)
+        : null;
     super.dispose();
   }
 }
