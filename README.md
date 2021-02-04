@@ -44,14 +44,13 @@ Star⭐ the repo if you like what you see😉.
 
 
 ## Screenshots
-<p>
-<img src="ss/w10.jpg" width="400"/> <img src="screenshoot/s1.png" width="400"/>
-<img src="ss/w12.jpg" width="400"> <img src="screenshoot/s2.png" width="400">
-<img src="ss/w8.jpg" width="400"> <img src="screenshoot/s3.png" width="400">
-<img src="ss/w9.jpg" width="400"> <img src="screenshoot/s4.png" width="400">
-<img src="ss/w4.jpg" width="400"> <img src="screenshoot/s5.png" width="400">
-<img src="ss/w3.jpg" width="400"> <img src="screenshoot/s6.png" width="400">
-<img src="ss/w3.jpg" width="400"> <img src="screenshoot/s7.png" width="400">
+<p> <img src="screenshoot/s1.png" width="400"/>
+ <img src="screenshoot/s2.png" width="400">
+ <img src="screenshoot/s3.png" width="400">
+  <img src="screenshoot/s4.png" width="400">
+  <img src="screenshoot/s5.png" width="400">
+   <img src="screenshoot/s6.png" width="400">
+    <img src="screenshoot/s7.png" width="400">
 </p>
 
 
