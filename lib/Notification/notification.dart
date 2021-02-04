@@ -21,6 +21,59 @@ class _ActivitiesState extends State<Activities> {
     return firebaseAuth.currentUser.uid;
   }
 
+  final tab = new TabBar(tabs: <Tab>[
+    new Tab(icon: new Icon(Icons.chat_outlined)),
+    new Tab(icon: new Icon(Icons.mark_chat_unread_outlined)),
+  ]);
+
+  Widget getBody2() {
+    return Scaffold(
+        appBar: new PreferredSize(
+      preferredSize: tab.preferredSize,
+      child: new Card(
+        elevation: 26.0,
+        color: Theme.of(context).primaryColor,
+        child: tab,
+      ),
+    ));
+  }
+
+  Widget getPageView() {
+    return PageView(
+      children: [
+        Scaffold(
+          appBar: AppBar(
+            automaticallyImplyLeading: false,
+            title: Text('Notifications'),
+            centerTitle: true,
+            actions: [
+              Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: GestureDetector(
+                  onTap: () => deleteAllItems(),
+                  child: Text(
+                    'CLEAR',
+                    style: TextStyle(
+                      fontSize: 13.0,
+                      fontWeight: FontWeight.w900,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          body: ListView(
+            children: [
+              getActivities(),
+            ],
+          ),
+        ),
+        Chats()
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return PageView(

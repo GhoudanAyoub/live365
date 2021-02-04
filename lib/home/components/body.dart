@@ -323,101 +323,104 @@ class _BodyState extends State<Body> with SingleTickerProviderStateMixin {
   }
 
   Widget topScrollFeedRow() {
-    return Column(
-      children: [
-        SizedBox(
-          height: 30,
-        ),
-        Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
-          FlatButton(
-              onPressed: () {
-                setState(() {
-                  followButton = false;
-                  liveButton = true;
-                  recommended = false;
-                });
-              },
-              child: Text('LIVE',
-                  style: liveButton
-                      ? TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: "SFProDisplay-Regular",
-                          fontSize: 18)
-                      : TextStyle(
-                          color: Colors.grey,
-                          fontFamily: "SFProDisplay-Regular",
-                          fontSize: 16))),
+    return Container(
+      width: SizeConfig.screenWidth - 10,
+      child: Column(
+        children: [
           SizedBox(
-            width: getProportionateScreenWidth(5),
+            height: 30,
           ),
-          Text(
-            ".",
-            style: TextStyle(
-              fontFamily: "SFProDisplay-Bold",
-              color: orange,
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
+          Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
+            FlatButton(
+                onPressed: () {
+                  setState(() {
+                    followButton = false;
+                    liveButton = true;
+                    recommended = false;
+                  });
+                },
+                child: Text('LIVE',
+                    style: liveButton
+                        ? TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: "SFProDisplay-Regular",
+                            fontSize: 18)
+                        : TextStyle(
+                            color: Colors.grey,
+                            fontFamily: "SFProDisplay-Regular",
+                            fontSize: 16))),
+            SizedBox(
+              width: getProportionateScreenWidth(5),
             ),
-          ),
-          SizedBox(
-            width: getProportionateScreenWidth(5),
-          ),
-          FlatButton(
-              onPressed: () {
-                setState(() {
-                  followButton = false;
-                  liveButton = false;
-                  recommended = true;
-                });
-              },
-              child: Text('RECOMMENDED',
-                  style: recommended
-                      ? TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: "SFProDisplay-Regular",
-                          fontSize: 16)
-                      : TextStyle(
-                          color: Colors.grey,
-                          fontFamily: "SFProDisplay-Regular",
-                          fontSize: 16))),
-          SizedBox(
-            width: getProportionateScreenWidth(5),
-          ),
-          Text(
-            ".",
-            style: TextStyle(
-              fontFamily: "SFProDisplay-Bold",
-              color: orange,
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
+            Text(
+              ".",
+              style: TextStyle(
+                fontFamily: "SFProDisplay-Bold",
+                color: orange,
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
-          SizedBox(
-            width: getProportionateScreenWidth(5),
-          ),
-          FlatButton(
-              onPressed: () {
-                setState(() {
-                  followButton = true;
-                  liveButton = false;
-                  recommended = false;
-                });
-              },
-              child: Text('FOLLOW',
-                  style: followButton
-                      ? TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: "SFProDisplay-Regular",
-                          fontSize: 18)
-                      : TextStyle(
-                          color: Colors.grey,
-                          fontFamily: "SFProDisplay-Regular",
-                          fontSize: 16)))
-        ])
-      ],
+            SizedBox(
+              width: getProportionateScreenWidth(5),
+            ),
+            FlatButton(
+                onPressed: () {
+                  setState(() {
+                    followButton = false;
+                    liveButton = false;
+                    recommended = true;
+                  });
+                },
+                child: Text('RECOMMENDED',
+                    style: recommended
+                        ? TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: "SFProDisplay-Regular",
+                            fontSize: 16)
+                        : TextStyle(
+                            color: Colors.grey,
+                            fontFamily: "SFProDisplay-Regular",
+                            fontSize: 16))),
+            SizedBox(
+              width: getProportionateScreenWidth(5),
+            ),
+            Text(
+              ".",
+              style: TextStyle(
+                fontFamily: "SFProDisplay-Bold",
+                color: orange,
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(
+              width: getProportionateScreenWidth(5),
+            ),
+            FlatButton(
+                onPressed: () {
+                  setState(() {
+                    followButton = true;
+                    liveButton = false;
+                    recommended = false;
+                  });
+                },
+                child: Text('FOLLOW',
+                    style: followButton
+                        ? TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: "SFProDisplay-Regular",
+                            fontSize: 18)
+                        : TextStyle(
+                            color: Colors.grey,
+                            fontFamily: "SFProDisplay-Regular",
+                            fontSize: 16)))
+          ])
+        ],
+      ),
     );
   }
 

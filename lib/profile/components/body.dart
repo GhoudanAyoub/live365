@@ -387,43 +387,44 @@ class _BodyState extends State<Body> {
       children: [
         SizedBox(height: getProportionateScreenHeight(30)),
         Container(
+            width: SizeConfig.screenWidth - 10,
             child: Center(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              SizedBox(width: getProportionateScreenWidth(10)),
-              widget.profileId == firebaseAuth.currentUser.uid
-                  ? IconButton(
-                      icon: Icon(
-                        Icons.settings_outlined,
-                        color: Colors.white,
-                      ),
-                      onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => SettingScreen(
-                                users: user1,
-                              ),
-                            ));
-                      })
-                  : Container(),
-              SizedBox(
-                width: getProportionateScreenWidth(260),
-                height: getProportionateScreenHeight(10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  SizedBox(width: getProportionateScreenWidth(10)),
+                  widget.profileId == firebaseAuth.currentUser.uid
+                      ? IconButton(
+                          icon: Icon(
+                            Icons.settings_outlined,
+                            color: Colors.white,
+                          ),
+                          onPressed: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => SettingScreen(
+                                    users: user1,
+                                  ),
+                                ));
+                          })
+                      : Container(),
+                  SizedBox(
+                    width: getProportionateScreenWidth(260),
+                    height: getProportionateScreenHeight(10),
+                  ),
+                  widget.profileId == firebaseAuth.currentUser.uid
+                      ? IconButton(
+                          icon: Icon(
+                            Icons.search,
+                            color: Colors.white,
+                          ),
+                          onPressed: () {})
+                      : Container(),
+                  SizedBox(width: getProportionateScreenWidth(10))
+                ],
               ),
-              widget.profileId == firebaseAuth.currentUser.uid
-                  ? IconButton(
-                      icon: Icon(
-                        Icons.search,
-                        color: Colors.white,
-                      ),
-                      onPressed: () {})
-                  : Container(),
-              SizedBox(width: getProportionateScreenWidth(10))
-            ],
-          ),
-        )),
+            )),
         StreamBuilder(
           stream: usersRef.doc(widget.profileId).snapshots(),
           builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
