@@ -67,7 +67,7 @@ Star⭐ the repo if you like what you see😉.
 
 * Go to the Firebase Console for your new instance.
 * Click "Authentication" in the left-hand menu
-* Click the "sign-in method" tab
+* Click the "sign-in method" tabZzz
 * enable "Email and Password"
 * enable "google Auth"
 * Create an app within your Firebase instance for Android, with package name com.<yourCompany>.app

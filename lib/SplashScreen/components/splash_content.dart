@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../SizeConfig.dart';
-import '../../constants.dart';
-
 class SplashContent extends StatelessWidget {
   const SplashContent({
     Key key,
@@ -17,19 +14,12 @@ class SplashContent extends StatelessWidget {
       child: Column(
         children: <Widget>[
           Spacer(),
-          Text(
-            "LIVE365",
-            style: TextStyle(
-              fontSize: getProportionateScreenWidth(36),
-              color: GTextColorWhite,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
           Image.asset(
-            "assets/images/logo.png",
-            height: getProportionateScreenHeight(265),
-            width: getProportionateScreenWidth(235),
+            "assets/images/logo2.png",
+            height: 350,
+            width: 350,
           ),
+          Spacer(),
           Spacer(),
         ],
       ),

@@ -72,79 +72,15 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
   @override
   Widget build(BuildContext context) {
     return PageView(
-      children: [
-        ResponsiveBuilder(
-          builder: (context, sizingInformation) {
-            return Scaffold(
-              body: SingleChildScrollView(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 5.0, vertical: 20.0),
-                child: Container(
-                  child: Column(
-                    children: [
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(left: 15.0, right: 15.0),
-                        child: Material(
-                          elevation: 5.0,
-                          borderRadius: BorderRadius.circular(50.0),
-                          child: TextFormField(
-                              cursorColor: black,
-                              controller: searchController,
-                              decoration: InputDecoration(
-                                  border: InputBorder.none,
-                                  prefixIcon: Icon(Icons.search,
-                                      color: GBottomNav, size: 30.0),
-                                  contentPadding:
-                                      EdgeInsets.only(left: 15.0, top: 15.0),
-                                  hintText: 'Search',
-                                  hintStyle: TextStyle(
-                                      color: Colors.white,
-                                      fontFamily: 'SFProDisplay-Black'))),
-                        ),
-                      ),
-                      SizedBox(
-                        height: 20,
-                      ),
-                      _buildTrendHeading(sizingInformation,
-                          title: "PkCricketFever",
-                          range: "2.7b",
-                          descrition: "Trending Hashtag"),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      _buildListView(),
-                      SizedBox(height: 20),
-                      _buildTrendHeading(sizingInformation,
-                          title: "SportLover",
-                          range: "13.7b",
-                          descrition: "Trending Hashtag"),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      _buildListView(),
-                      SizedBox(height: 20),
-                      _buildTrendHeading(sizingInformation,
-                          title: "myOutFit",
-                          range: "7.7b",
-                          descrition: "Trending Hashtag"),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      _buildListView(),
-                      SizedBox(height: 20),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          },
-        ),
-        ResponsiveBuilder(builder: (context, sizingInformation) {
-          return Scaffold(
-              body: SingleChildScrollView(
+      children: [getAllUsers()],
+    );
+  }
+
+  Widget getVideosAndUsers() {
+    return ResponsiveBuilder(
+      builder: (context, sizingInformation) {
+        return Scaffold(
+          body: SingleChildScrollView(
             padding:
                 const EdgeInsets.symmetric(horizontal: 5.0, vertical: 20.0),
             child: Container(
@@ -161,9 +97,6 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                       child: TextFormField(
                           cursorColor: black,
                           controller: searchController,
-                          onChanged: (query) {
-                            search(query);
-                          },
                           decoration: InputDecoration(
                               border: InputBorder.none,
                               prefixIcon: Icon(Icons.search,
@@ -177,16 +110,87 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                     ),
                   ),
                   SizedBox(
+                    height: 20,
+                  ),
+                  _buildTrendHeading(sizingInformation,
+                      title: "PkCricketFever",
+                      range: "2.7b",
+                      descrition: "Trending Hashtag"),
+                  SizedBox(
                     height: 10,
                   ),
-                  buildUsers()
+                  _buildListView(),
+                  SizedBox(height: 20),
+                  _buildTrendHeading(sizingInformation,
+                      title: "SportLover",
+                      range: "13.7b",
+                      descrition: "Trending Hashtag"),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  _buildListView(),
+                  SizedBox(height: 20),
+                  _buildTrendHeading(sizingInformation,
+                      title: "myOutFit",
+                      range: "7.7b",
+                      descrition: "Trending Hashtag"),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  _buildListView(),
+                  SizedBox(height: 20),
                 ],
               ),
             ),
-          ));
-        })
-      ],
+          ),
+        );
+      },
     );
+  }
+
+  Widget getAllUsers() {
+    return ResponsiveBuilder(builder: (context, sizingInformation) {
+      return Scaffold(
+          body: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 20.0),
+        child: Container(
+          child: Column(
+            children: [
+              SizedBox(
+                height: 10,
+              ),
+              Padding(
+                padding: EdgeInsets.only(left: 15.0, right: 15.0),
+                child: Material(
+                  elevation: 5.0,
+                  borderRadius: BorderRadius.circular(50.0),
+                  child: TextFormField(
+                      cursorColor: black,
+                      controller: searchController,
+                      onChanged: (query) {
+                        search(query);
+                      },
+                      decoration: InputDecoration(
+                          border: InputBorder.none,
+                          prefixIcon:
+                              Icon(Icons.search, color: GBottomNav, size: 30.0),
+                          contentPadding:
+                              EdgeInsets.only(left: 15.0, top: 15.0),
+                          hintText: 'Search',
+                          hintStyle: TextStyle(
+                              color: Colors.white,
+                              fontFamily: 'SFProDisplay-Black'))),
+                ),
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              buildUsers()
+            ],
+          ),
+        ),
+      ));
+    });
   }
 
   buildUsers() {

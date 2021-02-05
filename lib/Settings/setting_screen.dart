@@ -1,4 +1,5 @@
 import 'package:LIVE365/SignIn/sign_in_screen.dart';
+import 'package:LIVE365/constants.dart';
 import 'package:LIVE365/firebaseService/FirebaseService.dart';
 import 'package:LIVE365/profile/components/edit_profile.dart';
 import 'package:LIVE365/profile/components/profile_menu.dart';
@@ -62,8 +63,7 @@ class _SettingScreenState extends State<SettingScreen> {
                 text: "Log Out",
                 icon: "assets/icons/Log out.svg",
                 press: () async {
-                  FirebaseService().signOut();
-                  Navigator.pushNamed(context, SignInScreen.routeName);
+                  logOut(context);
                 },
               ),
             ],
@@ -71,6 +71,38 @@ class _SettingScreenState extends State<SettingScreen> {
         ),
       ),
     );
+  }
+
+  logOut(BuildContext parentContext) {
+    return showDialog(
+        context: parentContext,
+        builder: (context) {
+          return SimpleDialog(
+            backgroundColor: GBottomNav,
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(5.0)),
+            children: [
+              SimpleDialogOption(
+                onPressed: () {
+                  Navigator.pop(context);
+                  FirebaseService().signOut();
+                  Navigator.pushNamed(context, SignInScreen.routeName);
+                },
+                child: Text(
+                  'Log Out',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+              Divider(),
+              SimpleDialogOption(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text('Cancel', style: TextStyle(color: Colors.white)),
+              ),
+            ],
+          );
+        });
   }
 
   _launchURL() async {

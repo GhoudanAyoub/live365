@@ -191,7 +191,9 @@ class _PostsState extends State<Posts> {
           children: [
             Text(timeago.format(widget.post.timestamp.toDate()),
                 style: TextStyle(
-                    fontWeight: FontWeight.bold, color: Colors.white)),
+                    fontSize: 12,
+                    fontWeight: FontWeight.normal,
+                    color: Colors.white)),
             SizedBox(width: 3.0),
             StreamBuilder(
               stream: likesRef

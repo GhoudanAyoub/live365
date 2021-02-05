@@ -1,3 +1,4 @@
+import 'package:LIVE365/Inbox/components/conversation.dart';
 import 'package:LIVE365/Settings/setting_screen.dart';
 import 'package:LIVE365/components/post_tiles.dart';
 import 'package:LIVE365/components/post_view.dart';
@@ -12,7 +13,9 @@ import 'package:LIVE365/profile/components/profile_pic.dart';
 import 'package:LIVE365/utils/firebase.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 import '../../SizeConfig.dart';
 import '../../constants.dart';
@@ -79,7 +82,7 @@ class _BodyState extends State<Body> {
                 builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
                   if (snapshot.hasData) {
                     user1 = UserModel.fromJson(snapshot.data.data());
-                    return DisplayUserInfo();
+                    return displayUserInfo();
                   }
                   return Container();
                 },
@@ -381,13 +384,13 @@ class _BodyState extends State<Body> {
     );
   }
 
-  Widget DisplayUserInfo() {
+  Widget displayUserInfo() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SizedBox(height: getProportionateScreenHeight(30)),
         Container(
-            width: SizeConfig.screenWidth - 10,
+            width: SizeConfig.screenWidth,
             child: Center(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -408,7 +411,14 @@ class _BodyState extends State<Body> {
                                   ),
                                 ));
                           })
-                      : Container(),
+                      : IconButton(
+                          icon: Icon(
+                            Icons.list,
+                            color: Colors.white,
+                          ),
+                          onPressed: () {
+                            reportSystem();
+                          }),
                   SizedBox(
                     width: getProportionateScreenWidth(260),
                     height: getProportionateScreenHeight(10),
@@ -433,7 +443,9 @@ class _BodyState extends State<Body> {
               return Column(
                 children: <Widget>[
                   ProfilePic(
-                    image: auth.getProfileImage(),
+                    image: firebaseAuth.currentUser.uid == user.id
+                        ? auth.getProfileImage()
+                        : user.photoUrl,
                   ),
                   SizedBox(height: 5),
                   Text("${user.username ?? 'Anonymous'}",
@@ -564,5 +576,317 @@ class _BodyState extends State<Body> {
         ),
       ],
     );
+  }
+
+  reportSystem() {
+    return showModalBottomSheet(
+      backgroundColor: GBottomNav,
+      context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10.0),
+      ),
+      builder: (BuildContext context) {
+        return FractionallySizedBox(
+          heightFactor: .3,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(height: 10.0),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                child: Center(
+                  child: Text(
+                    'SELECT',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold, color: Colors.white),
+                  ),
+                ),
+              ),
+              Divider(
+                color: Colors.white,
+              ),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  SizedBox(width: 10.0),
+                  Column(
+                    children: [
+                      IconButton(
+                          icon: Icon(
+                            CupertinoIcons.flag,
+                            color: Colors.white,
+                          ),
+                          onPressed: () {
+                            Navigator.pop(context);
+                            reportButton();
+                          }),
+                      Text('Report',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white)),
+                    ],
+                  ),
+                  SizedBox(width: 10.0),
+                  Column(
+                    children: [
+                      IconButton(
+                          icon: Icon(
+                            Icons.email_outlined,
+                            color: Colors.white,
+                          ),
+                          onPressed: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => Conversation(
+                                    userId: widget.profileId,
+                                    chatId: 'newChat',
+                                  ),
+                                ));
+                          }),
+                      Center(
+                          child: Text('Send',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white))),
+                    ],
+                  ),
+                ],
+              )
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  reportButton() {
+    return showModalBottomSheet(
+        backgroundColor: GBottomNav,
+        context: context,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        builder: (BuildContext context) {
+          return FractionallySizedBox(
+            heightFactor: .4,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(height: 10.0),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                  child: Center(
+                    child: Text(
+                      'Select a reason',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
+                  ),
+                ),
+                Divider(
+                  color: Colors.white,
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ListTile(
+                      title: Text('Report account',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white)),
+                      onTap: () {
+                        Navigator.pop(context);
+                        reportAccountButton();
+                      },
+                    ),
+                    ListTile(
+                      title: Text('Report content',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white)),
+                      onTap: () {
+                        report('Content report');
+                      },
+                    ),
+                  ],
+                )
+              ],
+            ),
+          );
+        });
+  }
+
+  reportAccountButton() {
+    return showModalBottomSheet(
+        backgroundColor: GBottomNav,
+        context: context,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        builder: (BuildContext context) {
+          return FractionallySizedBox(
+            heightFactor: 0.75,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(height: 10.0),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                  child: Center(
+                    child: Text(
+                      'Select a reason',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
+                  ),
+                ),
+                Divider(
+                  color: Colors.white,
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ListTile(
+                        title: Text('Posting Inappropriate Content',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white)),
+                        onTap: () {
+                          Navigator.pop(context);
+                          reportPostingButton();
+                        }),
+                    ListTile(
+                      title: Text('Inappropriate Profile Info',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white)),
+                      onTap: () {
+                        report('Inappropriate Profile Info');
+                      },
+                    ),
+                    ListTile(
+                        title: Text('Intellectual property infringement',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white)),
+                        onTap: () {
+                          report('Intellectual property infringement');
+                        }),
+                    ListTile(
+                        title: Text('Other',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white)),
+                        onTap: () {
+                          report('Other report');
+                        }),
+                  ],
+                )
+              ],
+            ),
+          );
+        });
+  }
+
+  reportPostingButton() {
+    return showModalBottomSheet(
+        backgroundColor: GBottomNav,
+        context: context,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        builder: (BuildContext context) {
+          return FractionallySizedBox(
+            heightFactor: 1,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(height: 10.0),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                  child: Center(
+                    child: Text(
+                      'Select a reason',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
+                  ),
+                ),
+                Divider(
+                  color: Colors.white,
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ListTile(
+                        title: Text('Pornography and nudity',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white)),
+                        onTap: () {
+                          report('Pornography and nudity');
+                        }),
+                    ListTile(
+                      title: Text('Illegal activities and regulated goods',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white)),
+                      onTap: () {
+                        report('Illegal activities and regulated goods');
+                      },
+                    ),
+                    ListTile(
+                        title: Text('Hate speech',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white)),
+                        onTap: () {
+                          report('Hate speech');
+                        }),
+                    ListTile(
+                        title: Text('Violent and graphic content',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white)),
+                        onTap: () {
+                          report('Violent and graphic content');
+                        }),
+                    ListTile(
+                        title: Text('Suicide, self-harm, and dangerous acts',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white)),
+                        onTap: () {
+                          report('Suicide, self-harm, and dangerous acts');
+                        }),
+                  ],
+                )
+              ],
+            ),
+          );
+        });
+  }
+
+  report(String type) {
+    Navigator.pop(context);
+    reportRef.doc(widget.profileId).set({
+      'accountId': widget.profileId,
+      'type': type,
+      'reporterId': firebaseAuth.currentUser.uid
+    });
+    Fluttertoast.showToast(
+        msg: "Thank You For Reporting We Will Take It From Here",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.TOP,
+        timeInSecForIosWeb: 1,
+        backgroundColor: GBottomNav,
+        textColor: Colors.white,
+        fontSize: 16.0);
   }
 }

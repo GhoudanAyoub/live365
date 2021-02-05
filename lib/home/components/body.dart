@@ -1,20 +1,23 @@
 import 'dart:async';
-import 'dart:math' as math;
 
 import 'package:LIVE365/components/indicators.dart';
 import 'package:LIVE365/components/picture_card.dart';
 import 'package:LIVE365/components/stream_builder_wrapper.dart';
+import 'package:LIVE365/components/stream_comments_wrapper.dart';
 import 'package:LIVE365/firebaseService/FirebaseService.dart';
 import 'package:LIVE365/models/User.dart';
 import 'package:LIVE365/models/live.dart';
+import 'package:LIVE365/models/post_comments.dart';
 import 'package:LIVE365/models/video.dart';
 import 'package:LIVE365/profile/profile_screen.dart';
 import 'package:LIVE365/services/video_service.dart';
 import 'package:LIVE365/utils/firebase.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flare_flutter/flare_controls.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:timeago/timeago.dart' as timeago;
 import 'package:video_player/video_player.dart';
 
 import '../../SizeConfig.dart';
@@ -26,6 +29,7 @@ class Body extends StatefulWidget {
 }
 
 class _BodyState extends State<Body> with SingleTickerProviderStateMixin {
+  TextEditingController commentsTEC = TextEditingController();
   final auth = FirebaseService();
   final FlareControls flareControls = FlareControls();
   final databaseReference = FirebaseFirestore.instance;
@@ -49,8 +53,9 @@ class _BodyState extends State<Body> with SingleTickerProviderStateMixin {
   bool isFollowing = false;
   UserModel users;
   final DateTime timestamp = DateTime.now();
-
+  UserModel user;
   String profileId;
+  String likeNum;
 
   currentUserId() {
     return firebaseAuth.currentUser.uid;
@@ -65,6 +70,7 @@ class _BodyState extends State<Body> with SingleTickerProviderStateMixin {
     if (_controller != null) _controller.pause();
     if (_controllerRec != null) _controllerRec.pause();
     if (profileId != null) checkIfFollowing(profileId);
+    likeNum = '0';
     getVideosList();
     callList();
   }
@@ -110,140 +116,6 @@ class _BodyState extends State<Body> with SingleTickerProviderStateMixin {
     } else {
       return followFeed();
     }
-  }
-
-  buildRecButton(profileId) {
-    //if isMe then display "edit profile"
-    bool isMe = profileId == firebaseAuth.currentUser.uid;
-    if (isMe) {
-      return buildButton(
-        text: "Account",
-        function: () {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ProfileScreen(
-                  profileUID: firebaseAuth.currentUser.uid,
-                ),
-              ));
-        },
-      );
-      //if you are already following the user then "unfollow"
-    } else if (isFollowing) {
-      return buildButton(
-        text: "Unfollow",
-        function: handleUnfollow,
-      );
-      //if you are not following the user then "follow"
-    } else if (!isFollowing) {
-      return buildButton(
-        text: "Follow",
-        function: handleFollow,
-      );
-    }
-  }
-
-  handleUnfollow() async {
-    DocumentSnapshot doc = await usersRef.doc(currentUserId()).get();
-    users = UserModel.fromJson(doc.data());
-    setState(() {
-      isFollowing = false;
-    });
-    //remove follower
-    followersRef
-        .doc(profileId)
-        .collection('userFollowers')
-        .doc(currentUserId())
-        .get()
-        .then((doc) {
-      if (doc.exists) {
-        doc.reference.delete();
-      }
-    });
-    //remove following
-    followingRef
-        .doc(currentUserId())
-        .collection('userFollowing')
-        .doc(profileId)
-        .get()
-        .then((doc) {
-      if (doc.exists) {
-        doc.reference.delete();
-      }
-    });
-    //remove from notifications feeds
-    notificationRef
-        .doc(profileId)
-        .collection('notifications')
-        .doc(currentUserId())
-        .get()
-        .then((doc) {
-      if (doc.exists) {
-        doc.reference.delete();
-      }
-    });
-  }
-
-  handleFollow() async {
-    DocumentSnapshot doc = await usersRef.doc(currentUserId()).get();
-    users = UserModel.fromJson(doc.data());
-    setState(() {
-      isFollowing = true;
-    });
-    //updates the followers collection of the followed user
-    followersRef
-        .doc(profileId)
-        .collection('userFollowers')
-        .doc(currentUserId())
-        .set({});
-    //updates the following collection of the currentUser
-    followingRef
-        .doc(currentUserId())
-        .collection('userFollowing')
-        .doc(profileId)
-        .set({});
-    //update the notification feeds
-    notificationRef
-        .doc(profileId)
-        .collection('notifications')
-        .doc(currentUserId())
-        .set({
-      "type": "follow",
-      "ownerId": profileId,
-      "username": users.username,
-      "userId": users.id,
-      "userDp": users.photoUrl,
-      "timestamp": timestamp,
-    });
-  }
-
-  buildButton({String text, Function function}) {
-    return Center(
-      child: GestureDetector(
-        onTap: function,
-        child: Container(
-          height: 40.0,
-          width: 200.0,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(5.0),
-            gradient: LinearGradient(
-              begin: Alignment.topRight,
-              end: Alignment.bottomLeft,
-              colors: [
-                orange,
-                orange,
-              ],
-            ),
-          ),
-          child: Center(
-            child: Text(
-              text,
-              style: TextStyle(color: Colors.white),
-            ),
-          ),
-        ),
-      ),
-    );
   }
 
   Widget videoSlider(filteredv, int index) {
@@ -557,52 +429,85 @@ class _BodyState extends State<Body> with SingleTickerProviderStateMixin {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: <Widget>[
-                              Container(
-                                margin: EdgeInsets.only(bottom: 15),
-                                width: 40,
-                                height: getProportionateScreenHeight(50),
-                                child: Stack(
-                                  children: <Widget>[
-                                    CircleAvatar(
-                                      radius: 20,
-                                      backgroundColor: Colors.white,
-                                      child: CircleAvatar(
-                                        radius: 19,
-                                        backgroundColor: Colors.black,
-                                        backgroundImage: NetworkImage(
-                                            listVideos[index].userPic),
-                                      ),
-                                    )
-                                  ],
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => ProfileScreen(
+                                          profileUID: listVideos[index].ownerId,
+                                        ),
+                                      ));
+                                },
+                                child: Container(
+                                  margin: EdgeInsets.only(bottom: 5),
+                                  width: 40,
+                                  height: getProportionateScreenHeight(50),
+                                  child: Stack(
+                                    children: <Widget>[
+                                      CircleAvatar(
+                                        radius: 20,
+                                        backgroundColor: Colors.white,
+                                        child: CircleAvatar(
+                                          radius: 19,
+                                          backgroundColor: Colors.black,
+                                          backgroundImage: NetworkImage(
+                                              listVideos[index].userPic),
+                                        ),
+                                      )
+                                    ],
+                                  ),
                                 ),
                               ),
-                              Container(
-                                padding: EdgeInsets.only(bottom: 20),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: <Widget>[
-                                    Icon(Icons.favorite,
-                                        size: 35, color: Colors.white),
-                                    Text('427.9K',
-                                        style: TextStyle(color: Colors.white))
-                                  ],
-                                ),
+                              buildLikeButton(listVideos[index]),
+                              SizedBox(height: 3.0),
+                              StreamBuilder(
+                                stream: likesRef
+                                    .where('postId',
+                                        isEqualTo: listVideos[index].id)
+                                    .snapshots(),
+                                builder: (context,
+                                    AsyncSnapshot<QuerySnapshot> snapshot) {
+                                  if (snapshot.hasData) {
+                                    QuerySnapshot snap = snapshot.data;
+                                    List<DocumentSnapshot> docs = snap.docs;
+                                    return buildLikesCount(
+                                        context, docs?.length ?? 0);
+                                  } else {
+                                    return buildLikesCount(context, 0);
+                                  }
+                                },
                               ),
-                              Container(
-                                padding: EdgeInsets.only(bottom: 15),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: <Widget>[
-                                    Transform(
-                                        alignment: Alignment.center,
-                                        transform: Matrix4.rotationY(math.pi),
-                                        child: Icon(Icons.sms,
-                                            size: 35, color: Colors.white)),
-                                    Text('2051',
-                                        style: TextStyle(color: Colors.white))
-                                  ],
+                              SizedBox(height: 3.0),
+                              IconButton(
+                                icon: Icon(
+                                  Icons.sms,
+                                  size: 35,
+                                  color: Colors.white,
                                 ),
+                                onPressed: () {
+                                  commentClicked(listVideos[index]);
+                                },
                               ),
+                              SizedBox(height: 3.0),
+                              StreamBuilder(
+                                stream: commentRef
+                                    .doc(listVideos[index].id)
+                                    .collection("comments")
+                                    .snapshots(),
+                                builder: (context,
+                                    AsyncSnapshot<QuerySnapshot> snapshot) {
+                                  if (snapshot.hasData) {
+                                    QuerySnapshot snap = snapshot.data;
+                                    List<DocumentSnapshot> docs = snap.docs;
+                                    return buildCommentsCount(
+                                        context, docs?.length ?? 0);
+                                  } else {
+                                    return buildCommentsCount(context, 0);
+                                  }
+                                },
+                              ),
+                              SizedBox(height: 3.0),
                               AnimatedBuilder(
                                 animation: animationController,
                                 child: CircleAvatar(
@@ -634,6 +539,28 @@ class _BodyState extends State<Body> with SingleTickerProviderStateMixin {
                   Text('Rush and Be The First \n To Upload The First Video 😊'),
             ),
           );
+  }
+
+  Widget buildCommentsCount(BuildContext context, int count) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 0.5),
+      child: Text(
+        '${count}comm',
+        style: TextStyle(
+            fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white),
+      ),
+    );
+  }
+
+  Widget buildLikesCount(BuildContext context, int count) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 7.0),
+      child: Text(
+        '$count likes',
+        style: TextStyle(
+            fontWeight: FontWeight.bold, fontSize: 10.0, color: Colors.white),
+      ),
+    );
   }
 
   Widget recommendedFeed() {
@@ -684,6 +611,405 @@ class _BodyState extends State<Body> with SingleTickerProviderStateMixin {
             )
           ],
         ));
+  }
+
+  Widget buildLikeButton(video) {
+    return StreamBuilder(
+      stream: likesRef
+          .where('postId', isEqualTo: video.id)
+          .where('userId', isEqualTo: currentUserId())
+          .snapshots(),
+      builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        if (snapshot.hasData) {
+          List<QueryDocumentSnapshot> docs = snapshot?.data?.docs ?? [];
+          return IconButton(
+            onPressed: () {
+              if (docs.isEmpty) {
+                likesRef.add({
+                  'userId': currentUserId(),
+                  'postId': video.id,
+                  'dateCreated': Timestamp.now(),
+                });
+                addLikesToNotification(video);
+              } else {
+                likesRef.doc(docs[0].id).delete();
+                removeLikeFromNotification(video);
+              }
+            },
+            icon: docs.isEmpty
+                ? Icon(CupertinoIcons.heart, size: 35, color: Colors.white)
+                : Icon(
+                    CupertinoIcons.heart_fill,
+                    size: 35,
+                    color: Colors.red,
+                  ),
+          );
+        }
+        return Container();
+      },
+    );
+  }
+
+  buildRecButton(profileId) {
+    //if isMe then display "edit profile"
+    bool isMe = profileId == firebaseAuth.currentUser.uid;
+    if (isMe) {
+      return buildButton(
+        text: "Account",
+        function: () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ProfileScreen(
+                  profileUID: firebaseAuth.currentUser.uid,
+                ),
+              ));
+        },
+      );
+      //if you are already following the user then "unfollow"
+    } else if (isFollowing) {
+      return buildButton(
+        text: "Unfollow",
+        function: handleUnfollow,
+      );
+      //if you are not following the user then "follow"
+    } else if (!isFollowing) {
+      return buildButton(
+        text: "Follow",
+        function: handleFollow,
+      );
+    }
+  }
+
+  handleUnfollow() async {
+    DocumentSnapshot doc = await usersRef.doc(currentUserId()).get();
+    users = UserModel.fromJson(doc.data());
+    setState(() {
+      isFollowing = false;
+    });
+    //remove follower
+    followersRef
+        .doc(profileId)
+        .collection('userFollowers')
+        .doc(currentUserId())
+        .get()
+        .then((doc) {
+      if (doc.exists) {
+        doc.reference.delete();
+      }
+    });
+    //remove following
+    followingRef
+        .doc(currentUserId())
+        .collection('userFollowing')
+        .doc(profileId)
+        .get()
+        .then((doc) {
+      if (doc.exists) {
+        doc.reference.delete();
+      }
+    });
+    //remove from notifications feeds
+    notificationRef
+        .doc(profileId)
+        .collection('notifications')
+        .doc(currentUserId())
+        .get()
+        .then((doc) {
+      if (doc.exists) {
+        doc.reference.delete();
+      }
+    });
+  }
+
+  handleFollow() async {
+    DocumentSnapshot doc = await usersRef.doc(currentUserId()).get();
+    users = UserModel.fromJson(doc.data());
+    setState(() {
+      isFollowing = true;
+    });
+    //updates the followers collection of the followed user
+    followersRef
+        .doc(profileId)
+        .collection('userFollowers')
+        .doc(currentUserId())
+        .set({});
+    //updates the following collection of the currentUser
+    followingRef
+        .doc(currentUserId())
+        .collection('userFollowing')
+        .doc(profileId)
+        .set({});
+    //update the notification feeds
+    notificationRef
+        .doc(profileId)
+        .collection('notifications')
+        .doc(currentUserId())
+        .set({
+      "type": "follow",
+      "ownerId": profileId,
+      "username": users.username,
+      "userId": users.id,
+      "userDp": users.photoUrl,
+      "timestamp": timestamp,
+    });
+  }
+
+  buildButton({String text, Function function}) {
+    return Center(
+      child: GestureDetector(
+        onTap: function,
+        child: Container(
+          height: 40.0,
+          width: 200.0,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(5.0),
+            gradient: LinearGradient(
+              begin: Alignment.topRight,
+              end: Alignment.bottomLeft,
+              colors: [
+                orange,
+                orange,
+              ],
+            ),
+          ),
+          child: Center(
+            child: Text(
+              text,
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  commentClicked(video) {
+    return showModalBottomSheet(
+        backgroundColor: GBottomNav,
+        context: context,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        builder: (BuildContext context) {
+          return FractionallySizedBox(
+            heightFactor: 1.1,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(height: 10.0),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [SizedBox(height: 5.0), commentsBody(video)],
+                )
+              ],
+            ),
+          );
+        });
+  }
+
+  commentsBody(video) {
+    return Container(
+      height: 390,
+      child: Column(
+        children: [
+          Flexible(
+            child: ListView(
+              children: [
+                Flexible(
+                  child: buildComments(video),
+                )
+              ],
+            ),
+          ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Container(
+              decoration: BoxDecoration(
+                color: GBottomNav,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey[500],
+                    offset: Offset(0.0, 1.5),
+                    blurRadius: 4.0,
+                  ),
+                ],
+              ),
+              constraints: BoxConstraints(
+                maxHeight: 190.0,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Flexible(
+                    child: ListTile(
+                      contentPadding: EdgeInsets.all(0),
+                      title: TextField(
+                        textCapitalization: TextCapitalization.sentences,
+                        controller: commentsTEC,
+                        style: TextStyle(
+                          fontSize: 15.0,
+                          color: Colors.white,
+                        ),
+                        decoration: InputDecoration(
+                          contentPadding: EdgeInsets.all(10.0),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(5.0),
+                            borderSide: BorderSide(
+                              color: Colors.white,
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.white,
+                            ),
+                            borderRadius: BorderRadius.circular(5.0),
+                          ),
+                          hintText: "Write your comment...",
+                          hintStyle: TextStyle(
+                            fontSize: 15.0,
+                            color: Colors.white,
+                          ),
+                        ),
+                        maxLines: null,
+                      ),
+                      trailing: GestureDetector(
+                        onTap: () {
+                          addComments(video);
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.only(right: 10.0),
+                          child: Icon(
+                            Icons.send,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  addComments(video) async {
+    DocumentSnapshot doc = await usersRef.doc(currentUserId()).get();
+    user = UserModel.fromJson(doc.data());
+    commentRef.doc(video.id).collection("comments").add({
+      "username": user.username,
+      "comment": commentsTEC.text,
+      "timestamp": timestamp,
+      "userDp": user.photoUrl,
+      "userId": user.id,
+    });
+
+    bool isNotMe = video.ownerId != currentUserId();
+    if (isNotMe) {
+      notificationRef.doc(video.ownerId).collection('notifications').add({
+        "type": "comment",
+        "commentData": commentsTEC.text,
+        "username": user.username,
+        "userId": user.id,
+        "userDp": user.photoUrl,
+        "postId": video.id,
+        "mediaUrl": video.mediaUrl,
+        "timestamp": timestamp,
+      });
+    }
+    commentsTEC.clear();
+  }
+
+  buildComments(video) {
+    return CommentsStreamWrapper(
+      shrinkWrap: true,
+      stream: commentRef
+          .doc(video.id)
+          .collection('comments')
+          .orderBy('timestamp', descending: true)
+          .snapshots(),
+      physics: NeverScrollableScrollPhysics(),
+      itemBuilder: (_, DocumentSnapshot snapshot) {
+        CommentModel comments = CommentModel.fromJson(snapshot.data());
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            ListTile(
+              contentPadding: EdgeInsets.symmetric(horizontal: 20.0),
+              leading: CircleAvatar(
+                radius: 20.0,
+                backgroundImage: NetworkImage(comments.userDp),
+              ),
+              title: Text(
+                comments.username,
+                style:
+                    TextStyle(fontWeight: FontWeight.w700, color: Colors.white),
+              ),
+              subtitle: Text(
+                timeago.format(comments.timestamp.toDate()),
+                style: TextStyle(fontSize: 12.0, color: Colors.white),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 80.0),
+              child: Text(
+                comments.comment,
+                style:
+                    TextStyle(fontWeight: FontWeight.w400, color: Colors.white),
+              ),
+            ),
+            Divider(
+              color: Colors.white,
+              indent: 20,
+              endIndent: 25,
+            )
+          ],
+        );
+      },
+    );
+  }
+
+  addLikesToNotification(video) async {
+    bool isNotMe = currentUserId() != video.ownerId;
+
+    if (isNotMe) {
+      DocumentSnapshot doc = await usersRef.doc(currentUserId()).get();
+      user = UserModel.fromJson(doc.data());
+      notificationRef
+          .doc(video.ownerId)
+          .collection('notifications')
+          .doc(video.postId)
+          .set({
+        "type": "like",
+        "username": user.username,
+        "userId": currentUserId(),
+        "userDp": user.photoUrl,
+        "postId": video.id,
+        "mediaUrl": video.mediaUrl,
+        "timestamp": timestamp,
+      });
+    }
+  }
+
+  removeLikeFromNotification(video) async {
+    bool isNotMe = currentUserId() != video.ownerId;
+
+    if (isNotMe) {
+      DocumentSnapshot doc = await usersRef.doc(currentUserId()).get();
+      user = UserModel.fromJson(doc.data());
+      notificationRef
+          .doc(video.ownerId)
+          .collection('notifications')
+          .doc(video.id)
+          .get()
+          .then((doc) => {
+                if (doc.exists) {doc.reference.delete()}
+              });
+    }
   }
 
   buildVideoSlider() {

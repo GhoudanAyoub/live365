@@ -7,6 +7,6 @@ class UserViewModel extends ChangeNotifier {
 
   setUser() {
     user = auth.currentUser;
-    notifyListeners();
+    //notifyListeners();
   }
 }

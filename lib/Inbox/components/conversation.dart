@@ -87,12 +87,14 @@ class _ConversationState extends State<Conversation> {
             children: [
               Flexible(
                 child: StreamBuilder(
-                  stream: messageListStream(widget.chatId),
+                  stream: messageListStream(chatId),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       List messages = snapshot.data.documents;
-                      viewModel.setReadCount(
-                          widget.chatId, user, messages.length);
+                      if (widget.chatId != 'newChat') {
+                        viewModel.setReadCount(
+                            widget.chatId, user, messages.length);
+                      }
                       return ListView.builder(
                         controller: scrollController,
                         padding: EdgeInsets.symmetric(horizontal: 10.0),
