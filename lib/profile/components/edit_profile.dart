@@ -22,9 +22,17 @@ class EditProfile extends StatefulWidget {
 
 class _EditProfileState extends State<EditProfile> {
   UserModel user;
+  bool valuesecond;
 
   String currentUid() {
     return firebaseAuth.currentUser.uid;
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    valuesecond = widget.user.msgToAll;
   }
 
   @override
@@ -158,6 +166,23 @@ class _EditProfileState extends State<EditProfile> {
               onChanged: (String val) {
                 viewModel.setBio(val);
               },
+            ),
+            SizedBox(height: 10.0),
+            Row(
+              children: [
+                Checkbox(
+                    value: this.valuesecond,
+                    onChanged: (bool value) {
+                      setState(() {
+                        this.valuesecond = value;
+                        viewModel.setMsgAll(value);
+                      });
+                    }),
+                Text(
+                  "Receive Message From All",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ],
             ),
           ],
         ),

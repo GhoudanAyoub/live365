@@ -1,7 +1,5 @@
-import 'package:LIVE365/models/live.dart';
 import 'package:LIVE365/models/message.dart';
 import 'package:LIVE365/models/message_list.dart';
-import 'package:LIVE365/models/users.dart';
 import 'package:LIVE365/utils/firebase.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -37,32 +35,17 @@ class FirebaseService {
 
   //USER LIVE
   static void createLiveUser({username, name, id, time, image}) async {
-    final snapShot = await liveRef.doc(firebaseAuth.currentUser.uid).get();
-    Live live = Live.fromJson(snapShot.data());
     var ref = liveRef.doc();
-    if (snapShot.exists) {
-      await liveRef.doc(firebaseAuth.currentUser.uid).update({
-        'id': ref.id,
-        'ownerId': live.ownerId,
-        'username': username,
-        'channelName': name,
-        'channelId': id,
-        'time': time,
-        'hostImage': image,
-        'image': image
-      });
-    } else {
-      await liveRef.doc(firebaseAuth.currentUser.uid).set({
-        'id': ref.id,
-        'ownerId': firebaseAuth.currentUser.uid,
-        'username': username,
-        'channelName': name,
-        'channelId': id,
-        'time': time,
-        'hostImage': image,
-        'image': image
-      });
-    }
+    await liveRef.doc(firebaseAuth.currentUser.uid).set({
+      'id': ref.id,
+      'ownerId': firebaseAuth.currentUser.uid,
+      'username': username,
+      'channelName': name,
+      'channelId': id,
+      'time': time,
+      'hostImage': image,
+      'image': image
+    });
   }
 
   static void deleteUser({username}) async {
@@ -71,65 +54,19 @@ class FirebaseService {
 
   // USER DATA
   static Future addUsers(User user) async {
-    usersRef.doc(user.uid).set({
-      'username': user.displayName,
-      'email': user.email,
-      'time': Timestamp.now(),
-      'id': user.uid,
-      'bio': "",
-      'country': "",
-      'photoUrl': user.photoURL ?? ''
-    });
-  }
-
-  static Stream<List<users>> GetUserData() => FirebaseFirestore.instance
-      .collection("Users")
-      .orderBy("followers", descending: true)
-      .snapshots()
-      .transform(Utils.transformer(users.fromJson));
-
-  //Friend data
-  static Future addFriendUsers(users user, String img) async {
-    await FirebaseFirestore.instance
-        .collection("Users")
-        .doc(FirebaseAuth.instance.currentUser.displayName)
-        .collection('Friend')
-        .doc()
-        .set({
-      'id': user.id,
-      'name': user.name,
-      'img': img,
-      'online': true,
-      'live': false,
-      'message': "",
-      'created_at': DateTime.now()
-    });
-  }
-
-  static Stream<List<MessageList>> getFriends() => FirebaseFirestore.instance
-      .collection("Users")
-      .doc(FirebaseAuth.instance.currentUser.displayName)
-      .collection('Friend')
-      .orderBy(MessageListField.lastMessageTime, descending: true)
-      .snapshots()
-      .transform(Utils.transformer(MessageList.fromJson));
-
-  // MESSAGE DATA
-  static Future addRandomUsers(users user, String img) async {
-    await FirebaseFirestore.instance
-        .collection("Message")
-        .doc(FirebaseAuth.instance.currentUser.displayName)
-        .collection('users')
-        .doc()
-        .set({
-      'id': user.id,
-      'name': user.name,
-      'img': img,
-      'online': true,
-      'live': false,
-      'message': "",
-      'created_at': DateTime.now()
-    });
+    final snapShot = await usersRef.doc(user.uid).get();
+    if (!snapShot.exists) {
+      usersRef.doc(user.uid).set({
+        'username': user.displayName,
+        'email': user.email,
+        'time': Timestamp.now(),
+        'id': user.uid,
+        'bio': "",
+        'country': "",
+        'photoUrl': user.photoURL ?? '',
+        'msgToAll': true
+      });
+    }
   }
 
   static Stream<List<MessageList>> getUsers() => FirebaseFirestore.instance

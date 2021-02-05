@@ -14,6 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:wakelock/wakelock.dart';
 
+import '../../constants.dart';
 import '../../utils/setting.dart';
 import '../composents/HearAnim.dart';
 
@@ -49,7 +50,7 @@ class _CallPageState extends State<CallPage> {
 
   bool _isLogin = true;
   bool _isInChannel = true;
-  int userNo = 0;
+  int userNo;
   var userMap;
   var tryingToEnd = false;
   bool personBool = false;
@@ -145,7 +146,7 @@ class _CallPageState extends State<CallPage> {
               time: widget.time,
               image: widget.image);
         }
-        await Wakelock.enable();
+        userJoinChannelSuccess();
       });
     }, leaveChannel: (stats) {
       setState(() {
@@ -154,6 +155,7 @@ class _CallPageState extends State<CallPage> {
       });
     }, userJoined: (uid, elapsed) async {
       setState(() {
+        if (userList.length > 0) anyPerson = true;
         final info = 'userJoined: $uid';
         _infoString.add(info);
         _users.add(uid);
@@ -175,6 +177,10 @@ class _CallPageState extends State<CallPage> {
         _infoString.add(info);
       });
     }));
+  }
+
+  userJoinChannelSuccess() async {
+    await Wakelock.enable();
   }
 
   /// Helper function to get list of native views
@@ -260,7 +266,7 @@ class _CallPageState extends State<CallPage> {
       final height = _random.nextInt(size.height.floor());
       final width = 20;
       confetti.add(HeartAnim(
-        height % 200.0,
+        height % 100.0,
         width.toDouble(),
         0.5,
       ));
@@ -347,7 +353,9 @@ class _CallPageState extends State<CallPage> {
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: <Widget>[
                                 CachedNetworkImage(
-                                  imageUrl: _infoStrings[index].image,
+                                  imageUrl: _infoStrings[index].image == null
+                                      ? 'https://www.google.com/search?q=user+image&safe=active&sxsrf=ALeKk02NmCuAk7tH4ZoWQ0Yztn_0xB8Pyw:1612529245165&tbm=isch&source=iu&ictx=1&fir=P6AlQsrs5ks3RM%252CnKbZ7-T8tpkWLM%252C_&vet=1&usg=AI4_-kQy-UTR8GfaFb5jIRQVJzZMH4SEEg&sa=X&ved=2ahUKEwiIgOTG49LuAhU7VBUIHaqWAUwQ9QF6BAgOEAE&biw=1024&bih=657#imgrc=P6AlQsrs5ks3RM'
+                                      : _infoStrings[index].image,
                                   imageBuilder: (context, imageProvider) =>
                                       Container(
                                     width: 32.0,
@@ -430,7 +438,7 @@ class _CallPageState extends State<CallPage> {
             Container(
               decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [Colors.indigo, Colors.blue],
+                    colors: [GBottomNav, GBottomNav],
                   ),
                   borderRadius: BorderRadius.all(Radius.circular(4.0))),
               child: Padding(
@@ -468,7 +476,7 @@ class _CallPageState extends State<CallPage> {
                           width: 5,
                         ),
                         Text(
-                          '$userNo',
+                          '${userNo == null ? _users.length : userNo}',
                           style: TextStyle(color: Colors.white, fontSize: 11),
                         ),
                       ],
@@ -481,7 +489,7 @@ class _CallPageState extends State<CallPage> {
     );
   }
 
-  Widget endLive() {
+  Widget endLive2() {
     return Container(
       color: Colors.black.withOpacity(0.5),
       child: Stack(
@@ -515,7 +523,7 @@ class _CallPageState extends State<CallPage> {
                         ),
                       ),
                       elevation: 2.0,
-                      color: Colors.red,
+                      color: GBottomNav,
                       onPressed: () async {
                         await Wakelock.disable();
                         _logout();
@@ -544,7 +552,7 @@ class _CallPageState extends State<CallPage> {
                         ),
                       ),
                       elevation: 2.0,
-                      color: Colors.grey,
+                      color: GBottomNav,
                       onPressed: () {
                         setState(() {
                           tryingToEnd = false;
@@ -559,6 +567,46 @@ class _CallPageState extends State<CallPage> {
         ],
       ),
     );
+  }
+
+  endLive(BuildContext parentContext) {
+    return showDialog(
+        context: parentContext,
+        builder: (context) {
+          return SimpleDialog(
+            backgroundColor: GBottomNav,
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(5.0)),
+            children: [
+              SimpleDialogOption(
+                onPressed: () async {
+                  await Wakelock.disable();
+                  _logout();
+                  _leaveChannel();
+                  _engine.leaveChannel();
+                  _engine.destroy();
+                  FirebaseService.deleteUser(username: channelName);
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => HomeScreen()));
+                },
+                child: Text(
+                  'End LIVE',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+              Divider(),
+              SimpleDialogOption(
+                onPressed: () {
+                  setState(() {
+                    tryingToEnd = false;
+                  });
+                  Navigator.pop(context);
+                },
+                child: Text('Cancel', style: TextStyle(color: Colors.white)),
+              ),
+            ],
+          );
+        });
   }
 
   Widget personList() {
@@ -792,7 +840,7 @@ class _CallPageState extends State<CallPage> {
         child: SafeArea(
           child: Scaffold(
             body: Container(
-              color: Colors.black,
+              color: Colors.black.withOpacity(0.2),
               child: Center(
                 child: Stack(
                   children: <Widget>[
@@ -825,7 +873,7 @@ class _CallPageState extends State<CallPage> {
                     if (heart == true && tryingToEnd == false) heartPop(),
                     if (tryingToEnd == false) _bottomBar(), // send message
                     if (tryingToEnd == false) messageList(),
-                    if (tryingToEnd == true) endLive(), // view message
+                    if (tryingToEnd == true) endLive2(), // view message
                     if (personBool == true && waiting == false) personList(),
                     if (giftBool == true && waiting == false) GiftList(),
                     if (accepted == true) stopSharing(),
@@ -943,7 +991,7 @@ class _CallPageState extends State<CallPage> {
     return Container(
       alignment: Alignment.bottomRight,
       child: Container(
-        color: Colors.black,
+        color: Colors.black.withOpacity(0),
         child: Padding(
           padding: const EdgeInsets.only(left: 8, top: 5, right: 8, bottom: 5),
           child:
@@ -1025,6 +1073,7 @@ class _CallPageState extends State<CallPage> {
                 child: MaterialButton(
                   minWidth: 0,
                   onPressed: () {
+                    endLive(context);
                     if (personBool == true) {
                       setState(() {
                         personBool = false;
@@ -1034,7 +1083,6 @@ class _CallPageState extends State<CallPage> {
                       if (waiting == true) {
                         waiting = false;
                       }
-                      tryingToEnd = true;
                     });
                   },
                   child: Icon(
@@ -1098,11 +1146,17 @@ class _CallPageState extends State<CallPage> {
       return;
     }
     try {
+      await _channel.sendMessage(
+          AgoraRtmMessage.fromText(_channelMessageController.text));
+      _log(
+          user: widget.userName,
+          info: _channelMessageController.text,
+          type: 'message');
       _channelMessageController.clear();
-      await _channel.sendMessage(AgoraRtmMessage.fromText(text));
-      _log(user: widget.channelName, info: text, type: 'message');
     } catch (errorCode) {
-      //_log(info: 'Send channel message error: ' + errorCode.toString(), type: 'error');
+      _log(
+          info: 'Send channel message error: ' + errorCode.toString(),
+          type: 'error');
     }
   }
 
@@ -1111,9 +1165,9 @@ class _CallPageState extends State<CallPage> {
       return;
     }
     try {
-      _channelMessageController.clear();
       await _channel.sendMessage(AgoraRtmMessage.fromText(text));
-      _log(user: widget.channelName, info: text, type: 'message');
+      _log(user: widget.userName, info: text, type: 'message');
+      _channelMessageController.clear();
     } catch (errorCode) {
       _log(
           info: 'Send channel message error: ' + errorCode.toString(),
@@ -1151,7 +1205,7 @@ class _CallPageState extends State<CallPage> {
       });
       userMap.putIfAbsent(member.userId, () => img);
       var len;
-      _channel.getMembers().then((value) {
+      channel.getMembers().then((value) {
         len = value.length;
         setState(() {
           userNo = len - 1;
@@ -1178,7 +1232,7 @@ class _CallPageState extends State<CallPage> {
         if (userList.length == 0) anyPerson = false;
       });
 
-      _channel.getMembers().then((value) {
+      channel.getMembers().then((value) {
         len = value.length;
         setState(() {
           userNo = len - 1;

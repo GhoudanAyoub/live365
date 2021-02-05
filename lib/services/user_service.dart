@@ -20,7 +20,11 @@ class UserService extends Service {
   }
 
   updateProfile(
-      {File image, String username, String bio, String country}) async {
+      {File image,
+      String username,
+      String bio,
+      String country,
+      bool msgToAll}) async {
     DocumentSnapshot doc = await usersRef.doc(currentUid()).get();
     var users = UserModel.fromJson(doc.data());
     users?.username = username;
@@ -32,6 +36,7 @@ class UserService extends Service {
     await usersRef.doc(currentUid()).update({
       'username': username,
       'bio': bio,
+      'msgToAll': msgToAll,
       'country': country,
       "photoUrl": users?.photoUrl ?? '',
     });

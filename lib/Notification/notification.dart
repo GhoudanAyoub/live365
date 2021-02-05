@@ -38,96 +38,56 @@ class _ActivitiesState extends State<Activities> {
     ));
   }
 
-  Widget getPageView() {
-    return PageView(
-      children: [
-        Scaffold(
-          appBar: AppBar(
-            automaticallyImplyLeading: false,
-            title: Text('Notifications'),
-            centerTitle: true,
-            actions: [
-              Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: GestureDetector(
-                  onTap: () => deleteAllItems(),
-                  child: Text(
-                    'CLEAR',
-                    style: TextStyle(
-                      fontSize: 13.0,
-                      fontWeight: FontWeight.w900,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          body: ListView(
-            children: [
-              getActivities(),
-            ],
-          ),
-        ),
-        Chats()
-      ],
-    );
-  }
+  List<Widget> containers = [
+    Scaffold(
+      body: ListView(
+        children: [
+          ActivityStreamWrapper(
+              shrinkWrap: true,
+              padding: const EdgeInsets.symmetric(horizontal: 10.0),
+              stream: notificationRef
+                  .doc(firebaseAuth.currentUser.uid)
+                  .collection('notifications')
+                  .orderBy('timestamp', descending: true)
+                  .limit(20)
+                  .snapshots(),
+              physics: NeverScrollableScrollPhysics(),
+              itemBuilder: (_, DocumentSnapshot snapshot) {
+                ActivityModel activities =
+                    ActivityModel.fromJson(snapshot.data());
+                return ActivityItems(
+                  activity: activities,
+                );
+              })
+        ],
+      ),
+    ),
+    Chats(),
+  ];
 
   @override
   Widget build(BuildContext context) {
-    return PageView(
-      children: [
-        Scaffold(
-          appBar: AppBar(
-            automaticallyImplyLeading: false,
-            title: Text('Notifications'),
-            centerTitle: true,
-            actions: [
-              Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: GestureDetector(
-                  onTap: () => deleteAllItems(),
-                  child: Text(
-                    'CLEAR',
-                    style: TextStyle(
-                      fontSize: 13.0,
-                      fontWeight: FontWeight.w900,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          bottom: TabBar(
+            tabs: <Widget>[
+              Tab(
+                text: 'Notification',
+              ),
+              Tab(
+                text: 'Chat',
               ),
             ],
           ),
-          body: ListView(
-            children: [
-              getActivities(),
-            ],
-          ),
         ),
-        Chats()
-      ],
+        body: TabBarView(
+          children: containers,
+        ),
+      ),
     );
-  }
-
-  getActivities() {
-    return ActivityStreamWrapper(
-        shrinkWrap: true,
-        padding: const EdgeInsets.symmetric(horizontal: 10.0),
-        stream: notificationRef
-            .doc(currentUserId())
-            .collection('notifications')
-            .orderBy('timestamp', descending: true)
-            .limit(20)
-            .snapshots(),
-        physics: NeverScrollableScrollPhysics(),
-        itemBuilder: (_, DocumentSnapshot snapshot) {
-          ActivityModel activities = ActivityModel.fromJson(snapshot.data());
-          return ActivityItems(
-            activity: activities,
-          );
-        });
   }
 
   deleteAllItems() async {
@@ -141,43 +101,6 @@ class _ActivitiesState extends State<Activities> {
         doc.reference.delete();
       }
     });
-  }
-
-  Widget getBody() {
-    return IndexedStack(
-      index: pageIndex,
-      children: [
-        Scaffold(
-          appBar: AppBar(
-            automaticallyImplyLeading: false,
-            title: Text('Notifications'),
-            centerTitle: true,
-            actions: [
-              Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: GestureDetector(
-                  onTap: () => deleteAllItems(),
-                  child: Text(
-                    'CLEAR',
-                    style: TextStyle(
-                      fontSize: 13.0,
-                      fontWeight: FontWeight.w900,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          body: ListView(
-            children: [
-              getActivities(),
-            ],
-          ),
-        ),
-        Chats(),
-      ],
-    );
   }
 
   Widget Footer2() {

@@ -35,7 +35,8 @@ class AuthService {
       'id': user.uid,
       'bio': "",
       'country': country,
-      'photoUrl': user.photoURL ?? ''
+      'photoUrl': user.photoURL ?? '',
+      'msgToAll': true
     });
   }
 

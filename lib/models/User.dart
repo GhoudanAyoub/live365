@@ -10,6 +10,7 @@ class UserModel {
   Timestamp signedUpAt;
   Timestamp lastSeen;
   bool isOnline;
+  bool msgToAll;
 
   UserModel(
       {this.username,
@@ -20,7 +21,8 @@ class UserModel {
       this.isOnline,
       this.lastSeen,
       this.bio,
-      this.country});
+      this.country,
+      this.msgToAll});
 
   UserModel.fromJson(Map<String, dynamic> json) {
     username = json['username'];
@@ -32,6 +34,7 @@ class UserModel {
     lastSeen = json['lastSeen'];
     bio = json['bio'];
     id = json['id'];
+    msgToAll = json['msgToAll'];
   }
 
   Map<String, dynamic> toJson() {
@@ -45,6 +48,7 @@ class UserModel {
     data['isOnline'] = this.isOnline;
     data['lastSeen'] = this.lastSeen;
     data['id'] = this.id;
+    data['msgToAll'] = this.msgToAll;
 
     return data;
   }

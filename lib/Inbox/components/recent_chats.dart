@@ -14,11 +14,6 @@ class Chats extends StatelessWidget {
         Provider.of<UserViewModel>(context, listen: false);
     viewModel.setUser();
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: Text("Chats"),
-        centerTitle: true,
-      ),
       body: StreamBuilder(
           stream: userChatsStream('${viewModel.user.uid ?? ""}'),
           builder: (context, snapshot) {

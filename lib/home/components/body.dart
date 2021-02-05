@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:collection';
 
+import 'package:LIVE365/Upload/composents/join.dart';
 import 'package:LIVE365/components/indicators.dart';
 import 'package:LIVE365/components/picture_card.dart';
 import 'package:LIVE365/components/stream_builder_wrapper.dart';
@@ -50,7 +52,7 @@ class _BodyState extends State<Body> with SingleTickerProviderStateMixin {
       PageController(initialPage: 0, viewportFraction: 0.8);
   PageController foryouController = new PageController();
   bool loading = true;
-  bool isFollowing = false;
+  HashMap isFollowing = new HashMap<String, bool>();
   UserModel users;
   final DateTime timestamp = DateTime.now();
   UserModel user;
@@ -69,7 +71,7 @@ class _BodyState extends State<Body> with SingleTickerProviderStateMixin {
     animationController.repeat();
     if (_controller != null) _controller.pause();
     if (_controllerRec != null) _controllerRec.pause();
-    if (profileId != null) checkIfFollowing(profileId);
+    //if (profileId != null) checkIfFollowing(profileId);
     likeNum = '0';
     getVideosList();
     callList();
@@ -82,7 +84,7 @@ class _BodyState extends State<Body> with SingleTickerProviderStateMixin {
         .doc(currentUserId())
         .get();
     setState(() {
-      isFollowing = doc.exists;
+      isFollowing.putIfAbsent(profileId, () => doc.exists);
     });
   }
 
@@ -107,7 +109,10 @@ class _BodyState extends State<Body> with SingleTickerProviderStateMixin {
     if (liveButton) {
       if (_controller != null) _controller.pause();
       if (_controllerRec != null) _controllerRec.pause();
-      return scrollFeed();
+      return Padding(
+        padding: const EdgeInsets.only(top: 80.0, left: 10.0, right: 10.0),
+        child: scrollFeed(),
+      );
     }
     if (recommended) {
       if (_controller != null) _controller.pause();
@@ -122,7 +127,7 @@ class _BodyState extends State<Body> with SingleTickerProviderStateMixin {
     DocumentSnapshot doc = filteredv[index];
     Video video = Video.fromJson(doc.data());
     profileId = video.ownerId;
-    checkIfFollowing(video.ownerId);
+    checkIfFollowing(profileId);
     if (video.ownerId == currentUserId()) {
       Timer(Duration(milliseconds: 50), () {
         setState(() {
@@ -322,19 +327,48 @@ class _BodyState extends State<Body> with SingleTickerProviderStateMixin {
               physics: NeverScrollableScrollPhysics(),
               itemBuilder: (_, DocumentSnapshot snapshot) {
                 Live live = Live.fromJson(snapshot.data());
-                return Padding(
-                  padding: const EdgeInsets.only(
-                      bottom: 15.0, left: 10.0, right: 10.0),
-                  child: PictureCard(
-                    live: live,
-                  ),
-                );
+                return GestureDetector(
+                    onTap: () {
+                      onJoin(
+                          channelName: live.channelName,
+                          channelId: live.channelId,
+                          username: live.username,
+                          hostImage: live.image,
+                          userImage: live.image);
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                          bottom: 15.0, left: 10.0, right: 10.0),
+                      child: PictureCard(
+                        live: live,
+                      ),
+                    ));
               },
             );
           }),
         ),
       ],
     );
+  }
+
+  Future<void> onJoin(
+      {channelName, channelId, username, hostImage, userImage}) async {
+    // update input validation
+    if (channelName.isNotEmpty) {
+      // push video page with given channel name
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => JoinPage(
+            channelName: channelName,
+            channelId: channelId,
+            username: username,
+            hostImage: hostImage,
+            userImage: userImage,
+          ),
+        ),
+      );
+    }
   }
 
   Widget followFeed() {
@@ -667,25 +701,25 @@ class _BodyState extends State<Body> with SingleTickerProviderStateMixin {
         },
       );
       //if you are already following the user then "unfollow"
-    } else if (isFollowing) {
+    } else if (isFollowing[profileId]) {
       return buildButton(
         text: "Unfollow",
-        function: handleUnfollow,
+        function: () => handleUnfollow(profileId),
       );
       //if you are not following the user then "follow"
-    } else if (!isFollowing) {
+    } else if (!isFollowing[profileId]) {
       return buildButton(
         text: "Follow",
-        function: handleFollow,
+        function: () => handleFollow(profileId),
       );
     }
   }
 
-  handleUnfollow() async {
+  handleUnfollow(profileId) async {
     DocumentSnapshot doc = await usersRef.doc(currentUserId()).get();
     users = UserModel.fromJson(doc.data());
     setState(() {
-      isFollowing = false;
+      isFollowing.putIfAbsent(profileId, () => false);
     });
     //remove follower
     followersRef
@@ -722,11 +756,11 @@ class _BodyState extends State<Body> with SingleTickerProviderStateMixin {
     });
   }
 
-  handleFollow() async {
+  handleFollow(profileId) async {
     DocumentSnapshot doc = await usersRef.doc(currentUserId()).get();
     users = UserModel.fromJson(doc.data());
     setState(() {
-      isFollowing = true;
+      isFollowing.putIfAbsent(profileId, () => true);
     });
     //updates the followers collection of the followed user
     followersRef

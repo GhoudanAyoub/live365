@@ -45,7 +45,7 @@ class PictureCard extends StatelessWidget {
                       child: LiveCardInfoShow(
                           image: live.image,
                           name: live.username,
-                          views: live.views),
+                          views: live.views == null ? '0' : live.views),
                     ),
                     Positioned(
                       left: 0.0,

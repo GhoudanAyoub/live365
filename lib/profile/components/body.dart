@@ -9,6 +9,7 @@ import 'package:LIVE365/firebaseService/FirebaseService.dart';
 import 'package:LIVE365/models/User.dart';
 import 'package:LIVE365/models/post.dart';
 import 'package:LIVE365/models/video.dart';
+import 'package:LIVE365/profile/components/follow_unfollow_page.dart';
 import 'package:LIVE365/profile/components/profile_pic.dart';
 import 'package:LIVE365/utils/firebase.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -518,22 +519,32 @@ class _BodyState extends State<Body> {
                                   color: Colors.grey,
                                 ),
                               ),
-                              StreamBuilder(
-                                stream: followersRef
-                                    .doc(widget.profileId)
-                                    .collection('userFollowers')
-                                    .snapshots(),
-                                builder: (context,
-                                    AsyncSnapshot<QuerySnapshot> snapshot) {
-                                  if (snapshot.hasData) {
-                                    QuerySnapshot snap = snapshot.data;
-                                    List<DocumentSnapshot> docs = snap.docs;
-                                    return buildCount(
-                                        "FOLLOWERS", docs?.length ?? 0);
-                                  } else {
-                                    return buildCount("FOLLOWERS", 0);
-                                  }
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => FollowUnfollowPage(
+                                            profileId: widget.profileId),
+                                      ));
                                 },
+                                child: StreamBuilder(
+                                  stream: followersRef
+                                      .doc(widget.profileId)
+                                      .collection('userFollowers')
+                                      .snapshots(),
+                                  builder: (context,
+                                      AsyncSnapshot<QuerySnapshot> snapshot) {
+                                    if (snapshot.hasData) {
+                                      QuerySnapshot snap = snapshot.data;
+                                      List<DocumentSnapshot> docs = snap.docs;
+                                      return buildCount(
+                                          "FOLLOWERS", docs?.length ?? 0);
+                                    } else {
+                                      return buildCount("FOLLOWERS", 0);
+                                    }
+                                  },
+                                ),
                               ),
                               Padding(
                                 padding: const EdgeInsets.only(bottom: 15.0),

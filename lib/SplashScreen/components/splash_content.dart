@@ -15,9 +15,16 @@ class SplashContent extends StatelessWidget {
         children: <Widget>[
           Spacer(),
           Image.asset(
-            "assets/images/logo2.png",
-            height: 350,
-            width: 350,
+            "assets/images/logo.png",
+            height: 200,
+            width: 200,
+          ),
+          Text(
+            text,
+            style: TextStyle(
+                color: Colors.white,
+                fontSize: 24,
+                fontFamily: 'SFProDisplay-Medium'),
           ),
           Spacer(),
           Spacer(),

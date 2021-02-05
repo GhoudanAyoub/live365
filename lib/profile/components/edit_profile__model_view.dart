@@ -22,6 +22,12 @@ class EditProfileViewModel extends ChangeNotifier {
   String bio;
   File image;
   String imgLink;
+  bool msgAll;
+
+  setMsgAll(bool val) {
+    msgAll = val;
+    notifyListeners();
+  }
 
   setUser(UserModel val) {
     user = val;
@@ -63,6 +69,7 @@ class EditProfileViewModel extends ChangeNotifier {
         notifyListeners();
         bool success = await userService.updateProfile(
           //  user: user,
+          msgToAll: msgAll,
           image: image,
           username: username,
           bio: bio,

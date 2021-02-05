@@ -28,6 +28,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
   List<DocumentSnapshot> users = [];
   List<DocumentSnapshot> filteredUsers = [];
   bool loading = true;
+  bool isFollowing = false;
 
   currentUserId() {
     return firebaseAuth.currentUser.uid;
@@ -208,6 +209,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
           itemBuilder: (BuildContext context, int index) {
             DocumentSnapshot doc = filteredUsers[index];
             UserModel user = UserModel.fromJson(doc.data());
+            checkIfFollowing(user.id);
             if (doc.id == currentUserId()) {
               Timer(Duration(milliseconds: 50), () {
                 setState(() {
@@ -230,20 +232,24 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                   subtitle: Text(user?.email,
                       style: TextStyle(
                           color: Colors.white, fontWeight: FontWeight.bold)),
-                  trailing: GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => Conversation(
-                              userId: doc.id,
-                              chatId: 'newChat',
-                            ),
-                          ));
-                    },
-                    child: Icon(CupertinoIcons.chat_bubble_fill,
-                        color: Colors.white),
-                  ),
+                  trailing: user.msgToAll == true || isFollowing == true
+                      ? GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => Conversation(
+                                    userId: doc.id,
+                                    chatId: 'newChat',
+                                  ),
+                                ));
+                          },
+                          child: Icon(CupertinoIcons.chat_bubble_fill,
+                              color: Colors.white),
+                        )
+                      : Container(
+                          width: 1,
+                        ),
                 ),
                 Divider(),
               ],
@@ -264,6 +270,17 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
         MaterialPageRoute(
           builder: (_) => Body(profileId: profileId),
         ));
+  }
+
+  checkIfFollowing(profileId) async {
+    DocumentSnapshot doc = await followersRef
+        .doc(profileId)
+        .collection('userFollowers')
+        .doc(currentUserId())
+        .get();
+    setState(() {
+      isFollowing = doc.exists;
+    });
   }
 
   Widget buildText(String text) => Center(
