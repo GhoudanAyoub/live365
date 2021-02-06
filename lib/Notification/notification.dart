@@ -72,6 +72,7 @@ class _ActivitiesState extends State<Activities> {
       child: Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: false,
+          toolbarHeight: 50,
           bottom: TabBar(
             tabs: <Widget>[
               Tab(

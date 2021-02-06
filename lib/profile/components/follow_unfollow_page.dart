@@ -29,20 +29,21 @@ class _FollowUnfollowPageState extends State<FollowUnfollowPage> {
     return firebaseAuth.currentUser.uid;
   }
 
-  List<Widget> containers = [
-    Container(
-      color: Colors.blue,
-    ),
-    Container(
-      color: Colors.blue,
-    ),
-  ];
-
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    id = widget.profileId;
+    getUsers();
+  }
+
+  getUsers() async {
+    QuerySnapshot snap = await usersRef.get();
+    List<DocumentSnapshot> doc = snap.docs;
+    users = doc;
+    filteredUsers = doc;
+    setState(() {
+      loading = false;
+    });
   }
 
   @override
@@ -51,6 +52,8 @@ class _FollowUnfollowPageState extends State<FollowUnfollowPage> {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
+          automaticallyImplyLeading: false,
+          toolbarHeight: 50,
           bottom: TabBar(
             tabs: <Widget>[
               Tab(
@@ -63,7 +66,7 @@ class _FollowUnfollowPageState extends State<FollowUnfollowPage> {
           ),
         ),
         body: TabBarView(
-          children: containers,
+          children: [buildUsers(), buildUsers2()],
         ),
       ),
     );
@@ -86,19 +89,48 @@ class _FollowUnfollowPageState extends State<FollowUnfollowPage> {
             UserModel user = UserModel.fromJson(doc.data());
             return Column(
               children: [
-                ListTile(
-                  onTap: () => showProfile(context, profileId: user?.id),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 25.0),
-                  leading: CircleAvatar(
-                    radius: 35.0,
-                    backgroundImage: NetworkImage(user?.photoUrl),
-                  ),
-                  title: Text(user?.username,
-                      style: TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.bold)),
-                  subtitle: Text(user?.email,
-                      style: TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.bold)),
+                StreamBuilder(
+                  stream: followersRef
+                      .doc(widget.profileId)
+                      .collection('userFollowers')
+                      .snapshots(),
+                  builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                    if (snapshot.hasData) {
+                      QuerySnapshot snap = snapshot.data;
+                      List<DocumentSnapshot> docs = snap.docs;
+                      return ListView.builder(
+                          itemCount: docs.length,
+                          scrollDirection: Axis.vertical,
+                          shrinkWrap: true,
+                          itemBuilder: (BuildContext context, int index) {
+                            return docs[index].id == user.id
+                                ? ListTile(
+                                    onTap: () => showProfile(context,
+                                        profileId: user.id),
+                                    contentPadding:
+                                        EdgeInsets.symmetric(horizontal: 25.0),
+                                    leading: CircleAvatar(
+                                      radius: 35.0,
+                                      backgroundImage:
+                                          NetworkImage(user.photoUrl),
+                                    ),
+                                    title: Text(user.username,
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold)),
+                                    subtitle: Text(user.email,
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold)),
+                                  )
+                                : Divider(
+                                    height: 0,
+                                  );
+                          });
+                    } else {
+                      return Container();
+                    }
+                  },
                 ),
                 Divider(),
               ],
@@ -113,48 +145,77 @@ class _FollowUnfollowPageState extends State<FollowUnfollowPage> {
     }
   }
 
-  getUsers(uid) async {
-    DocumentSnapshot snap = await usersRef.doc(uid).get();
-
-    setState(() {
-      loading = false;
-    });
-  }
-
-  getFollowers() {
-    return StreamBuilder(
-      stream: followersRef
-          .doc(widget.profileId)
-          .collection('userFollowers')
-          .snapshots(),
-      builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-        if (snapshot.hasData) {
-          QuerySnapshot snap = snapshot.data;
-          List<DocumentSnapshot> docs = snap.docs;
-          return Container();
-        } else {
-          return Container();
-        }
-      },
-    );
-  }
-
-  getFollowings() {
-    return StreamBuilder(
-      stream: followingRef
-          .doc(widget.profileId)
-          .collection('userFollowing')
-          .snapshots(),
-      builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-        if (snapshot.hasData) {
-          QuerySnapshot snap = snapshot.data;
-          List<DocumentSnapshot> docs = snap.docs;
-          return Container();
-        } else {
-          return Container();
-        }
-      },
-    );
+  buildUsers2() {
+    if (!loading) {
+      if (filteredUsers.isEmpty) {
+        return Center(
+          child: Text("No User Found",
+              style: TextStyle(fontWeight: FontWeight.bold)),
+        );
+      } else {
+        return ListView.builder(
+          itemCount: filteredUsers.length,
+          scrollDirection: Axis.vertical,
+          shrinkWrap: true,
+          itemBuilder: (BuildContext context, int index) {
+            DocumentSnapshot doc = filteredUsers[index];
+            UserModel user = UserModel.fromJson(doc.data());
+            return Column(
+              children: [
+                StreamBuilder(
+                  stream: followingRef
+                      .doc(widget.profileId)
+                      .collection('userFollowing')
+                      .snapshots(),
+                  builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                    if (snapshot.hasData) {
+                      QuerySnapshot snap = snapshot.data;
+                      List<DocumentSnapshot> docs = snap.docs;
+                      return ListView.builder(
+                          itemCount: docs.length,
+                          scrollDirection: Axis.vertical,
+                          shrinkWrap: true,
+                          itemBuilder: (BuildContext context, int index) {
+                            return docs[index].id == user.id
+                                ? ListTile(
+                                    onTap: () => showProfile(context,
+                                        profileId: user.id),
+                                    contentPadding:
+                                        EdgeInsets.symmetric(horizontal: 25.0),
+                                    leading: CircleAvatar(
+                                      radius: 35.0,
+                                      backgroundImage:
+                                          NetworkImage(user.photoUrl),
+                                    ),
+                                    title: Text(user.username,
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold)),
+                                    subtitle: Text(user.email,
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold)),
+                                  )
+                                : Divider(
+                                    height: 0,
+                                  );
+                          });
+                    } else {
+                      return Container();
+                    }
+                  },
+                ),
+                Divider(),
+              ],
+            );
+          },
+        );
+      }
+    } else {
+      return Center(
+        child: circularProgress(context),
+      );
+    }
   }
 
   showProfile(BuildContext context, {String profileId}) {
