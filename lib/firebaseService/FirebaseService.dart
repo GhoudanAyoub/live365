@@ -1,6 +1,6 @@
 import 'package:LIVE365/models/message.dart';
 import 'package:LIVE365/models/message_list.dart';
-import 'package:LIVE365/models/users.dart';
+import 'package:LIVE365/utils/firebase.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -9,52 +9,64 @@ import 'package:google_sign_in/google_sign_in.dart';
 import '../utils.dart';
 
 class FirebaseService {
+  static final liveCollection = 'liveuser';
   static final CollectionReference userCollection =
       FirebaseFirestore.instance.collection('LIVE365Users');
   static String Client_displayName = FirebaseAuth.instance.currentUser.email;
 
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
-  final _fireStore = FirebaseFirestore.instance;
+  static final _fireStore = FirebaseFirestore.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
 
   Stream<String> get onAuthStateChanged => _firebaseAuth.authStateChanges().map(
         (User user) => user?.uid,
       );
 
-  // USER DATA
-  static Future addUsers(User user) async {
-    FirebaseFirestore.instance.collection("Users").add({
-      'id': user.uid,
-      'name': user.displayName,
-      'email': user.email,
-      'like': 0,
-      'following': 0,
-      'followers': 0,
+  static void changeStatus(String status) async {
+    var snapshots = FirebaseFirestore.instance.collection("Users").snapshots();
+    await snapshots.forEach((snapshot) async {
+      List<DocumentSnapshot> documents = snapshot.docs;
+      for (var document in documents) {
+        if (document.data()['email'] == FirebaseAuth.instance.currentUser.email)
+          await document.data().update("status", (value) => status);
+      }
     });
   }
 
-  static Stream<List<users>> GetUserData() => FirebaseFirestore.instance
-      .collection("Users")
-      .orderBy("followers", descending: true)
-      .snapshots()
-      .transform(Utils.transformer(users.fromJson));
-
-  // MESSAGE DATA
-  static Future addRandomUsers(users user, String img) async {
-    await FirebaseFirestore.instance
-        .collection("Message")
-        .doc(FirebaseAuth.instance.currentUser.displayName)
-        .collection('users')
-        .doc()
-        .set({
-      'id': user.id,
-      'name': user.name,
-      'img': img,
-      'online': true,
-      'live': false,
-      'message': "",
-      'created_at': DateTime.now()
+  //USER LIVE
+  static void createLiveUser({username, name, id, time, image}) async {
+    var ref = liveRef.doc();
+    await liveRef.doc(firebaseAuth.currentUser.uid).set({
+      'id': ref.id,
+      'ownerId': firebaseAuth.currentUser.uid,
+      'username': username,
+      'channelName': name,
+      'channelId': id,
+      'time': time,
+      'hostImage': image,
+      'image': image
     });
+  }
+
+  static void deleteUser({username}) async {
+    await liveRef.doc(firebaseAuth.currentUser.uid).delete();
+  }
+
+  // USER DATA
+  static Future addUsers(User user) async {
+    final snapShot = await usersRef.doc(user.uid).get();
+    if (!snapShot.exists) {
+      usersRef.doc(user.uid).set({
+        'username': user.displayName,
+        'email': user.email,
+        'time': Timestamp.now(),
+        'id': user.uid,
+        'bio': "",
+        'country': "",
+        'photoUrl': user.photoURL ?? '',
+        'msgToAll': true
+      });
+    }
   }
 
   static Stream<List<MessageList>> getUsers() => FirebaseFirestore.instance
@@ -87,13 +99,18 @@ class FirebaseService {
       .transform(Utils.transformer(messages.fromJson));
 
   // GET UID
-  Future<String> getCurrentUID() async {
+  String getCurrentUID() {
     return _firebaseAuth.currentUser.uid;
   }
 
   // GET CURRENT USER
   Future getCurrentUser() async {
     return _firebaseAuth.currentUser;
+  }
+
+  // GET CURRENT USER name
+  String getCurrentUserName() {
+    return _firebaseAuth.currentUser.displayName;
   }
 
   getProfileImage() {
@@ -105,17 +122,29 @@ class FirebaseService {
   }
 
   // Email & Password Sign Up
-  Future<String> createUserWithEmailAndPassword(
+  Future createUserWithEmailAndPassword(
       String email, String password, String name) async {
     final authResult = await _firebaseAuth.createUserWithEmailAndPassword(
       email: email,
       password: password,
     );
 
+    var userNameExists = await checkUsername(username: name);
+    if (!userNameExists) {
+      return -1;
+    }
     // Update the username
     await updateUserName(name, authResult.user);
     addUsers(authResult.user);
-    return authResult.user.uid;
+    return 1;
+  }
+
+  static Future<bool> checkUsername({username}) async {
+    final snapShot = await usersRef.doc(username).get();
+    if (snapShot.exists) {
+      return false;
+    }
+    return true;
   }
 
   Future updateUserName(String name, User currentUser) async {

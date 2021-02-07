@@ -1,14 +1,15 @@
+import 'package:LIVE365/SizeConfig.dart';
 import 'package:LIVE365/firebaseService/FirebaseService.dart';
 import 'package:LIVE365/models/message_list.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 
 import '../constants.dart';
 import 'components/chat_detail_page.dart';
 import 'components/header_inbox_page.dart';
 
 class Inbox extends StatelessWidget {
-  TextEditingController _searchController = new TextEditingController();
   final auth = FirebaseService();
   var fireStore = FirebaseFirestore.instance;
   List ListUserMessage = [];
@@ -37,27 +38,6 @@ class Inbox extends StatelessWidget {
         SizedBox(
           height: 10,
         ),
-        Padding(
-          padding: EdgeInsets.only(left: 15.0, right: 15.0),
-          child: Material(
-            elevation: 5.0,
-            borderRadius: BorderRadius.circular(50.0),
-            child: TextFormField(
-                cursorColor: black,
-                controller: _searchController,
-                decoration: InputDecoration(
-                    border: InputBorder.none,
-                    prefixIcon:
-                        Icon(Icons.search, color: GBottomNav, size: 30.0),
-                    contentPadding: EdgeInsets.only(left: 15.0, top: 15.0),
-                    hintText: 'Search',
-                    hintStyle: TextStyle(
-                        color: Colors.grey, fontFamily: 'SFProDisplay-Black'))),
-          ),
-        ),
-        SizedBox(
-          height: 30,
-        ),
         StreamBuilder<List<MessageList>>(
           stream: FirebaseService.getUsers(),
           builder: (context, snapshot) {
@@ -72,7 +52,30 @@ class Inbox extends StatelessWidget {
                   final MessageList = snapshot.data;
 
                   if (MessageList.isEmpty) {
-                    return buildText('No Message Found');
+                    return Container(
+                        padding: EdgeInsets.only(
+                            top: getProportionateScreenHeight(200)),
+                        child: Center(
+                          child: Column(
+                            children: [
+                              IconButton(
+                                  icon: SvgPicture.asset(
+                                'assets/icons/Chat bubble Icon.svg',
+                                color: white,
+                                height: getProportionateScreenHeight(50),
+                                width: getProportionateScreenWidth(50),
+                              )),
+                              buildText('All activity'),
+                              Text(
+                                "Notifications  about your account will appear here",
+                                style: TextStyle(
+                                    fontSize: 14,
+                                    fontFamily: "SFProDisplay-Regular",
+                                    color: Colors.grey[400]),
+                              )
+                            ],
+                          ),
+                        ));
                   } else
                     return Column(
                       children: [DisplayUsersMessage(context, MessageList)],
@@ -223,7 +226,10 @@ class Inbox extends StatelessWidget {
   Widget buildText(String text) => Center(
         child: Text(
           text,
-          style: TextStyle(fontSize: 24, color: Colors.white),
+          style: TextStyle(
+              fontSize: 24,
+              fontFamily: "SFProDisplay-Regular",
+              color: Colors.white),
         ),
       );
   Widget DisplayUserInformation(BuildContext context, AsyncSnapshot snapshot) {

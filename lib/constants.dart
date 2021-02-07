@@ -1,9 +1,6 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'SizeConfig.dart';
-
-final String CurrentClient = FirebaseAuth.instance.currentUser.uid;
 
 const appBgColor = Color(0xFF000000);
 const primary = Color(0xFFFC2D55);
@@ -42,6 +39,7 @@ const defaultDuration = Duration(milliseconds: 250);
 // Form Error
 final RegExp emailValidatorRegExp =
     RegExp(r"^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
+const String kCountryNullError = "Please Enter your Country";
 const String kNameNullError = "Please Enter your Name";
 const String kEmailNullError = "Please Enter your email";
 const String kInvalidEmailError = "Please Enter Valid Email";

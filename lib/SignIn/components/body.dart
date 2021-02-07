@@ -1,3 +1,4 @@
+import 'package:LIVE365/components/indicators.dart';
 import 'package:LIVE365/components/no_account_text.dart';
 import 'package:LIVE365/components/socal_card.dart';
 import 'package:LIVE365/firebaseService/FirebaseService.dart';
@@ -19,9 +20,9 @@ class Body extends StatelessWidget {
           child: SingleChildScrollView(
             child: Column(
               children: [
-                SizedBox(height: SizeConfig.screenHeight * 0.04),
+                SizedBox(height: SizeConfig.screenHeight * 0.08),
                 Text(
-                  "Welcome Back",
+                  "Welcome",
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: getProportionateScreenWidth(28),
@@ -41,6 +42,7 @@ class Body extends StatelessWidget {
                     SocalCard(
                       icon: "assets/icons/google-icon.svg",
                       press: () async {
+                        circularProgress(context);
                         final auth = FirebaseService();
                         dynamic result = await auth.signInWithGoogle();
 

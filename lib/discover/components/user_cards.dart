@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../SizeConfig.dart';
 import '../../constants.dart';
 
 class UserCards extends StatelessWidget {
@@ -68,21 +69,29 @@ class UserCards extends StatelessWidget {
             ),
             SizedBox(height: 15.0),
             Expanded(
-                child: Container(
-                    width: 175.0,
-                    decoration: BoxDecoration(
-                      color: status == 'Away' ? Colors.grey : GBottomNav,
-                      borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(10.0),
-                          bottomRight: Radius.circular(10.0)),
-                    ),
-                    child: Center(
-                      child: Text(
-                        'Request',
-                        style: TextStyle(
-                            color: Colors.white, fontFamily: 'Quicksand'),
-                      ),
-                    )))
+              child: IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Container(
+                        decoration: BoxDecoration(
+                          color: status == 'Away' ? Colors.grey : GBottomNav,
+                          borderRadius: BorderRadius.only(
+                              bottomLeft: Radius.circular(10.0),
+                              bottomRight: Radius.circular(10.0)),
+                        ),
+                        width: getProportionateScreenWidth(157.5),
+                        child: Center(
+                          child: Text(
+                            'Request',
+                            style: TextStyle(
+                                color: Colors.white, fontFamily: 'Quicksand'),
+                          ),
+                        ))
+                  ],
+                ),
+              ),
+            )
           ],
         ),
         margin: cardIndex.isEven

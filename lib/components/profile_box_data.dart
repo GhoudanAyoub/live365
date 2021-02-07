@@ -11,9 +11,9 @@ class ProfileBoxData extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      padding: EdgeInsets.fromLTRB(20, 10, 20, 0),
       child: FlatButton(
-        padding: EdgeInsets.all(15),
+        padding: EdgeInsets.all(10),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
         color: Color(0xFFF5F6F9),
         onPressed: () {},

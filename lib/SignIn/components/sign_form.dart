@@ -1,10 +1,10 @@
 import 'package:LIVE365/components/custom_surfix_icon.dart';
 import 'package:LIVE365/components/default_button.dart';
 import 'package:LIVE365/components/form_error.dart';
-import 'package:LIVE365/firebaseService/FirebaseService.dart';
 import 'package:LIVE365/forgot_password/forgot_password_screen.dart';
 import 'package:LIVE365/helper/keyboard.dart';
 import 'package:LIVE365/home/home_screen.dart';
+import 'package:LIVE365/services/auth_service.dart';
 import 'package:flutter/material.dart';
 
 import '../../SizeConfig.dart';
@@ -19,15 +19,20 @@ class SignForm extends StatefulWidget {
 class _SignFormState extends State<SignForm> {
   final _formKey = GlobalKey<FormState>();
 
+  GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   TextEditingController _emailContoller = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
   bool remember = false;
   final List<String> errors = [];
 
+  var submitted = false;
+  var buttonText = "Continue";
+
   void addError({String error}) {
     if (!errors.contains(error))
       setState(() {
         errors.add(error);
+        submitted = false;
       });
   }
 
@@ -142,19 +147,35 @@ class _SignFormState extends State<SignForm> {
           FormError(errors: errors),
           SizedBox(height: getProportionateScreenHeight(20)),
           DefaultButton(
-            text: "Continue",
+            text: buttonText,
+            submitted: submitted,
             press: () async {
+              AuthService auth = AuthService();
               if (_formKey.currentState.validate()) {
+                submitted = true;
                 KeyboardUtil.hideKeyboard(context);
-                final auth = FirebaseService();
-
-                dynamic result = await auth.signInWithEmailAndPassword(
-                    _emailContoller.text, _passwordController.text);
-                if (result != null) {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => HomeScreen()));
-                  Scaffold.of(context)
-                      .showSnackBar(SnackBar(content: Text('Welcome Back')));
+                try {
+                  bool success = await auth.loginUser(
+                    email: _emailContoller.text,
+                    password: _passwordController.text,
+                  );
+                  print(success);
+                  if (success) {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => HomeScreen()));
+                    Scaffold.of(context)
+                        .showSnackBar(SnackBar(content: Text('Welcome Back')));
+                  } else {
+                    setState(() {
+                      buttonText = "Check Your Email/Password";
+                      submitted = false;
+                    });
+                  }
+                } catch (e) {
+                  submitted = false;
+                  print(e);
+                  showInSnackBar(
+                      '${auth.handleFirebaseAuthError(e.toString())}');
                 }
               }
             },
@@ -162,5 +183,10 @@ class _SignFormState extends State<SignForm> {
         ],
       ),
     );
+  }
+
+  void showInSnackBar(String value) {
+    scaffoldKey.currentState.removeCurrentSnackBar();
+    scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(value)));
   }
 }

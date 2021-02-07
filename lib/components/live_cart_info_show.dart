@@ -5,20 +5,21 @@ import '../SizeConfig.dart';
 class LiveCardInfoShow extends StatelessWidget {
   final String image;
   final String name;
-  final String Views;
-  final Function press;
+  final String views;
 
-  const LiveCardInfoShow(
-      {Key key, this.image, this.name, this.Views, this.press})
+  const LiveCardInfoShow({Key key, this.image, this.name, this.views})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Container(
+      width: getProportionateScreenWidth(20),
+      alignment: Alignment.centerLeft,
       decoration: BoxDecoration(
-          color: Colors.grey.withOpacity(0.5),
+          color: Colors.grey.withOpacity(0.2),
           borderRadius: BorderRadius.circular(50.0)),
       child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
           SizedBox(width: getProportionateScreenWidth(2)),
           Container(
@@ -31,6 +32,7 @@ class LiveCardInfoShow extends StatelessWidget {
           ),
           SizedBox(width: getProportionateScreenWidth(5)),
           Column(
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
               SizedBox(height: getProportionateScreenHeight(10)),
               buildText(name),
@@ -42,7 +44,7 @@ class LiveCardInfoShow extends StatelessWidget {
                     height: getProportionateScreenHeight(20),
                     width: getProportionateScreenWidth(20),
                   ),
-                  buildText(Views),
+                  buildText(views),
                 ],
               )
             ],
@@ -52,9 +54,9 @@ class LiveCardInfoShow extends StatelessWidget {
     );
   }
 
-  Widget buildText(String text) => Center(
+  Widget buildText(views) => Center(
         child: Text(
-          text,
+          views,
           style: TextStyle(color: Colors.white, fontSize: 12),
         ),
       );

@@ -13,16 +13,13 @@ class GotAccountText extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text(
-          "I have an account!! ",
-          style: TextStyle(fontSize: getProportionateScreenWidth(16)),
-        ),
+        Text("I have an account "),
         GestureDetector(
           onTap: () => Navigator.pushNamed(context, SignInScreen.routeName),
           child: Text(
             "Sign In",
             style: TextStyle(
-                fontSize: getProportionateScreenWidth(16),
+                fontSize: getProportionateScreenWidth(14),
                 color: kPrimaryColor),
           ),
         ),
