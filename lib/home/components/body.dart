@@ -234,9 +234,6 @@ class _BodyState extends State<Body> with SingleTickerProviderStateMixin {
                             color: Colors.grey,
                             fontFamily: "SFProDisplay-Regular",
                             fontSize: 16))),
-            SizedBox(
-              width: getProportionateScreenWidth(5),
-            ),
             Text(
               ".",
               style: TextStyle(
@@ -245,9 +242,6 @@ class _BodyState extends State<Body> with SingleTickerProviderStateMixin {
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
               ),
-            ),
-            SizedBox(
-              width: getProportionateScreenWidth(5),
             ),
             FlatButton(
                 onPressed: () {
@@ -268,9 +262,6 @@ class _BodyState extends State<Body> with SingleTickerProviderStateMixin {
                             color: Colors.grey,
                             fontFamily: "SFProDisplay-Regular",
                             fontSize: 16))),
-            SizedBox(
-              width: getProportionateScreenWidth(5),
-            ),
             Text(
               ".",
               style: TextStyle(
@@ -279,9 +270,6 @@ class _BodyState extends State<Body> with SingleTickerProviderStateMixin {
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
               ),
-            ),
-            SizedBox(
-              width: getProportionateScreenWidth(5),
             ),
             FlatButton(
                 onPressed: () {
@@ -383,12 +371,12 @@ class _BodyState extends State<Body> with SingleTickerProviderStateMixin {
         ? PageView.builder(
             controller: foryouController,
             onPageChanged: (index) {
-              setState(() {
-                _controller =
-                    VideoPlayerController.network(listVideos[index].mediaUrl);
-                _controller.seekTo(Duration.zero);
-                _controller.play();
-              });
+              _controller.pause();
+              _controller =
+                  VideoPlayerController.network(listVideos[index].mediaUrl)
+                    ..initialize();
+              _controller.seekTo(Duration.zero);
+              _controller.play();
             },
             scrollDirection: Axis.vertical,
             itemCount: listVideos.length,
