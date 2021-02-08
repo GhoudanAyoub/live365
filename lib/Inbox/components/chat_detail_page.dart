@@ -2,6 +2,7 @@ import 'package:LIVE365/components/IconBtnWithCounter.dart';
 import 'package:LIVE365/firebaseService/FirebaseService.dart';
 import 'package:LIVE365/models/message.dart';
 import 'package:LIVE365/models/message_list.dart';
+import 'package:LIVE365/profile/profile_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -19,49 +20,64 @@ class ChatDetailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: grey_toWhite.withOpacity(0.2),
-        elevation: 0,
-        leading: FlatButton(
-            onPressed: () {
-              Navigator.pop(context);
+          backgroundColor: grey_toWhite.withOpacity(0.2),
+          elevation: 0,
+          leading: FlatButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Icon(
+                Icons.arrow_back_ios,
+                color: black,
+              )),
+          title: GestureDetector(
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ProfileScreen(
+                      profileUID: Messagelist.id,
+                    ),
+                  ));
             },
-            child: Icon(
-              Icons.arrow_back_ios,
-              color: black,
-            )),
-        title: Row(
-          children: <Widget>[
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  image: DecorationImage(
-                      image: NetworkImage(Messagelist.img), fit: BoxFit.cover)),
-            ),
-            SizedBox(
-              width: 15,
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Row(
               children: <Widget>[
-                Text(
-                  Messagelist.name,
-                  style: TextStyle(
-                      fontSize: 18, fontWeight: FontWeight.bold, color: white),
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      image: DecorationImage(
+                          image: NetworkImage(Messagelist.img),
+                          fit: BoxFit.cover)),
                 ),
                 SizedBox(
-                  height: 3,
+                  width: 15,
                 ),
-                Text(
-                  "Active now",
-                  style: TextStyle(color: white.withOpacity(0.4), fontSize: 14),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      Messagelist.name,
+                      style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: white),
+                    ),
+                    SizedBox(
+                      height: 3,
+                    ),
+                    Text(
+                      "Active now",
+                      style: TextStyle(
+                          color: white.withOpacity(0.4), fontSize: 14),
+                    )
+                  ],
                 )
               ],
-            )
-          ],
-        ),
-        /*
+            ),
+          )
+          /*
         //todo : the phone  and  live buttons
         actions: <Widget>[
           Icon(
@@ -92,7 +108,7 @@ class ChatDetailPage extends StatelessWidget {
             width: 15,
           ),
         ],*/
-      ),
+          ),
       body: Messages(),
       bottomSheet: newshit(),
     );

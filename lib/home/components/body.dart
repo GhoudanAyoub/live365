@@ -90,9 +90,10 @@ class _BodyState extends State<Body> with SingleTickerProviderStateMixin {
 
   @override
   void dispose() {
-    super.dispose();
+    _controller.pause();
     _controller.dispose();
     _controllerRec.dispose();
+    super.dispose();
     animationController.dispose();
   }
 

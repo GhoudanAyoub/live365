@@ -5,6 +5,7 @@ import 'package:LIVE365/models/User.dart';
 import 'package:LIVE365/models/enum/message_type.dart';
 import 'package:LIVE365/models/new_message_system.dart';
 import 'package:LIVE365/profile/components/user_view_model.dart';
+import 'package:LIVE365/profile/profile_screen.dart';
 import 'package:LIVE365/utils/firebase.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -253,7 +254,15 @@ class _ConversationState extends State<Conversation> {
                 ),
               ],
             ),
-            onTap: () {},
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ProfileScreen(
+                      profileUID: user.id,
+                    ),
+                  ));
+            },
           );
         } else {
           return Center(child: CircularProgressIndicator());
