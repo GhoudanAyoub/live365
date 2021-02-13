@@ -9,6 +9,7 @@ import 'package:LIVE365/firebaseService/FirebaseService.dart';
 import 'package:LIVE365/models/User.dart';
 import 'package:LIVE365/models/post.dart';
 import 'package:LIVE365/models/video.dart';
+import 'package:LIVE365/profile/components/play_page.dart';
 import 'package:LIVE365/profile/components/profile_pic.dart';
 import 'package:LIVE365/utils/firebase.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -37,13 +38,13 @@ class _BodyState extends State<Body> {
   int followersCount = 0;
   int followingCount = 0;
   bool isToggle = true;
-  bool isVideo = false;
   bool isFollowing = false;
   UserModel users;
   UserModel user1;
   final DateTime timestamp = DateTime.now();
   ScrollController controller = ScrollController();
 
+  List<Video> listvideo;
   currentUserId() {
     return firebaseAuth.currentUser?.uid;
   }
@@ -52,6 +53,7 @@ class _BodyState extends State<Body> {
   void initState() {
     super.initState();
     checkIfFollowing();
+    GetVideoList(widget.profileId);
   }
 
   checkIfFollowing() async {
@@ -109,10 +111,13 @@ class _BodyState extends State<Body> {
                           color: Colors.white,
                         ),
                         onPressed: () {
-                          setState(() {
-                            isToggle = false;
-                            isVideo = false;
-                          });
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => PlayPage(
+                                  clips: listvideo,
+                                ),
+                              ));
                         }),
                     buildIcons(),
                   ],
@@ -143,7 +148,6 @@ class _BodyState extends State<Body> {
           onPressed: () {
             setState(() {
               isToggle = false;
-              isVideo = false;
             });
           });
     } else if (isToggle == false) {
@@ -155,7 +159,6 @@ class _BodyState extends State<Body> {
         onPressed: () {
           setState(() {
             isToggle = true;
-            isVideo = false;
           });
         },
       );
@@ -185,11 +188,11 @@ class _BodyState extends State<Body> {
   }
 
   buildPostView() {
-    if (isToggle == true && isVideo == false) {
+    if (isToggle == true) {
       return buildGridPost();
-    } else if (isToggle == false && isVideo == false) {
+    } else if (isToggle == false) {
       return buildPosts();
-    } else if (isToggle == false && isVideo == true) {
+    } else if (isToggle == false) {
       return buildVideos();
     }
   }
@@ -901,5 +904,19 @@ class _BodyState extends State<Body> {
         backgroundColor: GBottomNav,
         textColor: Colors.white,
         fontSize: 16.0);
+  }
+
+  static Future<List<Video>> getVideoList(profileId) async {
+    var data = await videoRef.get();
+    var videoList = <Video>[];
+    data.docs.forEach((element) {
+      Video video = Video.fromJson(element.data());
+      if (video.ownerId == profileId) videoList.add(video);
+    });
+    return videoList;
+  }
+
+  Future<void> GetVideoList(profileId) async {
+    listvideo = await getVideoList(profileId);
   }
 }
