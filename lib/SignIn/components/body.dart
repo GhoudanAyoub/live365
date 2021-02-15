@@ -1,4 +1,3 @@
-import 'package:LIVE365/components/indicators.dart';
 import 'package:LIVE365/components/no_account_text.dart';
 import 'package:LIVE365/components/socal_card.dart';
 import 'package:LIVE365/firebaseService/FirebaseService.dart';
@@ -42,15 +41,19 @@ class Body extends StatelessWidget {
                     SocalCard(
                       icon: "assets/icons/google-icon.svg",
                       press: () async {
-                        circularProgress(context);
                         final auth = FirebaseService();
                         dynamic result = await auth.signInWithGoogle();
-
+                        Scaffold.of(context).showSnackBar(
+                            SnackBar(content: Text("Check Your Account..")));
                         if (result != null) {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
                                   builder: (context) => HomeScreen()));
+                        } else {
+                          Scaffold.of(context).showSnackBar(SnackBar(
+                              content: Text(
+                                  "We Faced A Problem Connection To Your Account")));
                         }
                       },
                     ),

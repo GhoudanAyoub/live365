@@ -21,6 +21,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:screen/screen.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:video_player/video_player.dart';
@@ -37,6 +38,8 @@ class Body extends StatefulWidget {
 }
 
 class _BodyState extends State<Body> with SingleTickerProviderStateMixin {
+  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
+      GlobalKey<RefreshIndicatorState>();
   TextEditingController commentsTEC = TextEditingController();
   final auth = FirebaseService();
   final FlareControls flareControls = FlareControls();
@@ -139,6 +142,8 @@ class _BodyState extends State<Body> with SingleTickerProviderStateMixin {
     callList();
     _initializeAndPlay(0);
     super.initState();
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
   }
 
   checkIfFollowing(profileId) async {
@@ -153,6 +158,8 @@ class _BodyState extends State<Body> with SingleTickerProviderStateMixin {
   }
 
   void _initializeAndPlay(int index) async {
+    print("_initializeAndPlay ---------> $index");
+    if (index == -1) index = 0;
     print("_initializeAndPlay ---------> $index");
     final clip = listVideos[index];
 
@@ -262,11 +269,11 @@ class _BodyState extends State<Body> with SingleTickerProviderStateMixin {
   @override
   void dispose() {
     _disposed = true;
-    _timerVisibleControl?.cancel();
+    _timerVisibleControl.cancel();
     Screen.keepOn(false);
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
-    _controller?.pause(); // mute instantly
-    _controller?.dispose();
+    _controller.pause(); // mute instantly
+    _controller.dispose();
     _controller = null;
     animationController.dispose();
     super.dispose();
@@ -460,7 +467,16 @@ class _BodyState extends State<Body> with SingleTickerProviderStateMixin {
   }
 
   Widget followFeed() {
-    return BasicOverlayWidget();
+    return RefreshIndicator(
+        key: _refreshIndicatorKey,
+        onRefresh: _refresh,
+        child: BasicOverlayWidget());
+  }
+
+  Future<Null> _refresh() async {
+    return await VideoService.getVideoList().then((_user) {
+      setState(() => listVideos = _user);
+    });
   }
 
   Widget BasicOverlayWidget() {
@@ -605,6 +621,17 @@ class _BodyState extends State<Body> with SingleTickerProviderStateMixin {
                               } else {
                                 return buildCommentsCount(context, 0);
                               }
+                            },
+                          ),
+                          SizedBox(height: 3.0),
+                          IconButton(
+                            icon: Icon(
+                              CupertinoIcons.ellipsis,
+                              size: 35,
+                              color: Colors.white,
+                            ),
+                            onPressed: () {
+                              settingClicked(listVideos[0], listVideos[0].id);
                             },
                           ),
                           SizedBox(height: 3.0),
@@ -769,6 +796,18 @@ class _BodyState extends State<Body> with SingleTickerProviderStateMixin {
                             },
                           ),
                           SizedBox(height: 3.0),
+                          IconButton(
+                            icon: Icon(
+                              CupertinoIcons.ellipsis,
+                              size: 35,
+                              color: Colors.white,
+                            ),
+                            onPressed: () {
+                              settingClicked(
+                                  listVideos[index], listVideos[index].id);
+                            },
+                          ),
+                          SizedBox(height: 3.0),
                           AnimatedBuilder(
                             animation: animationController,
                             child: CircleAvatar(
@@ -793,6 +832,127 @@ class _BodyState extends State<Body> with SingleTickerProviderStateMixin {
                   ))
             ],
           );
+  }
+
+  settingClicked(video, id) {
+    return showModalBottomSheet(
+      backgroundColor: GBottomNav,
+      context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10.0),
+      ),
+      builder: (BuildContext context) {
+        return FractionallySizedBox(
+          heightFactor: .3,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(height: 10.0),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                child: Center(
+                  child: Text(
+                    'SELECT',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold, color: Colors.white),
+                  ),
+                ),
+              ),
+              Divider(
+                color: Colors.white,
+              ),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  SizedBox(width: 10.0),
+                  Column(
+                    children: [
+                      IconButton(
+                          icon: Icon(
+                            CupertinoIcons.flag,
+                            color: Colors.white,
+                          ),
+                          onPressed: () {
+                            Navigator.pop(context);
+                            report('Content report', id);
+                          }),
+                      Text('Report',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white)),
+                    ],
+                  ),
+                  SizedBox(width: 10.0),
+                  Column(
+                    children: [
+                      buildBookButton(video),
+                      Center(
+                          child: Text('Save',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white))),
+                    ],
+                  ),
+                ],
+              )
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  report(String type, String id) {
+    reportRef.doc(id).set({
+      'accountId': id,
+      'type': type,
+      'reporterId': firebaseAuth.currentUser.uid
+    });
+    Fluttertoast.showToast(
+        msg: "Thank You For Reporting We Will Take It From Here",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.TOP,
+        timeInSecForIosWeb: 1,
+        backgroundColor: GBottomNav,
+        textColor: Colors.white,
+        fontSize: 16.0);
+  }
+
+  Widget buildBookButton(video) {
+    return StreamBuilder(
+      stream: bookRef
+          .where('postId', isEqualTo: video.id)
+          .where('userId', isEqualTo: currentUserId())
+          .snapshots(),
+      builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        if (snapshot.hasData) {
+          List<QueryDocumentSnapshot> docs = snapshot?.data?.docs ?? [];
+          return IconButton(
+            onPressed: () {
+              if (docs.isEmpty) {
+                bookRef.add({
+                  'userId': currentUserId(),
+                  'postId': video.id,
+                  'dateCreated': Timestamp.now(),
+                });
+              } else {
+                bookRef.doc(docs[0].id).delete();
+              }
+            },
+            icon: docs.isEmpty
+                ? Icon(CupertinoIcons.bookmark, size: 25, color: Colors.white)
+                : Icon(
+                    CupertinoIcons.bookmark_solid,
+                    size: 25,
+                    color: Colors.white,
+                  ),
+          );
+        }
+        return Container();
+      },
+    );
   }
 
   Widget _playView(BuildContext context) {

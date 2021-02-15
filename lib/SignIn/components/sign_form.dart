@@ -5,6 +5,7 @@ import 'package:LIVE365/forgot_password/forgot_password_screen.dart';
 import 'package:LIVE365/helper/keyboard.dart';
 import 'package:LIVE365/home/home_screen.dart';
 import 'package:LIVE365/services/auth_service.dart';
+import 'package:LIVE365/utils/firebase.dart';
 import 'package:flutter/material.dart';
 
 import '../../SizeConfig.dart';
@@ -154,26 +155,27 @@ class _SignFormState extends State<SignForm> {
               if (_formKey.currentState.validate()) {
                 submitted = true;
                 KeyboardUtil.hideKeyboard(context);
+                String success;
                 try {
-                  bool success = await auth.loginUser(
+                  removeError(error: success);
+                  success = await auth.loginUser(
                     email: _emailContoller.text,
                     password: _passwordController.text,
                   );
                   print(success);
-                  if (success) {
+                  if (success == firebaseAuth.currentUser.uid) {
                     Navigator.push(context,
                         MaterialPageRoute(builder: (context) => HomeScreen()));
                     Scaffold.of(context)
                         .showSnackBar(SnackBar(content: Text('Welcome Back')));
                   } else {
-                    setState(() {
-                      buttonText = "Check Your Email/Password";
-                      submitted = false;
-                    });
+                    addError(error: success);
+                    submitted = false;
                   }
                 } catch (e) {
                   submitted = false;
-                  print(e);
+                  print("=====" + success);
+                  addError(error: success);
                   showInSnackBar(
                       '${auth.handleFirebaseAuthError(e.toString())}');
                 }

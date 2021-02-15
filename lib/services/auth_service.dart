@@ -40,17 +40,32 @@ class AuthService {
     });
   }
 
-  Future<bool> loginUser({String email, String password}) async {
-    var res = await firebaseAuth.signInWithEmailAndPassword(
-      email: '$email',
-      password: '$password',
-    );
-
-    if (res.user != null) {
-      return true;
-    } else {
-      return false;
+  Future<String> loginUser({String email, String password}) async {
+    var result;
+    var errorType;
+    try {
+      result = await firebaseAuth.signInWithEmailAndPassword(
+        email: '$email',
+        password: '$password',
+      );
+    } catch (e) {
+      switch (e.message) {
+        case 'There is no user record corresponding to this identifier. The user may have been deleted.':
+          errorType = "No Account For This Email";
+          break;
+        case 'The password is invalid or the user does not have a password.':
+          errorType = "Password Invalid";
+          break;
+        case 'A network error (interrupted connection or unreachable host) has occurred.':
+          errorType = "Connection Error";
+          break;
+        // ...
+        default:
+          print('Case ${errorType} is not yet implemented');
+      }
     }
+    if (errorType != null) return errorType;
+    return result.user.uid;
   }
 
   forgotPassword(String email) async {
