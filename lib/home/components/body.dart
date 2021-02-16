@@ -542,7 +542,7 @@ class _BodyState extends State<Body> with SingleTickerProviderStateMixin {
                     alignment: Alignment.bottomRight,
                     child: Container(
                       width: getProportionateScreenWidth(50),
-                      height: getProportionateScreenHeight(300),
+                      height: 350,
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: <Widget>[
@@ -713,7 +713,7 @@ class _BodyState extends State<Body> with SingleTickerProviderStateMixin {
                     alignment: Alignment.bottomRight,
                     child: Container(
                       width: getProportionateScreenWidth(50),
-                      height: getProportionateScreenHeight(300),
+                      height: getProportionateScreenHeight(350),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: <Widget>[

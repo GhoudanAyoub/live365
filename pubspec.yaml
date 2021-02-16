@@ -82,7 +82,8 @@ dependencies:
   google_fonts: ^1.1.1
   provider: ^4.3.2+3
   modal_progress_hud: ^0.1.3
-
+  flutter_facebook_auth: ^2.0.2
+  flutter_facebook_login: ^3.0.0
   screen: ^0.0.5 # keeping screen on
 
 dev_dependencies:

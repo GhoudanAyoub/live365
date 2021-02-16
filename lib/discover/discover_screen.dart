@@ -72,9 +72,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return PageView(
-      children: [getAllUsers()],
-    );
+    return getAllUsers();
   }
 
   Widget getVideosAndUsers() {
