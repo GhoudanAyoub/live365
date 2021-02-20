@@ -83,6 +83,7 @@ class Body extends StatelessWidget {
   Future<void> signInWithGoogle(context) async {
     Scaffold.of(context)
         .showSnackBar(SnackBar(content: Text("Checking Your Account..")));
+    Scaffold.of(context).showSnackBar(SnackBar(content: Text("please Wait..")));
     final GoogleSignInAccount account = await _googleSignIn.signIn();
     final GoogleSignInAuthentication _googleAuth = await account.authentication;
     final AuthCredential credential = GoogleAuthProvider.credential(
@@ -91,13 +92,10 @@ class Body extends StatelessWidget {
     );
     UserCredential userdata =
         await _firebaseAuth.signInWithCredential(credential).catchError((e) {
-      showInSnackBar("Welcome Mr" + e.toString());
       print("Error===>" + e.toString());
     });
-    showInSnackBar("Welcome Mr" + userdata.user.displayName);
     FirebaseService.addUsers(userdata.user);
-    Navigator.push(
-        context, MaterialPageRoute(builder: (context) => HomeScreen()));
+    Navigator.pushNamed(context, HomeScreen.routeName);
   }
 
   Future<void> handleLogin(context) async {
