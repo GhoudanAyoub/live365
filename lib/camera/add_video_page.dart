@@ -8,7 +8,6 @@ import 'package:LIVE365/camera/videoo.dart';
 import 'package:LIVE365/components/IconBtnWithCounter.dart';
 import 'package:LIVE365/components/default_button.dart';
 import 'package:LIVE365/constants.dart';
-import 'package:LIVE365/models/FakeRepository.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -349,7 +348,6 @@ class _AddVideoPageState extends State<AddVideoPage> {
                   : Container(),
               _topRowWidget(context),
               _bottomRowWidget(),
-              _bottomWidget(),
             ],
           ),
         );
@@ -415,7 +413,7 @@ class _AddVideoPageState extends State<AddVideoPage> {
 
   Widget _bottomRowWidget() {
     return Positioned(
-      bottom: 60,
+      bottom: 20,
       left: 10,
       right: 10,
       child: Container(
@@ -468,9 +466,6 @@ class _AddVideoPageState extends State<AddVideoPage> {
                     }
                   },
                 )),
-                Center(
-                  child: Text(time.toString()),
-                )
               ],
             ),
             Container(
@@ -508,63 +503,6 @@ class _AddVideoPageState extends State<AddVideoPage> {
           ],
         ),
       ),
-    );
-  }
-
-  Widget _bottomWidget() {
-    return Positioned(
-      bottom: 0,
-      left: 0,
-      right: 0,
-      child: Container(
-          height: 50,
-          width: 100,
-          decoration: BoxDecoration(
-            color: Colors.black,
-          ),
-          child: Stack(
-            children: <Widget>[
-              PageView.builder(
-                itemCount: FakeRepository.dataList.length,
-                onPageChanged: (int index) {
-                  setState(() {
-                    _pageSelectedIndex = index;
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => CreateVideo()),
-                    );
-                  });
-                },
-                scrollDirection: Axis.horizontal,
-                controller: PageController(
-                    initialPage: 1, keepPage: true, viewportFraction: 0.2),
-                itemBuilder: (BuildContext context, int index) {
-                  return Container(
-                    alignment: Alignment.center,
-                    child: Text(
-                      "${FakeRepository.dataList[index]}",
-                      style: TextStyle(
-                          color: _pageSelectedIndex == index
-                              ? Colors.white
-                              : Colors.grey),
-                    ),
-                  );
-                },
-              ),
-              Positioned(
-                child: Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Container(
-                    width: 8,
-                    height: 8,
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.all(Radius.circular(10))),
-                  ),
-                ),
-              )
-            ],
-          )),
     );
   }
 
