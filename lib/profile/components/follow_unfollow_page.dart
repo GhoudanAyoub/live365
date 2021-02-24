@@ -123,7 +123,7 @@ class _FollowUnfollowPageState extends State<FollowUnfollowPage> {
                                             color: Colors.white,
                                             fontWeight: FontWeight.bold)),
                                   )
-                                : Divider(
+                                : Container(
                                     height: 0,
                                   );
                           });
@@ -132,7 +132,6 @@ class _FollowUnfollowPageState extends State<FollowUnfollowPage> {
                     }
                   },
                 ),
-                Divider(),
               ],
             );
           },
@@ -196,7 +195,7 @@ class _FollowUnfollowPageState extends State<FollowUnfollowPage> {
                                             color: Colors.white,
                                             fontWeight: FontWeight.bold)),
                                   )
-                                : Divider(
+                                : Container(
                                     height: 0,
                                   );
                           });
@@ -204,8 +203,7 @@ class _FollowUnfollowPageState extends State<FollowUnfollowPage> {
                       return Container();
                     }
                   },
-                ),
-                Divider(),
+                )
               ],
             );
           },
