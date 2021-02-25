@@ -487,351 +487,356 @@ class _BodyState extends State<Body> with SingleTickerProviderStateMixin {
   }
 
   Widget videoData(index) {
-    return index == -1
-        ? Stack(
-            children: [
-              Padding(
-                padding: EdgeInsets.only(bottom: 5),
-                child: Align(
-                  alignment: Alignment.bottomLeft,
-                  child: Container(
-                    width: MediaQuery.of(context).size.width - 100,
-                    height: 100,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Padding(
-                          padding: EdgeInsets.only(left: 10, bottom: 10),
-                          child: Text(
-                            listVideos[0].username,
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ),
-                        Padding(
-                            padding: EdgeInsets.only(left: 10, bottom: 10),
-                            child: Text.rich(
-                              TextSpan(children: <TextSpan>[
-                                TextSpan(text: listVideos[0].videoTitle),
-                                TextSpan(
-                                    text: '${listVideos[0].tags}\n',
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold)),
-                              ]),
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 14),
-                            )),
-                        Container(
-                          padding: EdgeInsets.only(left: 10),
-                          child: Row(
-                            children: <Widget>[
-                              Icon(Icons.music_note,
-                                  size: 16, color: Colors.white),
-                              Text(listVideos[0].songName,
-                                  style: TextStyle(color: Colors.white))
-                            ],
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              Padding(
-                  padding: EdgeInsets.only(bottom: 15, right: 10),
-                  child: Align(
-                    alignment: Alignment.bottomRight,
-                    child: Container(
-                      width: getProportionateScreenWidth(50),
-                      height: 350,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: <Widget>[
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => ProfileScreen(
-                                      profileUID: listVideos[0].ownerId,
-                                    ),
-                                  ));
-                            },
-                            child: Container(
-                              margin: EdgeInsets.only(bottom: 5),
-                              width: 40,
-                              height: getProportionateScreenHeight(50),
-                              child: Stack(
+    return listVideos.length != 0
+        ? index == -1
+            ? Stack(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 5),
+                    child: Align(
+                      alignment: Alignment.bottomLeft,
+                      child: Container(
+                        width: MediaQuery.of(context).size.width - 100,
+                        height: 100,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Padding(
+                              padding: EdgeInsets.only(left: 10, bottom: 10),
+                              child: Text(
+                                listVideos[0].username,
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ),
+                            Padding(
+                                padding: EdgeInsets.only(left: 10, bottom: 10),
+                                child: Text.rich(
+                                  TextSpan(children: <TextSpan>[
+                                    TextSpan(text: listVideos[0].videoTitle),
+                                    TextSpan(
+                                        text: '${listVideos[0].tags ?? ''}\n',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold)),
+                                  ]),
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 14),
+                                )),
+                            Container(
+                              padding: EdgeInsets.only(left: 10),
+                              child: Row(
                                 children: <Widget>[
-                                  CircleAvatar(
-                                    radius: 20,
-                                    backgroundColor: Colors.white,
-                                    child: CircleAvatar(
-                                      radius: 19,
-                                      backgroundColor: Colors.black,
-                                      backgroundImage:
-                                          NetworkImage(listVideos[0].userPic),
-                                    ),
-                                  )
+                                  Icon(Icons.music_note,
+                                      size: 16, color: Colors.white),
+                                  Text(listVideos[0].songName ?? '',
+                                      style: TextStyle(color: Colors.white))
                                 ],
                               ),
-                            ),
-                          ),
-                          buildLikeButton(listVideos[0]),
-                          SizedBox(height: 3.0),
-                          StreamBuilder(
-                            stream: likesRef
-                                .where('postId', isEqualTo: listVideos[0].id)
-                                .snapshots(),
-                            builder: (context,
-                                AsyncSnapshot<QuerySnapshot> snapshot) {
-                              if (snapshot.hasData) {
-                                QuerySnapshot snap = snapshot.data;
-                                List<DocumentSnapshot> docs = snap.docs;
-                                return buildLikesCount(
-                                    context, docs?.length ?? 0);
-                              } else {
-                                return buildLikesCount(context, 0);
-                              }
-                            },
-                          ),
-                          SizedBox(height: 3.0),
-                          IconButton(
-                            icon: Icon(
-                              Icons.sms,
-                              size: 35,
-                              color: Colors.white,
-                            ),
-                            onPressed: () {
-                              commentClicked(listVideos[0]);
-                            },
-                          ),
-                          SizedBox(height: 3.0),
-                          StreamBuilder(
-                            stream: commentRef
-                                .doc(listVideos[0].id)
-                                .collection("comments")
-                                .snapshots(),
-                            builder: (context,
-                                AsyncSnapshot<QuerySnapshot> snapshot) {
-                              if (snapshot.hasData) {
-                                QuerySnapshot snap = snapshot.data;
-                                List<DocumentSnapshot> docs = snap.docs;
-                                return buildCommentsCount(
-                                    context, docs?.length ?? 0);
-                              } else {
-                                return buildCommentsCount(context, 0);
-                              }
-                            },
-                          ),
-                          SizedBox(height: 3.0),
-                          IconButton(
-                            icon: Icon(
-                              CupertinoIcons.ellipsis,
-                              size: 35,
-                              color: Colors.white,
-                            ),
-                            onPressed: () {
-                              settingClicked(listVideos[0], listVideos[0].id);
-                            },
-                          ),
-                          SizedBox(height: 3.0),
-                          AnimatedBuilder(
-                            animation: animationController,
-                            child: CircleAvatar(
-                              radius: 22,
-                              backgroundColor:
-                                  Colors.grey[400].withOpacity(0.1),
-                              child: CircleAvatar(
-                                radius: 12,
-                                backgroundImage:
-                                    AssetImage('assets/images/effects.png'),
-                              ),
-                            ),
-                            builder: (context, _widget) {
-                              return Transform.rotate(
-                                  angle: animationController.value * 6.3,
-                                  child: _widget);
-                            },
-                          )
-                        ],
-                      ),
-                    ),
-                  ))
-            ],
-          )
-        : Stack(
-            children: [
-              Padding(
-                padding: EdgeInsets.only(bottom: 5),
-                child: Align(
-                  alignment: Alignment.bottomLeft,
-                  child: Container(
-                    width: MediaQuery.of(context).size.width - 100,
-                    height: 100,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Padding(
-                          padding: EdgeInsets.only(left: 10, bottom: 10),
-                          child: Text(
-                            listVideos[index].username,
-                            style: TextStyle(color: Colors.white),
-                          ),
+                            )
+                          ],
                         ),
-                        Padding(
-                            padding: EdgeInsets.only(left: 10, bottom: 10),
-                            child: Text.rich(
-                              TextSpan(children: <TextSpan>[
-                                TextSpan(text: listVideos[index].videoTitle),
-                                TextSpan(
-                                    text: '${listVideos[index].tags}\n',
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold)),
-                              ]),
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 14),
-                            )),
-                        Container(
-                          padding: EdgeInsets.only(left: 10),
-                          child: Row(
-                            children: <Widget>[
-                              Icon(Icons.music_note,
-                                  size: 16, color: Colors.white),
-                              Text(listVideos[index].songName,
-                                  style: TextStyle(color: Colors.white))
-                            ],
-                          ),
-                        )
-                      ],
+                      ),
                     ),
                   ),
-                ),
-              ),
-              Padding(
-                  padding: EdgeInsets.only(bottom: 15, right: 10),
-                  child: Align(
-                    alignment: Alignment.bottomRight,
-                    child: Container(
-                      width: getProportionateScreenWidth(50),
-                      height: getProportionateScreenHeight(350),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: <Widget>[
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => ProfileScreen(
-                                      profileUID: listVideos[index].ownerId,
-                                    ),
-                                  ));
-                            },
-                            child: Container(
-                              margin: EdgeInsets.only(bottom: 5),
-                              width: 40,
-                              height: getProportionateScreenHeight(50),
-                              child: Stack(
+                  Padding(
+                      padding: EdgeInsets.only(bottom: 15, right: 10),
+                      child: Align(
+                        alignment: Alignment.bottomRight,
+                        child: Container(
+                          width: getProportionateScreenWidth(50),
+                          height: 350,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: <Widget>[
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => ProfileScreen(
+                                          profileUID: listVideos[0].ownerId,
+                                        ),
+                                      ));
+                                },
+                                child: Container(
+                                  margin: EdgeInsets.only(bottom: 5),
+                                  width: 40,
+                                  height: getProportionateScreenHeight(50),
+                                  child: Stack(
+                                    children: <Widget>[
+                                      CircleAvatar(
+                                        radius: 20,
+                                        backgroundColor: Colors.white,
+                                        child: CircleAvatar(
+                                          radius: 19,
+                                          backgroundColor: Colors.black,
+                                          backgroundImage: NetworkImage(
+                                              listVideos[0].userPic),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              buildLikeButton(listVideos[0]),
+                              SizedBox(height: 3.0),
+                              StreamBuilder(
+                                stream: likesRef
+                                    .where('postId',
+                                        isEqualTo: listVideos[0].id)
+                                    .snapshots(),
+                                builder: (context,
+                                    AsyncSnapshot<QuerySnapshot> snapshot) {
+                                  if (snapshot.hasData) {
+                                    QuerySnapshot snap = snapshot.data;
+                                    List<DocumentSnapshot> docs = snap.docs;
+                                    return buildLikesCount(
+                                        context, docs?.length ?? 0);
+                                  } else {
+                                    return buildLikesCount(context, 0);
+                                  }
+                                },
+                              ),
+                              SizedBox(height: 3.0),
+                              IconButton(
+                                icon: Icon(
+                                  Icons.sms,
+                                  size: 35,
+                                  color: Colors.white,
+                                ),
+                                onPressed: () {
+                                  commentClicked(listVideos[0]);
+                                },
+                              ),
+                              SizedBox(height: 3.0),
+                              StreamBuilder(
+                                stream: commentRef
+                                    .doc(listVideos[0].id)
+                                    .collection("comments")
+                                    .snapshots(),
+                                builder: (context,
+                                    AsyncSnapshot<QuerySnapshot> snapshot) {
+                                  if (snapshot.hasData) {
+                                    QuerySnapshot snap = snapshot.data;
+                                    List<DocumentSnapshot> docs = snap.docs;
+                                    return buildCommentsCount(
+                                        context, docs?.length ?? 0);
+                                  } else {
+                                    return buildCommentsCount(context, 0);
+                                  }
+                                },
+                              ),
+                              SizedBox(height: 3.0),
+                              IconButton(
+                                icon: Icon(
+                                  CupertinoIcons.ellipsis,
+                                  size: 35,
+                                  color: Colors.white,
+                                ),
+                                onPressed: () {
+                                  settingClicked(
+                                      listVideos[0], listVideos[0].id);
+                                },
+                              ),
+                              SizedBox(height: 3.0),
+                              AnimatedBuilder(
+                                animation: animationController,
+                                child: CircleAvatar(
+                                  radius: 22,
+                                  backgroundColor:
+                                      Colors.grey[400].withOpacity(0.1),
+                                  child: CircleAvatar(
+                                    radius: 12,
+                                    backgroundImage:
+                                        AssetImage('assets/images/effects.png'),
+                                  ),
+                                ),
+                                builder: (context, _widget) {
+                                  return Transform.rotate(
+                                      angle: animationController.value * 6.3,
+                                      child: _widget);
+                                },
+                              )
+                            ],
+                          ),
+                        ),
+                      ))
+                ],
+              )
+            : Stack(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 5),
+                    child: Align(
+                      alignment: Alignment.bottomLeft,
+                      child: Container(
+                        width: MediaQuery.of(context).size.width - 100,
+                        height: 100,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Padding(
+                              padding: EdgeInsets.only(left: 10, bottom: 10),
+                              child: Text(
+                                listVideos[index].username,
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ),
+                            Padding(
+                                padding: EdgeInsets.only(left: 10, bottom: 10),
+                                child: Text.rich(
+                                  TextSpan(children: <TextSpan>[
+                                    TextSpan(
+                                        text: listVideos[index].videoTitle),
+                                    TextSpan(
+                                        text: '${listVideos[index].tags}\n',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold)),
+                                  ]),
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 14),
+                                )),
+                            Container(
+                              padding: EdgeInsets.only(left: 10),
+                              child: Row(
                                 children: <Widget>[
-                                  CircleAvatar(
-                                    radius: 20,
-                                    backgroundColor: Colors.white,
-                                    child: CircleAvatar(
-                                      radius: 19,
-                                      backgroundColor: Colors.black,
-                                      backgroundImage: NetworkImage(
-                                          listVideos[index].userPic),
-                                    ),
-                                  )
+                                  Icon(Icons.music_note,
+                                      size: 16, color: Colors.white),
+                                  Text(listVideos[index].songName ?? '',
+                                      style: TextStyle(color: Colors.white))
                                 ],
                               ),
-                            ),
-                          ),
-                          buildLikeButton(listVideos[index]),
-                          SizedBox(height: 3.0),
-                          StreamBuilder(
-                            stream: likesRef
-                                .where('postId',
-                                    isEqualTo: listVideos[index].id)
-                                .snapshots(),
-                            builder: (context,
-                                AsyncSnapshot<QuerySnapshot> snapshot) {
-                              if (snapshot.hasData) {
-                                QuerySnapshot snap = snapshot.data;
-                                List<DocumentSnapshot> docs = snap.docs;
-                                return buildLikesCount(
-                                    context, docs?.length ?? 0);
-                              } else {
-                                return buildLikesCount(context, 0);
-                              }
-                            },
-                          ),
-                          SizedBox(height: 3.0),
-                          IconButton(
-                            icon: Icon(
-                              Icons.sms,
-                              size: 35,
-                              color: Colors.white,
-                            ),
-                            onPressed: () {
-                              commentClicked(listVideos[index]);
-                            },
-                          ),
-                          SizedBox(height: 3.0),
-                          StreamBuilder(
-                            stream: commentRef
-                                .doc(listVideos[index].id)
-                                .collection("comments")
-                                .snapshots(),
-                            builder: (context,
-                                AsyncSnapshot<QuerySnapshot> snapshot) {
-                              if (snapshot.hasData) {
-                                QuerySnapshot snap = snapshot.data;
-                                List<DocumentSnapshot> docs = snap.docs;
-                                return buildCommentsCount(
-                                    context, docs?.length ?? 0);
-                              } else {
-                                return buildCommentsCount(context, 0);
-                              }
-                            },
-                          ),
-                          SizedBox(height: 3.0),
-                          IconButton(
-                            icon: Icon(
-                              CupertinoIcons.ellipsis,
-                              size: 35,
-                              color: Colors.white,
-                            ),
-                            onPressed: () {
-                              settingClicked(
-                                  listVideos[index], listVideos[index].id);
-                            },
-                          ),
-                          SizedBox(height: 3.0),
-                          AnimatedBuilder(
-                            animation: animationController,
-                            child: CircleAvatar(
-                              radius: 22,
-                              backgroundColor:
-                                  Colors.grey[400].withOpacity(0.1),
-                              child: CircleAvatar(
-                                radius: 12,
-                                backgroundImage:
-                                    AssetImage('assets/images/effects.png'),
-                              ),
-                            ),
-                            builder: (context, _widget) {
-                              return Transform.rotate(
-                                  angle: animationController.value * 6.3,
-                                  child: _widget);
-                            },
-                          )
-                        ],
+                            )
+                          ],
+                        ),
                       ),
                     ),
-                  ))
-            ],
-          );
+                  ),
+                  Padding(
+                      padding: EdgeInsets.only(bottom: 15, right: 10),
+                      child: Align(
+                        alignment: Alignment.bottomRight,
+                        child: Container(
+                          width: getProportionateScreenWidth(50),
+                          height: getProportionateScreenHeight(350),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: <Widget>[
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => ProfileScreen(
+                                          profileUID: listVideos[index].ownerId,
+                                        ),
+                                      ));
+                                },
+                                child: Container(
+                                  margin: EdgeInsets.only(bottom: 5),
+                                  width: 40,
+                                  height: getProportionateScreenHeight(50),
+                                  child: Stack(
+                                    children: <Widget>[
+                                      CircleAvatar(
+                                        radius: 20,
+                                        backgroundColor: Colors.white,
+                                        child: CircleAvatar(
+                                          radius: 19,
+                                          backgroundColor: Colors.black,
+                                          backgroundImage: NetworkImage(
+                                              listVideos[index].userPic),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              buildLikeButton(listVideos[index]),
+                              SizedBox(height: 3.0),
+                              StreamBuilder(
+                                stream: likesRef
+                                    .where('postId',
+                                        isEqualTo: listVideos[index].id)
+                                    .snapshots(),
+                                builder: (context,
+                                    AsyncSnapshot<QuerySnapshot> snapshot) {
+                                  if (snapshot.hasData) {
+                                    QuerySnapshot snap = snapshot.data;
+                                    List<DocumentSnapshot> docs = snap.docs;
+                                    return buildLikesCount(
+                                        context, docs?.length ?? 0);
+                                  } else {
+                                    return buildLikesCount(context, 0);
+                                  }
+                                },
+                              ),
+                              SizedBox(height: 3.0),
+                              IconButton(
+                                icon: Icon(
+                                  Icons.sms,
+                                  size: 35,
+                                  color: Colors.white,
+                                ),
+                                onPressed: () {
+                                  commentClicked(listVideos[index]);
+                                },
+                              ),
+                              SizedBox(height: 3.0),
+                              StreamBuilder(
+                                stream: commentRef
+                                    .doc(listVideos[index].id)
+                                    .collection("comments")
+                                    .snapshots(),
+                                builder: (context,
+                                    AsyncSnapshot<QuerySnapshot> snapshot) {
+                                  if (snapshot.hasData) {
+                                    QuerySnapshot snap = snapshot.data;
+                                    List<DocumentSnapshot> docs = snap.docs;
+                                    return buildCommentsCount(
+                                        context, docs?.length ?? 0);
+                                  } else {
+                                    return buildCommentsCount(context, 0);
+                                  }
+                                },
+                              ),
+                              SizedBox(height: 3.0),
+                              IconButton(
+                                icon: Icon(
+                                  CupertinoIcons.ellipsis,
+                                  size: 35,
+                                  color: Colors.white,
+                                ),
+                                onPressed: () {
+                                  settingClicked(
+                                      listVideos[index], listVideos[index].id);
+                                },
+                              ),
+                              SizedBox(height: 3.0),
+                              AnimatedBuilder(
+                                animation: animationController,
+                                child: CircleAvatar(
+                                  radius: 22,
+                                  backgroundColor:
+                                      Colors.grey[400].withOpacity(0.1),
+                                  child: CircleAvatar(
+                                    radius: 12,
+                                    backgroundImage:
+                                        AssetImage('assets/images/effects.png'),
+                                  ),
+                                ),
+                                builder: (context, _widget) {
+                                  return Transform.rotate(
+                                      angle: animationController.value * 6.3,
+                                      child: _widget);
+                                },
+                              )
+                            ],
+                          ),
+                        ),
+                      ))
+                ],
+              )
+        : Container();
   }
 
   settingClicked(video, id) {

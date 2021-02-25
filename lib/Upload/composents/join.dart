@@ -51,6 +51,7 @@ class _JoinPageState extends State<JoinPage> {
   bool heart = false;
   bool requested = false;
 
+  bool giftBool = false;
   bool _isLogin = true;
   bool _isInChannel = true;
 
@@ -250,6 +251,102 @@ class _JoinPageState extends State<JoinPage> {
         height += _random.nextInt(20);
       });
     });
+  }
+
+  Widget GiftList() {
+    return Container(
+      alignment: Alignment.bottomRight,
+      child: Container(
+        height: 2 * MediaQuery.of(context).size.height / 3,
+        width: MediaQuery.of(context).size.height,
+        decoration: new BoxDecoration(
+          color: Colors.grey[850],
+          borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(25), topRight: Radius.circular(25)),
+        ),
+        child: Stack(
+          children: <Widget>[
+            Container(
+              height: 2 * MediaQuery.of(context).size.height / 3 - 50,
+              child: Column(
+                children: <Widget>[
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(4.0, 0, 0, 0),
+                    child: MaterialButton(
+                      minWidth: 0,
+                      onPressed: () {},
+                      child: Icon(
+                        Icons.lock_clock,
+                        color: Colors.white,
+                        size: 20.0,
+                      ),
+                      shape: CircleBorder(),
+                      elevation: 2.0,
+                      color: Colors.red,
+                      padding: const EdgeInsets.all(12.0),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Container(
+                    padding: EdgeInsets.symmetric(vertical: 12),
+                    width: MediaQuery.of(context).size.width,
+                    alignment: Alignment.center,
+                    child: Text(
+                      'Purchase Coins',
+                      style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Divider(
+                    color: Colors.grey[800],
+                    thickness: 0.5,
+                    height: 0,
+                  ),
+                ],
+              ),
+            ),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: GestureDetector(
+                onTap: () {
+                  setState(() {
+                    giftBool = !giftBool;
+                  });
+                },
+                child: Container(
+                  color: Colors.grey[850],
+                  alignment: Alignment.bottomCenter,
+                  height: 50,
+                  child: Stack(
+                    children: <Widget>[
+                      Container(
+                          height: double.maxFinite,
+                          alignment: Alignment.center,
+                          child: Text(
+                            'Cancel',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
+                          )),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget heartPop() {
@@ -711,6 +808,12 @@ class _JoinPageState extends State<JoinPage> {
     });
   }
 
+  void _addGift() {
+    setState(() {
+      giftBool = !giftBool;
+    });
+  }
+
   Widget stopSharing() {
     return Container(
       height: MediaQuery.of(context).size.height / 2 + 40,
@@ -758,7 +861,7 @@ class _JoinPageState extends State<JoinPage> {
                           if (heart == true && completed == false) heartPop(),
                           if (requested == true) requestedWidget(),
                           if (accepted == true) stopSharing(),
-
+                          if (giftBool == true) GiftList(),
                           //_ending()
                         ],
                       ),
@@ -822,6 +925,23 @@ class _JoinPageState extends State<JoinPage> {
                 padding: const EdgeInsets.all(12.0),
               ),
             ),
+            if (giftBool == false)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(4.0, 0, 0, 0),
+                child: MaterialButton(
+                  minWidth: 0,
+                  onPressed: _addGift,
+                  child: Icon(
+                    Icons.lock_clock,
+                    color: Colors.red[900],
+                    size: 20.0,
+                  ),
+                  shape: CircleBorder(),
+                  elevation: 2.0,
+                  color: Colors.grey[400].withOpacity(0.2),
+                  padding: const EdgeInsets.all(12.0),
+                ),
+              ),
             Padding(
               padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
               child: MaterialButton(

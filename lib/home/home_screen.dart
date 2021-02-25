@@ -210,8 +210,6 @@ class _State extends State<HomeScreen> {
                     style: TextStyle(
                         fontWeight: FontWeight.bold, color: Colors.white)),
                 onTap: () async {
-                  await _handleCameraAndMic();
-
                   Navigator.pop(context);
                   Navigator.push(
                     context,
@@ -233,7 +231,6 @@ class _State extends State<HomeScreen> {
                 onTap: () async {
                   ///Feature coming soon
                   ///
-                  await _handleCameraAndMic();
                   Navigator.pop(context);
                   Navigator.push(
                     context,
