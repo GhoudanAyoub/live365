@@ -175,7 +175,7 @@ class _EditProfileState extends State<EditProfile> {
                     onChanged: (bool value) {
                       setState(() {
                         this.valuesecond = value;
-                        viewModel.setMsgAll(value);
+                        viewModel.setMsgAll(this.valuesecond);
                       });
                     }),
                 Text(

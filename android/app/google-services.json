@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "771052550982-6puos8e7aqo97p5hd7vr72905k7vccnn.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ghoudan.live365",
+            "certificate_hash": "f0cb0f71ce8bec3b3b102441b319352aa1b7760b"
+          }
+        },
+        {
           "client_id": "771052550982-hfne813aek32pv81cmjblgmluprlabpd.apps.googleusercontent.com",
           "client_type": 3
         }
