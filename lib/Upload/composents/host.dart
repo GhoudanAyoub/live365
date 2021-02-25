@@ -111,7 +111,7 @@ class _CallPageState extends State<CallPage> {
     _addAgoraEventHandlers();
     await _engine.enableWebSdkInteroperability(true);
     VideoEncoderConfiguration configuration = VideoEncoderConfiguration();
-    configuration.dimensions = VideoDimensions(1920, 1080);
+    configuration.dimensions = VideoDimensions(720, 520);
     await _engine.setVideoEncoderConfiguration(configuration);
     await _engine.joinChannel(Token, widget.channelName, null, 0);
   }
@@ -476,7 +476,7 @@ class _CallPageState extends State<CallPage> {
                           width: 5,
                         ),
                         Text(
-                          '${userNo == null ? _users.length : userNo}',
+                          '${_users.length ?? userNo}',
                           style: TextStyle(color: Colors.white, fontSize: 11),
                         ),
                       ],
@@ -1031,22 +1031,6 @@ class _CallPageState extends State<CallPage> {
                 shape: CircleBorder(),
                 elevation: 2.0,
                 color: Colors.grey[400].withOpacity(0.1),
-                padding: const EdgeInsets.all(12.0),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(4.0, 0, 0, 0),
-              child: MaterialButton(
-                minWidth: 0,
-                onPressed: _addGift,
-                child: Icon(
-                  Icons.card_giftcard,
-                  color: Colors.white,
-                  size: 20.0,
-                ),
-                shape: CircleBorder(),
-                elevation: 2.0,
-                color: Colors.orange,
                 padding: const EdgeInsets.all(12.0),
               ),
             ),

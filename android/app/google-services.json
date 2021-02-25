@@ -1,256 +1,40 @@
 {
   "project_info": {
-    "project_number": "386731171770",
-    "firebase_url": "https://pfe12-381d2.firebaseio.com",
-    "project_id": "pfe12-381d2",
-    "storage_bucket": "pfe12-381d2.appspot.com"
+    "project_number": "771052550982",
+    "project_id": "live365-7cbd6",
+    "storage_bucket": "live365-7cbd6.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:386731171770:android:2749081fd55605b8bac783",
-        "android_client_info": {
-          "package_name": "com.example.dream_house2"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "386731171770-s013to97je3osl16rlh216npli1qpjhm.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyCpcH9DVVZsBsnRFWw2nSG_WsAkQxitg20"
-        },
-        {
-          "current_key": "AIzaSyBppTzTDxcwKDz1UyhCFq3vP3yZku1ynW4"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "386731171770-s013to97je3osl16rlh216npli1qpjhm.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
-              "client_id": "386731171770-7e3jlnr9bimcjkrhb45qd21nrft2jqhc.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.example.shopApp"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:386731171770:android:9e2242f48655f09fbac783",
-        "android_client_info": {
-          "package_name": "com.example.food_delivery"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "386731171770-s013to97je3osl16rlh216npli1qpjhm.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyCpcH9DVVZsBsnRFWw2nSG_WsAkQxitg20"
-        },
-        {
-          "current_key": "AIzaSyBppTzTDxcwKDz1UyhCFq3vP3yZku1ynW4"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "386731171770-s013to97je3osl16rlh216npli1qpjhm.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
-              "client_id": "386731171770-7e3jlnr9bimcjkrhb45qd21nrft2jqhc.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.example.shopApp"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:386731171770:android:3b904c76066b7d95bac783",
-        "android_client_info": {
-          "package_name": "com.example.shop_app"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "386731171770-01crimbj29r4shfsclomvior27ef5gl7.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.example.shop_app",
-            "certificate_hash": "559a11f377717473cd4af55642b795aa2339510f"
-          }
-        },
-        {
-          "client_id": "386731171770-s013to97je3osl16rlh216npli1qpjhm.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyCpcH9DVVZsBsnRFWw2nSG_WsAkQxitg20"
-        },
-        {
-          "current_key": "AIzaSyBppTzTDxcwKDz1UyhCFq3vP3yZku1ynW4"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "386731171770-s013to97je3osl16rlh216npli1qpjhm.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
-              "client_id": "386731171770-7e3jlnr9bimcjkrhb45qd21nrft2jqhc.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.example.shopApp"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:386731171770:android:0f2adb30f1b2456bbac783",
-        "android_client_info": {
-          "package_name": "com.example.testnode1"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "386731171770-s013to97je3osl16rlh216npli1qpjhm.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyCpcH9DVVZsBsnRFWw2nSG_WsAkQxitg20"
-        },
-        {
-          "current_key": "AIzaSyBppTzTDxcwKDz1UyhCFq3vP3yZku1ynW4"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "386731171770-s013to97je3osl16rlh216npli1qpjhm.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
-              "client_id": "386731171770-7e3jlnr9bimcjkrhb45qd21nrft2jqhc.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.example.shopApp"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:386731171770:android:1119fa895543a97a",
-        "android_client_info": {
-          "package_name": "com.exemple.stage"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "386731171770-318s9p6bealk2stnmltv91q5cf34ee2p.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.exemple.stage",
-            "certificate_hash": "559a11f377717473cd4af55642b795aa2339510f"
-          }
-        },
-        {
-          "client_id": "386731171770-s013to97je3osl16rlh216npli1qpjhm.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyCpcH9DVVZsBsnRFWw2nSG_WsAkQxitg20"
-        },
-        {
-          "current_key": "AIzaSyBppTzTDxcwKDz1UyhCFq3vP3yZku1ynW4"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "386731171770-s013to97je3osl16rlh216npli1qpjhm.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
-              "client_id": "386731171770-7e3jlnr9bimcjkrhb45qd21nrft2jqhc.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.example.shopApp"
-              }
-            }
-          ]
-        }
-      },
-      "admob_app_id": "ca-app-pub-8004564561830355~1203769567"
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:386731171770:android:7554e383d199e5dabac783",
+        "mobilesdk_app_id": "1:771052550982:android:df0caeea5e9417f4ec4347",
         "android_client_info": {
           "package_name": "com.ghoudan.live365"
         }
       },
       "oauth_client": [
         {
-          "client_id": "386731171770-s013to97je3osl16rlh216npli1qpjhm.apps.googleusercontent.com",
+          "client_id": "771052550982-hfne813aek32pv81cmjblgmluprlabpd.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCpcH9DVVZsBsnRFWw2nSG_WsAkQxitg20"
-        },
-        {
-          "current_key": "AIzaSyBppTzTDxcwKDz1UyhCFq3vP3yZku1ynW4"
+          "current_key": "AIzaSyCM5ebWehmF-kq0_Oa99kujivL5y23d5kw"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "386731171770-s013to97je3osl16rlh216npli1qpjhm.apps.googleusercontent.com",
+              "client_id": "771052550982-hfne813aek32pv81cmjblgmluprlabpd.apps.googleusercontent.com",
               "client_type": 3
             },
             {
-              "client_id": "386731171770-7e3jlnr9bimcjkrhb45qd21nrft2jqhc.apps.googleusercontent.com",
+              "client_id": "771052550982-gj82ta7787tnq7ggbfgi7o909aguj860.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.example.shopApp"
+                "bundle_id": "com.ghoudan.live365"
               }
             }
           ]

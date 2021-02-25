@@ -72,9 +72,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return PageView(
-      children: [getAllUsers()],
-    );
+    return getAllUsers();
   }
 
   Widget getVideosAndUsers() {
@@ -151,44 +149,42 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
 
   Widget getAllUsers() {
     return ResponsiveBuilder(builder: (context, sizingInformation) {
-      return Scaffold(
-          body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 20.0),
-        child: Container(
-          child: Column(
-            children: [
-              SizedBox(
-                height: 10,
+      return SafeArea(
+          child: Scaffold(
+        resizeToAvoidBottomPadding: false,
+        body: Stack(
+          children: [
+            SizedBox(
+              height: 10,
+            ),
+            Padding(
+              padding: EdgeInsets.only(left: 15.0, right: 15.0),
+              child: Material(
+                elevation: 5.0,
+                borderRadius: BorderRadius.circular(50.0),
+                child: TextFormField(
+                    cursorColor: black,
+                    controller: searchController,
+                    onChanged: (query) {
+                      search(query);
+                    },
+                    decoration: InputDecoration(
+                        border: InputBorder.none,
+                        prefixIcon:
+                            Icon(Icons.search, color: GBottomNav, size: 30.0),
+                        contentPadding: EdgeInsets.only(left: 15.0, top: 15.0),
+                        hintText: 'Search',
+                        hintStyle: TextStyle(
+                            color: Colors.white,
+                            fontFamily: 'SFProDisplay-Black'))),
               ),
-              Padding(
-                padding: EdgeInsets.only(left: 15.0, right: 15.0),
-                child: Material(
-                  elevation: 5.0,
-                  borderRadius: BorderRadius.circular(50.0),
-                  child: TextFormField(
-                      cursorColor: black,
-                      controller: searchController,
-                      onChanged: (query) {
-                        search(query);
-                      },
-                      decoration: InputDecoration(
-                          border: InputBorder.none,
-                          prefixIcon:
-                              Icon(Icons.search, color: GBottomNav, size: 30.0),
-                          contentPadding:
-                              EdgeInsets.only(left: 15.0, top: 15.0),
-                          hintText: 'Search',
-                          hintStyle: TextStyle(
-                              color: Colors.white,
-                              fontFamily: 'SFProDisplay-Black'))),
-                ),
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              buildUsers()
-            ],
-          ),
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            Container(
+                margin: EdgeInsets.fromLTRB(0, 60, 0, 0), child: buildUsers())
+          ],
         ),
       ));
     });
@@ -209,8 +205,8 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
           itemBuilder: (BuildContext context, int index) {
             DocumentSnapshot doc = filteredUsers[index];
             UserModel user = UserModel.fromJson(doc.data());
-            checkIfFollowing(user.id);
             if (doc.id == currentUserId()) {
+              checkIfFollowing(user.id);
               Timer(Duration(milliseconds: 50), () {
                 setState(() {
                   removeFromList(index);

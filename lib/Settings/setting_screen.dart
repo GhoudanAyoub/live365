@@ -27,7 +27,7 @@ class _SettingScreenState extends State<SettingScreen> {
           child: Column(
             children: [
               ProfileMenu(
-                text: "My Account",
+                text: "Edit Profile",
                 icon: "assets/icons/User Icon.svg",
                 press: () => {
                   Navigator.of(context).push(

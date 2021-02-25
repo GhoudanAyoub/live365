@@ -198,14 +198,20 @@ class FirebaseService {
 
   // GOOGLE
   Future<String> signInWithGoogle() async {
+    String uid;
     final GoogleSignInAccount account = await _googleSignIn.signIn();
     final GoogleSignInAuthentication _googleAuth = await account.authentication;
     final AuthCredential credential = GoogleAuthProvider.credential(
       idToken: _googleAuth.idToken,
       accessToken: _googleAuth.accessToken,
     );
-    addUsers((await _firebaseAuth.signInWithCredential(credential)).user);
-    return (await _firebaseAuth.signInWithCredential(credential)).user.uid;
+    await _firebaseAuth.signInWithCredential(credential).catchError((e) {
+      print(e.toString());
+    }).then((value) => () {
+          addUsers(value.user);
+          uid = value.user.uid;
+        });
+    return uid;
   }
 
   // APPLE

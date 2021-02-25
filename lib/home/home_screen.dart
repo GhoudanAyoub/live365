@@ -13,7 +13,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-import '../SizeConfig.dart';
 import '../constants.dart';
 import 'components/body.dart';
 
@@ -111,14 +110,24 @@ class _State extends State<HomeScreen> {
       {"icon": "assets/icons/User Icon.svg", "label": "Me", "isIcon": true}
     ];
     return Container(
-      height: getProportionateScreenHeight(80),
+      padding: EdgeInsets.symmetric(vertical: 14),
+      height: 90,
       width: double.infinity,
-      decoration: BoxDecoration(color: GBottomNav),
-      child: Padding(
-        padding: const EdgeInsets.only(left: 20, right: 20, bottom: 5),
+      decoration: BoxDecoration(
+        color: GBottomNav,
+        boxShadow: [
+          BoxShadow(
+            offset: Offset(0, -15),
+            blurRadius: 20,
+            color: GBottomNav.withOpacity(0.15),
+          ),
+        ],
+      ),
+      child: SafeArea(
+        top: false,
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: List.generate(bottomItems.length, (index) {
             return bottomItems[index]['isIcon']
                 ? InkWell(
@@ -201,9 +210,6 @@ class _State extends State<HomeScreen> {
                     style: TextStyle(
                         fontWeight: FontWeight.bold, color: Colors.white)),
                 onTap: () async {
-                  ///Feature coming soon
-                  ///
-                  await _handleCameraAndMic();
                   Navigator.pop(context);
                   Navigator.push(
                     context,
@@ -225,7 +231,6 @@ class _State extends State<HomeScreen> {
                 onTap: () async {
                   ///Feature coming soon
                   ///
-                  await _handleCameraAndMic();
                   Navigator.pop(context);
                   Navigator.push(
                     context,
@@ -246,7 +251,6 @@ class _State extends State<HomeScreen> {
                         fontWeight: FontWeight.bold, color: Colors.white)),
                 onTap: () {
                   Navigator.pop(context);
-
                   Navigator.of(context)
                       .push(MaterialPageRoute(builder: (_) => CreatePost()));
                 },

@@ -7,6 +7,7 @@ ThemeData theme() {
     scaffoldBackgroundColor: GBottomNav,
     fontFamily: "SFProDisplay-Regular",
     appBarTheme: appBarTheme(),
+    primarySwatch: Colors.blueGrey,
     textTheme: textTheme(),
     inputDecorationTheme: inputDecorationTheme(),
     visualDensity: VisualDensity.adaptivePlatformDensity,
