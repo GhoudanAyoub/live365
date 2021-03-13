@@ -315,6 +315,13 @@ class _JoinPageState extends State<JoinPage> {
                 ],
               ),
             ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(10, 150, 0, 0),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: clipsWidget(),
+              ),
+            ),
             Align(
               alignment: Alignment.bottomCenter,
               child: GestureDetector(
@@ -348,6 +355,106 @@ class _JoinPageState extends State<JoinPage> {
       ),
     );
   }
+
+  Widget clipsWidget() {
+    return Container(
+      height: 250,
+      margin: EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+      child: Row(
+        children: [
+          Column(
+            children: [
+              roundedContainer(Colors.redAccent, "asset/gift/Bike.png", 200),
+              SizedBox(
+                height: 15,
+              ),
+              roundedContainer(
+                  Colors.greenAccent, "asset/gift/Balloon.png", 25),
+            ],
+          ),
+          SizedBox(
+            width: 15,
+          ),
+          Column(
+            children: [
+              roundedContainer(
+                  Colors.orangeAccent, "asset/gift/Camera.png", 100),
+              SizedBox(height: 15),
+              roundedContainer(Colors.purpleAccent, "asset/gift/Car.png", 300),
+            ],
+          ),
+          SizedBox(
+            width: 15,
+          ),
+          Column(
+            children: [
+              roundedContainer(Colors.blue, "asset/gift/Drinks.png", 15),
+              SizedBox(
+                height: 15,
+              ),
+              roundedContainer(
+                  Colors.lightGreenAccent, "asset/gift/Flower.png", 10),
+            ],
+          ),
+          SizedBox(
+            width: 15,
+          ),
+          Column(
+            children: [
+              roundedContainer(Colors.white, "asset/gift/Glasses.png", 70),
+              SizedBox(
+                height: 15,
+              ),
+              roundedContainer(
+                  Colors.deepOrangeAccent, "asset/gift/Ice Cream.png", 25),
+            ],
+          ),
+          SizedBox(width: 15),
+          Column(
+            children: [
+              roundedContainer(Colors.pink, "asset/gift/Love.png", 500),
+              SizedBox(
+                height: 15,
+              ),
+              roundedContainer(Colors.brown, "asset/gift/Ring.png", 1000),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget roundedContainer(color, assetName, price) {
+    return Column(
+      children: [
+        GestureDetector(
+          onTap: () {
+            print(price.toString());
+            checkPacket(price);
+          },
+          child: Container(
+              height: 100,
+              width: 100,
+              decoration: BoxDecoration(
+                  color: color,
+                  borderRadius: BorderRadius.all(Radius.circular(20))),
+              child: Hero(
+                tag: "image-",
+                child: Image(
+                  image: AssetImage(assetName),
+                  height: 40,
+                ),
+              )),
+        ),
+        Text(
+          "${price.toString()} C",
+          style: TextStyle(color: Colors.white),
+        )
+      ],
+    );
+  }
+
+  void checkPacket(price) {}
 
   Widget heartPop() {
     final size = MediaQuery.of(context).size;

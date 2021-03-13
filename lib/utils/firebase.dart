@@ -9,6 +9,7 @@ FirebaseStorage storage = FirebaseStorage.instance;
 final Uuid uuid = Uuid();
 
 // Collection refs
+CollectionReference paymentRef = firestore.collection('Payment');
 CollectionReference reportRef = firestore.collection('report');
 CollectionReference usersRef = firestore.collection('users');
 CollectionReference chatRef = firestore.collection("chats");

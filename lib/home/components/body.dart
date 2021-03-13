@@ -343,6 +343,7 @@ class _BodyState extends State<Body> with SingleTickerProviderStateMixin {
                 fontWeight: FontWeight.bold,
               ),
             ),
+            /*
             FlatButton(
                 onPressed: () {
                   setState(() {
@@ -370,7 +371,7 @@ class _BodyState extends State<Body> with SingleTickerProviderStateMixin {
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
               ),
-            ),
+            ),*/
             FlatButton(
                 onPressed: () {
                   setState(() {

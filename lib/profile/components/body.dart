@@ -468,7 +468,7 @@ class _BodyState extends State<Body> {
                           child: Container(
                             padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
                             child: Text(
-                                "${user.bio.isEmpty ? 'Lorem ipsum, or lipsum as it is sometimes known, graphic or web designs.' : user.bio}",
+                                "${user.bio.isEmpty ? 'Everyday LIVE365' : user.bio}",
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   fontSize: getProportionateScreenWidth(12),
