@@ -4,11 +4,13 @@ import 'dart:math' as math;
 import 'package:LIVE365/Upload/composents/Loading.dart';
 import 'package:LIVE365/firebaseService/FirebaseService.dart';
 import 'package:LIVE365/models/live_comments.dart';
+import 'package:LIVE365/utils/firebase.dart';
 import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:agora_rtc_engine/rtc_local_view.dart' as RtcLocalView;
 import 'package:agora_rtc_engine/rtc_remote_view.dart' as RtcRemoteView;
 import 'package:agora_rtm/agora_rtm.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:wakelock/wakelock.dart';
@@ -72,6 +74,8 @@ class _JoinPageState extends State<JoinPage> {
   bool stop = false;
   RtcEngine _engine;
   final _infoString = <String>[];
+
+  var Balance;
 
   @override
   void dispose() {
@@ -304,8 +308,34 @@ class _JoinPageState extends State<JoinPage> {
                           color: Colors.white),
                     ),
                   ),
-                  SizedBox(
-                    height: 10,
+                  FutureBuilder<DocumentSnapshot>(
+                    future: paymentRef.doc(firebaseAuth.currentUser.uid).get(),
+                    builder: (BuildContext context,
+                        AsyncSnapshot<DocumentSnapshot> snapshot) {
+                      if (snapshot.hasError) {
+                        return Text("Something went wrong");
+                      }
+
+                      if (snapshot.connectionState == ConnectionState.done) {
+                        Map<String, dynamic> data = snapshot.data.data();
+                        if (data != null) {
+                          setState(() {
+                            Balance = data["packet"];
+                          });
+                          return Text("Full Name: ${data.toString()} ",
+                              style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white));
+                        }
+                      }
+
+                      return Text("Balance : 0",
+                          style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white));
+                    },
                   ),
                   Divider(
                     color: Colors.grey[800],

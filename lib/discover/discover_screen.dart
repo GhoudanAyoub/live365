@@ -151,7 +151,6 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
     return ResponsiveBuilder(builder: (context, sizingInformation) {
       return SafeArea(
           child: Scaffold(
-        resizeToAvoidBottomPadding: false,
         body: Stack(
           children: [
             SizedBox(

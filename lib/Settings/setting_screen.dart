@@ -4,6 +4,8 @@ import 'package:LIVE365/firebaseService/FirebaseService.dart';
 import 'package:LIVE365/helper/PaypalPayment.dart';
 import 'package:LIVE365/profile/components/edit_profile.dart';
 import 'package:LIVE365/profile/components/profile_menu.dart';
+import 'package:LIVE365/utils/firebase.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -16,6 +18,15 @@ class SettingScreen extends StatefulWidget {
 }
 
 class _SettingScreenState extends State<SettingScreen> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    Future ref = paymentRef.doc(firebaseAuth.currentUser.uid).get();
+    print(ref);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -211,8 +222,33 @@ class _SettingScreenState extends State<SettingScreen> {
                                 color: Colors.white),
                           ),
                         ),
-                        SizedBox(
-                          height: 10,
+                        FutureBuilder<DocumentSnapshot>(
+                          future: paymentRef
+                              .doc(firebaseAuth.currentUser.uid)
+                              .get(),
+                          builder: (BuildContext context,
+                              AsyncSnapshot<DocumentSnapshot> snapshot) {
+                            if (snapshot.hasError) {
+                              return Text("Something went wrong");
+                            }
+
+                            if (snapshot.connectionState ==
+                                ConnectionState.done) {
+                              Map<String, dynamic> data = snapshot.data.data();
+                              if (data != null)
+                                return Text("Full Name: ${data.toString()} ",
+                                    style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white));
+                            }
+
+                            return Text("Balance : 0",
+                                style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white));
+                          },
                         ),
                         Divider(
                           color: Colors.grey[800],
@@ -251,7 +287,7 @@ class _SettingScreenState extends State<SettingScreen> {
                 height: 15,
               ),
               roundedContainer(
-                  Colors.greenAccent, "assets/gift/Balloon.png", 25),
+                  Colors.greenAccent, "assets/gift/balloon.png", 25),
             ],
           ),
           SizedBox(
@@ -311,8 +347,8 @@ class _SettingScreenState extends State<SettingScreen> {
       children: [
         GestureDetector(
           onTap: () {
-            print(price.toString());
-            checkPacket(price);
+            print("${(price * 100) / 1000}\$");
+            checkPacket((price * 100) / 1000);
           },
           child: Container(
               height: 100,
@@ -329,7 +365,7 @@ class _SettingScreenState extends State<SettingScreen> {
               )),
         ),
         Text(
-          "${price.toString()} C",
+          "${price.toString()} C/${(price * 100) / 1000}\$",
           style: TextStyle(color: Colors.white),
         )
       ],
