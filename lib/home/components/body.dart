@@ -25,9 +25,6 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:screen/screen.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:video_player/video_player.dart';
-import 'package:videos_player/model/video.model.dart';
-import 'package:videos_player/util/theme.util.dart';
-import 'package:videos_player/videos_player.dart';
 
 import '../../SizeConfig.dart';
 import '../../constants.dart';
@@ -1127,6 +1124,7 @@ class _BodyState extends State<Body> with SingleTickerProviderStateMixin {
   }
 
   //*******************************
+  /*
   Widget followFeed2() {
     return listVideos.isNotEmpty
         ? PageView.builder(
@@ -1319,7 +1317,7 @@ class _BodyState extends State<Body> with SingleTickerProviderStateMixin {
                   Text('Rush and Be The First \n To Upload The First Video 😊'),
             ),
           );
-  }
+  }*/
 
   Widget buildCommentsCount(BuildContext context, int count) {
     return Padding(

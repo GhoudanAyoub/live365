@@ -322,7 +322,7 @@ class _JoinPageState extends State<JoinPage> {
                           setState(() {
                             Balance = data["packet"];
                           });
-                          return Text("Full Name: ${data.toString()} ",
+                          return Text("Balance: ${Balance} ",
                               style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.bold,
@@ -394,12 +394,12 @@ class _JoinPageState extends State<JoinPage> {
         children: [
           Column(
             children: [
-              roundedContainer(Colors.redAccent, "asset/gift/Bike.png", 200),
+              roundedContainer(Colors.redAccent, "assets/gift/Bike.png", 200),
               SizedBox(
                 height: 15,
               ),
               roundedContainer(
-                  Colors.greenAccent, "asset/gift/Balloon.png", 25),
+                  Colors.greenAccent, "assets/gift/Balloon.png", 25),
             ],
           ),
           SizedBox(
@@ -408,9 +408,9 @@ class _JoinPageState extends State<JoinPage> {
           Column(
             children: [
               roundedContainer(
-                  Colors.orangeAccent, "asset/gift/Camera.png", 100),
+                  Colors.orangeAccent, "assets/gift/Camera.png", 100),
               SizedBox(height: 15),
-              roundedContainer(Colors.purpleAccent, "asset/gift/Car.png", 300),
+              roundedContainer(Colors.purpleAccent, "assets/gift/Car.png", 300),
             ],
           ),
           SizedBox(
@@ -418,12 +418,12 @@ class _JoinPageState extends State<JoinPage> {
           ),
           Column(
             children: [
-              roundedContainer(Colors.blue, "asset/gift/Drinks.png", 15),
+              roundedContainer(Colors.blue, "assets/gift/Drinks.png", 15),
               SizedBox(
                 height: 15,
               ),
               roundedContainer(
-                  Colors.lightGreenAccent, "asset/gift/Flower.png", 10),
+                  Colors.lightGreenAccent, "assets/gift/Flower.png", 10),
             ],
           ),
           SizedBox(
@@ -431,22 +431,22 @@ class _JoinPageState extends State<JoinPage> {
           ),
           Column(
             children: [
-              roundedContainer(Colors.white, "asset/gift/Glasses.png", 70),
+              roundedContainer(Colors.white, "assets/gift/Glasses.png", 70),
               SizedBox(
                 height: 15,
               ),
               roundedContainer(
-                  Colors.deepOrangeAccent, "asset/gift/Ice Cream.png", 25),
+                  Colors.deepOrangeAccent, "assets/gift/Ice Cream.png", 25),
             ],
           ),
           SizedBox(width: 15),
           Column(
             children: [
-              roundedContainer(Colors.pink, "asset/gift/Love.png", 500),
+              roundedContainer(Colors.pink, "assets/gift/Love.png", 500),
               SizedBox(
                 height: 15,
               ),
-              roundedContainer(Colors.brown, "asset/gift/Ring.png", 1000),
+              roundedContainer(Colors.brown, "assets/gift/Ring.png", 1000),
             ],
           ),
         ],

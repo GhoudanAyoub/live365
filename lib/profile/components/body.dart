@@ -4,7 +4,6 @@ import 'package:LIVE365/components/post_tiles.dart';
 import 'package:LIVE365/components/post_view.dart';
 import 'package:LIVE365/components/stream_builder_wrapper.dart';
 import 'package:LIVE365/components/stream_grid_wrapper.dart';
-import 'package:LIVE365/components/video_view.dart';
 import 'package:LIVE365/firebaseService/FirebaseService.dart';
 import 'package:LIVE365/models/User.dart';
 import 'package:LIVE365/models/post.dart';
@@ -192,11 +191,10 @@ class _BodyState extends State<Body> {
       return buildGridPost();
     } else if (isToggle == false) {
       return buildPosts();
-    } else if (isToggle == false) {
-      return buildVideos();
     }
   }
 
+/*
   buildVideos() {
     return StreamBuilderWrapper(
       shrinkWrap: true,
@@ -216,7 +214,7 @@ class _BodyState extends State<Body> {
       },
     );
   }
-
+*/
   buildPosts() {
     return StreamBuilderWrapper(
       shrinkWrap: true,

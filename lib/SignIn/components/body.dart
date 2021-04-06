@@ -55,19 +55,6 @@ class Body extends StatelessWidget {
                         await signInWithGoogle(context);
                       },
                     ),
-                    SocalCard(
-                      icon: "assets/icons/facebook-2.svg",
-                      press: () {
-                        handleLogin(context);
-                      },
-                    ),
-                    SocalCard(
-                      icon: "assets/icons/twitter.svg",
-                      press: () {
-                        Scaffold.of(context).showSnackBar(
-                            SnackBar(content: Text("Coming Soon")));
-                      },
-                    ),
                   ],
                 ),
                 SizedBox(height: getProportionateScreenHeight(20)),
