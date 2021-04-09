@@ -170,7 +170,7 @@ class _SettingScreenState extends State<SettingScreen> {
       ),
       builder: (BuildContext context) {
         return FractionallySizedBox(
-          heightFactor: 1,
+          heightFactor: 1.2,
           child: Container(
             alignment: Alignment.bottomRight,
             child: Container(
