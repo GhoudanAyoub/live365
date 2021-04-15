@@ -224,9 +224,6 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                   title: Text(user?.username,
                       style: TextStyle(
                           color: Colors.white, fontWeight: FontWeight.bold)),
-                  subtitle: Text(user?.email,
-                      style: TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.bold)),
                   trailing: user.msgToAll == true || isFollowing == true
                       ? GestureDetector(
                           onTap: () {

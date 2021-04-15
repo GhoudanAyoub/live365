@@ -19,6 +19,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 
 import '../../SizeConfig.dart';
 import '../../constants.dart';
+import 'edit_profile.dart';
 import 'follow_unfollow_page.dart';
 
 class Body extends StatefulWidget {
@@ -69,15 +70,41 @@ class _BodyState extends State<Body> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        elevation: 2,
+        leading: widget.profileId == firebaseAuth.currentUser.uid
+            ? IconButton(
+                icon: Icon(
+                  Icons.settings_outlined,
+                  color: Colors.white,
+                ),
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => SettingScreen(
+                          users: user1,
+                        ),
+                      ));
+                })
+            : IconButton(
+                icon: Icon(
+                  Icons.list,
+                  color: Colors.white,
+                ),
+                onPressed: () {
+                  reportSystem();
+                }),
+      ),
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
             automaticallyImplyLeading: false,
             pinned: true,
             floating: false,
-            toolbarHeight: 4.0,
-            collapsedHeight: 5.0,
-            expandedHeight: 390.0,
+            toolbarHeight: 1.0,
+            collapsedHeight: 2.0,
+            expandedHeight: 310.0,
             flexibleSpace: FlexibleSpaceBar(
               background: StreamBuilder(
                 stream: usersRef.doc(widget.profileId).snapshots(),
@@ -250,20 +277,16 @@ class _BodyState extends State<Body> {
   }
 
   buildProfileButton(user) {
-    //if isMe then display "edit profile"
     bool isMe = widget.profileId == firebaseAuth.currentUser.uid;
     if (isMe) {
-      return FlatButton(
-        child: Text(
-          "Change Bio =>",
-          style: TextStyle(color: white),
-        ),
-        onPressed: () {
+      return buildButton(
+        text: "Change Bio",
+        function: () {
           Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => SettingScreen(
-                  users: user1,
+                builder: (context) => EditProfile(
+                  user: user1,
                 ),
               ));
         },
@@ -390,53 +413,6 @@ class _BodyState extends State<Body> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(height: getProportionateScreenHeight(30)),
-        Container(
-            width: SizeConfig.screenWidth,
-            child: Center(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  SizedBox(width: getProportionateScreenWidth(10)),
-                  widget.profileId == firebaseAuth.currentUser.uid
-                      ? IconButton(
-                          icon: Icon(
-                            Icons.settings_outlined,
-                            color: Colors.white,
-                          ),
-                          onPressed: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => SettingScreen(
-                                    users: user1,
-                                  ),
-                                ));
-                          })
-                      : IconButton(
-                          icon: Icon(
-                            Icons.list,
-                            color: Colors.white,
-                          ),
-                          onPressed: () {
-                            reportSystem();
-                          }),
-                  SizedBox(
-                    width: getProportionateScreenWidth(260),
-                    height: getProportionateScreenHeight(10),
-                  ),
-                  widget.profileId == firebaseAuth.currentUser.uid
-                      ? IconButton(
-                          icon: Icon(
-                            Icons.search,
-                            color: Colors.white,
-                          ),
-                          onPressed: () {})
-                      : Container(),
-                  SizedBox(width: getProportionateScreenWidth(10))
-                ],
-              ),
-            )),
         StreamBuilder(
           stream: usersRef.doc(widget.profileId).snapshots(),
           builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {

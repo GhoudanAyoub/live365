@@ -2,10 +2,14 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:LIVE365/models/video.dart';
+import 'package:LIVE365/utils/firebase.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:screen/screen.dart';
 import 'package:video_player/video_player.dart';
+
+import '../../constants.dart';
 
 class PlayPage extends StatefulWidget {
   PlayPage({Key key, @required this.clips}) : super(key: key);
@@ -538,6 +542,19 @@ class _PlayPageState extends State<PlayPage> {
                     )
                   ]),
             ),
+            clip.ownerId == firebaseAuth.currentUser.uid
+                ? GestureDetector(
+                    onTap: () {
+                      deleteVideo(context, clip.videoId);
+                    },
+                    child: Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Icon(CupertinoIcons.delete),
+                    ),
+                  )
+                : Container(
+                    width: 0,
+                  ),
             Padding(
               padding: EdgeInsets.all(8.0),
               child: playing
@@ -551,5 +568,44 @@ class _PlayPageState extends State<PlayPage> {
         ),
       ),
     );
+  }
+
+  deleteVideo(BuildContext parentContext, videoid) {
+    return showDialog(
+        context: parentContext,
+        builder: (context) {
+          return SimpleDialog(
+            backgroundColor: GBottomNav,
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(5.0)),
+            children: [
+              SimpleDialogOption(
+                onPressed: () {
+                  Navigator.pop(context);
+                  deleteVideoList(videoid);
+                },
+                child: Text(
+                  'Delete',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+              Divider(),
+              SimpleDialogOption(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text('Cancel', style: TextStyle(color: Colors.white)),
+              ),
+            ],
+          );
+        });
+  }
+
+  void deleteVideoList(videoid) async {
+    videoRef
+        .doc(videoid)
+        .delete()
+        .then((value) => print("Video Delete Deleted"))
+        .catchError((error) => print("Failed to delete user: $error"));
   }
 }
