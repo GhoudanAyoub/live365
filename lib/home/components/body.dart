@@ -131,7 +131,7 @@ class _BodyState extends State<Body> with SingleTickerProviderStateMixin {
     animationController = new AnimationController(
         duration: new Duration(seconds: 5), vsync: this);
     animationController.repeat();
-    if (_controller != null) _controller.pause();
+    if (_controller != null) _controller.play();
     if (_controllerRec != null) _controllerRec.pause();
 
     likeNum = '0';
@@ -299,6 +299,7 @@ class _BodyState extends State<Body> with SingleTickerProviderStateMixin {
       if (_controllerRec != null) _controllerRec.pause();
       return recommendedFeed();
     } else {
+      if (_controller != null) _controller.play();
       return followFeed();
     }
   }
