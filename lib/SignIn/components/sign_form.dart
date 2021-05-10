@@ -3,7 +3,6 @@ import 'package:LIVE365/components/default_button.dart';
 import 'package:LIVE365/components/form_error.dart';
 import 'package:LIVE365/forgot_password/forgot_password_screen.dart';
 import 'package:LIVE365/helper/keyboard.dart';
-import 'package:LIVE365/home/home_screen.dart';
 import 'package:LIVE365/services/auth_service.dart';
 import 'package:LIVE365/utils/firebase.dart';
 import 'package:flutter/material.dart';
@@ -164,8 +163,9 @@ class _SignFormState extends State<SignForm> {
                   );
                   print(success);
                   if (success == firebaseAuth.currentUser.uid) {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => HomeScreen()));
+                    /* Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => HomeScreen()));*/
+                    Navigator.pop(context);
                     Scaffold.of(context)
                         .showSnackBar(SnackBar(content: Text('Welcome Back')));
                   } else {

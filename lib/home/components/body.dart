@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:collection';
 
 import 'package:LIVE365/Notification/notification.dart';
+import 'package:LIVE365/SignIn/sign_in_screen.dart';
 import 'package:LIVE365/Upload/CameraAccessScreen.dart';
 import 'package:LIVE365/Upload/composents/create_post.dart';
 import 'package:LIVE365/Upload/composents/join.dart';
@@ -141,12 +142,16 @@ class _BodyState extends State<Body>
         currentPage = DiscoverScreen();
         break;
       case TikTokPageTag.msg:
-        currentPage = Activities();
+        currentPage = firebaseAuth.currentUser == null
+            ? SignInForMessage()
+            : Activities();
         break;
       case TikTokPageTag.me:
-        currentPage = ProfileScreen(
-          profileUID: firebaseAuth.currentUser.uid,
-        );
+        currentPage = firebaseAuth.currentUser == null
+            ? SignInForProfile()
+            : ProfileScreen(
+                profileUID: firebaseAuth.currentUser.uid,
+              );
         break;
     }
 
@@ -159,9 +164,9 @@ class _BodyState extends State<Body>
       hasBackground = true;
     }
 
-    var userPage = ProfileScreen(
+    /* var userPage = ProfileScreen(
       profileUID: firebaseAuth.currentUser.uid,
-    );
+    );*/
     var searchPage = Activities();
     Widget tikTokTabBar = TikTokTabBar(
       hasBackground: hasBackground,
@@ -177,7 +182,9 @@ class _BodyState extends State<Body>
         });
       },
       onAddButton: () {
-        chooseUpload(context);
+        firebaseAuth.currentUser == null
+            ? SignInForCamera()
+            : chooseUpload(context);
       },
     );
 
@@ -188,13 +195,176 @@ class _BodyState extends State<Body>
       body: Stack(
         children: [
           homeScreen(header, hasBottomPadding, currentPage, searchPage,
-              userPage, tikTokTabBar, hasBackground),
+              tikTokTabBar, hasBackground),
           liveButton == true
               ? topScrollFeedRow()
               : Container(
                   height: 0,
                 )
         ],
+      ),
+    );
+  }
+
+  Widget SignInForCamera() {
+    return Scaffold(
+        body: Container(
+      child: Align(
+        alignment: Alignment.center,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              CupertinoIcons.camera,
+              color: Colors.grey,
+              size: 50,
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            Text(
+              "Sign In To Access Camera",
+              style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.normal,
+                  color: Colors.grey),
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            SizedBox(
+              width: 300,
+              height: 45,
+              child: FlatButton(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(5)),
+                color: Colors.redAccent,
+                onPressed: () {
+                  Navigator.pushNamed(context, SignInScreen.routeName);
+                },
+                child: Text(
+                  "Sign In",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontFamily: 'Lato-Regular.ttf',
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    ));
+  }
+
+  Widget SignInForProfile() {
+    return Scaffold(
+        body: Container(
+      child: Align(
+        alignment: Alignment.center,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              CupertinoIcons.person,
+              color: Colors.grey,
+              size: 50,
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            Text(
+              "Sign Up For An Account",
+              style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.normal,
+                  color: Colors.grey),
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            SizedBox(
+              width: 300,
+              height: 45,
+              child: FlatButton(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(5)),
+                color: Colors.redAccent,
+                onPressed: () {
+                  Navigator.pushNamed(context, SignInScreen.routeName);
+                },
+                child: Text(
+                  "Sign In",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontFamily: 'Lato-Regular.ttf',
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    ));
+  }
+
+  Widget SignInForMessage() {
+    return Scaffold(
+      body: Container(
+        child: Align(
+          alignment: Alignment.center,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                CupertinoIcons.mail,
+                color: Colors.grey,
+                size: 50,
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              Text(
+                "Message Will appear here",
+                style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.normal,
+                    color: Colors.grey),
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              SizedBox(
+                width: 300,
+                height: 45,
+                child: FlatButton(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(5)),
+                  color: Colors.redAccent,
+                  onPressed: () {
+                    Navigator.pushNamed(context, SignInScreen.routeName);
+                  },
+                  child: Text(
+                    "Sign In",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontFamily: 'Lato-Regular.ttf',
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -289,7 +459,7 @@ class _BodyState extends State<Body>
     );
   }
 
-  Widget homeScreen(header, hasBottomPadding, currentPage, searchPage, userPage,
+  Widget homeScreen(header, hasBottomPadding, currentPage, searchPage,
       tikTokTabBar, hasBackground) {
     if (liveButton) {
       return Padding(
@@ -304,7 +474,6 @@ class _BodyState extends State<Body>
         controller: tkController,
         hasBottomPadding: hasBackground,
         tabBar: tikTokTabBar,
-        rightPage: userPage,
         header: header,
         enableGesture: tabBarType == TikTokPageTag.home,
         // onPullDownRefresh: _fetchData,
@@ -323,7 +492,7 @@ class _BodyState extends State<Body>
                 bool isF = SafeMap(favoriteMap)[i].boolean ?? false;
                 var player = _videoListController.playerOfIndex(i);
 
-                if (isF == true) {
+                if (isF == true && firebaseAuth.currentUser != null) {
                   likesRef.add({
                     'userId': currentUserId(),
                     'postId': data.id,
@@ -485,42 +654,94 @@ class _BodyState extends State<Body>
       );
 
   Widget scrollFeed() {
-    return CustomScrollView(
-      slivers: <Widget>[
-        SliverList(
-          delegate:
-              SliverChildBuilderDelegate((BuildContext context, int index) {
-            if (index > 0) return null;
-            return StreamBuilderWrapper(
-              shrinkWrap: true,
-              stream: liveRef.snapshots(),
-              text:
-                  "\n\n\n\n\n\n\n\nRush and Be The First To\nUpload The First Video 😊",
-              physics: NeverScrollableScrollPhysics(),
-              itemBuilder: (_, DocumentSnapshot snapshot) {
-                Live live = Live.fromJson(snapshot.data());
-                return GestureDetector(
-                    onTap: () {
-                      onJoin(
-                          channelName: live.channelName,
-                          channelId: live.channelId,
-                          username: live.username,
-                          hostImage: live.image,
-                          userImage: live.image);
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.only(
-                          bottom: 15.0, left: 10.0, right: 10.0),
-                      child: PictureCard(
-                        live: live,
-                      ),
-                    ));
-              },
-            );
-          }),
+    if (firebaseAuth.currentUser != null)
+      return CustomScrollView(
+        slivers: <Widget>[
+          SliverList(
+            delegate:
+                SliverChildBuilderDelegate((BuildContext context, int index) {
+              if (index > 0) return null;
+              return StreamBuilderWrapper(
+                shrinkWrap: true,
+                stream: liveRef.snapshots(),
+                text:
+                    "\n\n\n\n\n\n\n\nRush and Be The First To\nUpload The First Video 😊",
+                physics: NeverScrollableScrollPhysics(),
+                itemBuilder: (_, DocumentSnapshot snapshot) {
+                  Live live = Live.fromJson(snapshot.data());
+                  return GestureDetector(
+                      onTap: () {
+                        onJoin(
+                            channelName: live.channelName,
+                            channelId: live.channelId,
+                            username: live.username,
+                            hostImage: live.image,
+                            userImage: live.image);
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                            bottom: 15.0, left: 10.0, right: 10.0),
+                        child: PictureCard(
+                          live: live,
+                        ),
+                      ));
+                },
+              );
+            }),
+          ),
+        ],
+      );
+    else
+      return Container(
+        child: Align(
+          alignment: Alignment.center,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                CupertinoIcons.tv_circle,
+                color: Colors.grey,
+                size: 50,
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              Text(
+                "Sign In To Access Live",
+                style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.normal,
+                    color: Colors.grey),
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              SizedBox(
+                width: 300,
+                height: 45,
+                child: FlatButton(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(5)),
+                  color: Colors.redAccent,
+                  onPressed: () {
+                    Navigator.pushNamed(context, SignInScreen.routeName);
+                  },
+                  child: Text(
+                    "Sign In",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontFamily: 'Lato-Regular.ttf',
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
-      ],
-    );
+      );
   }
 
   Future<void> onJoin(
@@ -808,38 +1029,39 @@ class _BodyState extends State<Body>
   }
 
   Widget buildBookButton(video) {
-    return StreamBuilder(
-      stream: bookRef
-          .where('postId', isEqualTo: video.id)
-          .where('userId', isEqualTo: currentUserId())
-          .snapshots(),
-      builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-        if (snapshot.hasData) {
-          List<QueryDocumentSnapshot> docs = snapshot?.data?.docs ?? [];
-          return IconButton(
-            onPressed: () {
-              if (docs.isEmpty) {
-                bookRef.add({
-                  'userId': currentUserId(),
-                  'postId': video.id,
-                  'dateCreated': Timestamp.now(),
-                });
-              } else {
-                bookRef.doc(docs[0].id).delete();
-              }
-            },
-            icon: docs.isEmpty
-                ? Icon(CupertinoIcons.bookmark, size: 25, color: Colors.white)
-                : Icon(
-                    CupertinoIcons.bookmark_solid,
-                    size: 25,
-                    color: Colors.white,
-                  ),
-          );
-        }
-        return Container();
-      },
-    );
+    if (firebaseAuth.currentUser != null)
+      return StreamBuilder(
+        stream: bookRef
+            .where('postId', isEqualTo: video.id)
+            .where('userId', isEqualTo: currentUserId())
+            .snapshots(),
+        builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          if (snapshot.hasData) {
+            List<QueryDocumentSnapshot> docs = snapshot?.data?.docs ?? [];
+            return IconButton(
+              onPressed: () {
+                if (docs.isEmpty) {
+                  bookRef.add({
+                    'userId': currentUserId(),
+                    'postId': video.id,
+                    'dateCreated': Timestamp.now(),
+                  });
+                } else {
+                  bookRef.doc(docs[0].id).delete();
+                }
+              },
+              icon: docs.isEmpty
+                  ? Icon(CupertinoIcons.bookmark, size: 25, color: Colors.white)
+                  : Icon(
+                      CupertinoIcons.bookmark_solid,
+                      size: 25,
+                      color: Colors.white,
+                    ),
+            );
+          }
+          return Container();
+        },
+      );
   }
 
   Widget buildCommentsCount(BuildContext context, int count) {
@@ -865,40 +1087,46 @@ class _BodyState extends State<Body>
   }
 
   Widget buildLikeButton(video) {
-    return StreamBuilder(
-      stream: likesRef
-          .where('postId', isEqualTo: video.id)
-          .where('userId', isEqualTo: currentUserId())
-          .snapshots(),
-      builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-        if (snapshot.hasData) {
-          List<QueryDocumentSnapshot> docs = snapshot?.data?.docs ?? [];
-          return IconButton(
-            onPressed: () {
-              if (docs.isEmpty) {
-                likesRef.add({
-                  'userId': currentUserId(),
-                  'postId': video.id,
-                  'dateCreated': Timestamp.now(),
-                });
-                addLikesToNotification(video);
-              } else {
-                likesRef.doc(docs[0].id).delete();
-                removeLikeFromNotification(video);
-              }
-            },
-            icon: docs.isEmpty
-                ? Icon(CupertinoIcons.heart, size: 35, color: Colors.white)
-                : Icon(
-                    CupertinoIcons.heart_fill,
-                    size: 35,
-                    color: Colors.red,
-                  ),
-          );
-        }
-        return Container();
-      },
-    );
+    if (firebaseAuth.currentUser != null)
+      return StreamBuilder(
+        stream: likesRef
+            .where('postId', isEqualTo: video.id)
+            .where('userId', isEqualTo: currentUserId())
+            .snapshots(),
+        builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          if (snapshot.hasData) {
+            List<QueryDocumentSnapshot> docs = snapshot?.data?.docs ?? [];
+            return IconButton(
+              onPressed: () {
+                if (docs.isEmpty) {
+                  likesRef.add({
+                    'userId': currentUserId(),
+                    'postId': video.id,
+                    'dateCreated': Timestamp.now(),
+                  });
+                  addLikesToNotification(video);
+                } else {
+                  likesRef.doc(docs[0].id).delete();
+                  removeLikeFromNotification(video);
+                }
+              },
+              icon: docs.isEmpty
+                  ? Icon(CupertinoIcons.heart, size: 35, color: Colors.white)
+                  : Icon(
+                      CupertinoIcons.heart_fill,
+                      size: 35,
+                      color: Colors.red,
+                    ),
+            );
+          }
+          return Container();
+        },
+      );
+    else
+      return IconButton(
+        onPressed: () {},
+        icon: Icon(CupertinoIcons.heart, size: 35, color: Colors.white),
+      );
   }
 
   buildRecButton(profileId, index) {
@@ -1075,75 +1303,79 @@ class _BodyState extends State<Body>
               ],
             ),
           ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: Container(
-              decoration: BoxDecoration(
-                color: GBottomNav,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey[500],
-                    offset: Offset(0.0, 1.5),
-                    blurRadius: 4.0,
-                  ),
-                ],
-              ),
-              constraints: BoxConstraints(
-                maxHeight: 190.0,
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Flexible(
-                    child: ListTile(
-                      contentPadding: EdgeInsets.all(0),
-                      title: TextField(
-                        textCapitalization: TextCapitalization.sentences,
-                        controller: commentsTEC,
-                        style: TextStyle(
-                          fontSize: 15.0,
-                          color: Colors.white,
+          firebaseAuth.currentUser != null
+              ? Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: GBottomNav,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey[500],
+                          offset: Offset(0.0, 1.5),
+                          blurRadius: 4.0,
                         ),
-                        decoration: InputDecoration(
-                          contentPadding: EdgeInsets.all(10.0),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(5.0),
-                            borderSide: BorderSide(
-                              color: Colors.white,
+                      ],
+                    ),
+                    constraints: BoxConstraints(
+                      maxHeight: 190.0,
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        Flexible(
+                          child: ListTile(
+                            contentPadding: EdgeInsets.all(0),
+                            title: TextField(
+                              textCapitalization: TextCapitalization.sentences,
+                              controller: commentsTEC,
+                              style: TextStyle(
+                                fontSize: 15.0,
+                                color: Colors.white,
+                              ),
+                              decoration: InputDecoration(
+                                contentPadding: EdgeInsets.all(10.0),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(5.0),
+                                  borderSide: BorderSide(
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Colors.white,
+                                  ),
+                                  borderRadius: BorderRadius.circular(5.0),
+                                ),
+                                hintText: "Write your comment...",
+                                hintStyle: TextStyle(
+                                  fontSize: 15.0,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              maxLines: null,
+                            ),
+                            trailing: GestureDetector(
+                              onTap: () {
+                                addComments(video);
+                              },
+                              child: Padding(
+                                padding: const EdgeInsets.only(right: 10.0),
+                                child: Icon(
+                                  Icons.send,
+                                  color: Colors.white,
+                                ),
+                              ),
                             ),
                           ),
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Colors.white,
-                            ),
-                            borderRadius: BorderRadius.circular(5.0),
-                          ),
-                          hintText: "Write your comment...",
-                          hintStyle: TextStyle(
-                            fontSize: 15.0,
-                            color: Colors.white,
-                          ),
                         ),
-                        maxLines: null,
-                      ),
-                      trailing: GestureDetector(
-                        onTap: () {
-                          addComments(video);
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.only(right: 10.0),
-                          child: Icon(
-                            Icons.send,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
+                      ],
                     ),
                   ),
-                ],
-              ),
-            ),
-          ),
+                )
+              : Container(
+                  height: 0,
+                ),
         ],
       ),
     );
@@ -1227,9 +1459,11 @@ class _BodyState extends State<Body>
   }
 
   addLikesToNotification(video) async {
-    bool isNotMe = currentUserId() != video.ownerId;
+    bool isNotMe;
+    if (firebaseAuth.currentUser != null)
+      isNotMe = currentUserId() != video.ownerId;
 
-    if (isNotMe) {
+    if (isNotMe && firebaseAuth.currentUser != null) {
       DocumentSnapshot doc = await usersRef.doc(currentUserId()).get();
       user = UserModel.fromJson(doc.data());
       notificationRef
@@ -1249,9 +1483,11 @@ class _BodyState extends State<Body>
   }
 
   removeLikeFromNotification(video) async {
-    bool isNotMe = currentUserId() != video.ownerId;
+    bool isNotMe;
+    if (firebaseAuth.currentUser != null)
+      isNotMe = currentUserId() != video.ownerId;
 
-    if (isNotMe) {
+    if (isNotMe && firebaseAuth.currentUser != null) {
       DocumentSnapshot doc = await usersRef.doc(currentUserId()).get();
       user = UserModel.fromJson(doc.data());
       notificationRef

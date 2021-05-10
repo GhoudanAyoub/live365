@@ -73,30 +73,34 @@ class _BodyState extends State<Body> {
       appBar: AppBar(
         elevation: 2,
         toolbarHeight: 30,
-        leading: widget.profileId == firebaseAuth.currentUser.uid
-            ? IconButton(
-                icon: Icon(
-                  CupertinoIcons.text_justify,
-                  color: Colors.white,
-                  size: 20,
-                ),
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => SettingScreen(
-                          users: user1,
-                        ),
-                      ));
-                })
-            : IconButton(
-                icon: Icon(
-                  Icons.list,
-                  color: Colors.white,
-                ),
-                onPressed: () {
-                  reportSystem();
-                }),
+        leading: firebaseAuth.currentUser != null
+            ? widget.profileId == firebaseAuth.currentUser.uid
+                ? IconButton(
+                    icon: Icon(
+                      CupertinoIcons.text_justify,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SettingScreen(
+                              users: user1,
+                            ),
+                          ));
+                    })
+                : IconButton(
+                    icon: Icon(
+                      Icons.list,
+                      color: Colors.white,
+                    ),
+                    onPressed: () {
+                      reportSystem();
+                    })
+            : Container(
+                height: 0,
+              ),
       ),
       body: CustomScrollView(
         slivers: [
@@ -270,7 +274,9 @@ class _BodyState extends State<Body> {
   }
 
   buildProfileButton(user) {
-    bool isMe = widget.profileId == firebaseAuth.currentUser.uid;
+    bool isMe = false;
+    if (firebaseAuth.currentUser != null)
+      isMe = widget.profileId == firebaseAuth.currentUser.uid;
     if (isMe) {
       return buildButton(
         text: "Change Bio",
@@ -341,36 +347,38 @@ class _BodyState extends State<Body> {
   }
 
   handleFollow() async {
-    DocumentSnapshot doc = await usersRef.doc(currentUserId()).get();
-    users = UserModel.fromJson(doc.data());
-    setState(() {
-      isFollowing = true;
-    });
-    //updates the followers collection of the followed user
-    followersRef
-        .doc(widget.profileId)
-        .collection('userFollowers')
-        .doc(currentUserId())
-        .set({});
-    //updates the following collection of the currentUser
-    followingRef
-        .doc(currentUserId())
-        .collection('userFollowing')
-        .doc(widget.profileId)
-        .set({});
-    //update the notification feeds
-    notificationRef
-        .doc(widget.profileId)
-        .collection('notifications')
-        .doc(currentUserId())
-        .set({
-      "type": "follow",
-      "ownerId": widget.profileId,
-      "username": users.username,
-      "userId": users.id,
-      "userDp": users.photoUrl,
-      "timestamp": timestamp,
-    });
+    if (firebaseAuth.currentUser != null) {
+      DocumentSnapshot doc = await usersRef.doc(currentUserId()).get();
+      users = UserModel.fromJson(doc.data());
+      setState(() {
+        isFollowing = true;
+      });
+      //updates the followers collection of the followed user
+      followersRef
+          .doc(widget.profileId)
+          .collection('userFollowers')
+          .doc(currentUserId())
+          .set({});
+      //updates the following collection of the currentUser
+      followingRef
+          .doc(currentUserId())
+          .collection('userFollowing')
+          .doc(widget.profileId)
+          .set({});
+      //update the notification feeds
+      notificationRef
+          .doc(widget.profileId)
+          .collection('notifications')
+          .doc(currentUserId())
+          .set({
+        "type": "follow",
+        "ownerId": widget.profileId,
+        "username": users.username,
+        "userId": users.id,
+        "userDp": users.photoUrl,
+        "timestamp": timestamp,
+      });
+    }
   }
 
   buildButton({String text, Function function}) {
@@ -414,7 +422,8 @@ class _BodyState extends State<Body> {
               return Column(
                 children: <Widget>[
                   ProfilePic(
-                    image: firebaseAuth.currentUser.uid == user.id
+                    image: firebaseAuth.currentUser != null &&
+                            firebaseAuth.currentUser.uid == user.id
                         ? auth.getProfileImage()
                         : user.photoUrl,
                   ),
@@ -550,7 +559,11 @@ class _BodyState extends State<Body> {
                     ),
                   ),
                   SizedBox(height: 10.0),
-                  buildProfileButton(user),
+                  firebaseAuth.currentUser != null
+                      ? buildProfileButton(user)
+                      : Container(
+                          height: 0,
+                        ),
                 ],
               );
             }

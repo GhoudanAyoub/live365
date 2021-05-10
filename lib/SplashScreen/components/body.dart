@@ -1,6 +1,4 @@
 import 'package:LIVE365/SignIn/sign_in_screen.dart';
-import 'package:LIVE365/home/home_screen.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../components/splash_content.dart';
@@ -19,12 +17,7 @@ class _BodyState extends State<Body> {
   @override
   void initState() {
     new Future.delayed(Duration(seconds: 3), () {
-      if (FirebaseAuth.instance.currentUser == null) {
-        Navigator.pushNamed(context, SignInScreen.routeName);
-      } else {
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) => HomeScreen()));
-      }
+      Navigator.pushNamed(context, SignInScreen.routeName);
     });
   }
 

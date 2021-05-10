@@ -8,7 +8,7 @@ class SignInScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: new WillPopScope(
-        onWillPop: () async => false,
+        onWillPop: () async => true,
         child: Body(),
       ),
     );

@@ -1,7 +1,7 @@
-import 'package:LIVE365/SignIn/sign_in_screen.dart';
 import 'package:LIVE365/constants.dart';
 import 'package:LIVE365/firebaseService/FirebaseService.dart';
 import 'package:LIVE365/helper/PaypalPayment.dart';
+import 'package:LIVE365/home/home_screen.dart';
 import 'package:LIVE365/profile/components/edit_profile.dart';
 import 'package:LIVE365/profile/components/profile_menu.dart';
 import 'package:LIVE365/utils/firebase.dart';
@@ -105,7 +105,7 @@ class _SettingScreenState extends State<SettingScreen> {
                 onPressed: () {
                   Navigator.pop(context);
                   FirebaseService().signOut();
-                  Navigator.pushNamed(context, SignInScreen.routeName);
+                  Navigator.pushNamed(context, HomeScreen.routeName);
                 },
                 child: Text(
                   'Log Out',

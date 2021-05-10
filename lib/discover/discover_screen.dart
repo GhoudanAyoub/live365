@@ -206,7 +206,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
           itemBuilder: (BuildContext context, int index) {
             DocumentSnapshot doc = filteredUsers[index];
             UserModel user = UserModel.fromJson(doc.data());
-            if (doc.id == currentUserId()) {
+            if (firebaseAuth.currentUser != null && doc.id == currentUserId()) {
               checkIfFollowing(user.id);
               Timer(Duration(milliseconds: 50), () {
                 setState(() {
