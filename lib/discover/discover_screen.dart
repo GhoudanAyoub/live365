@@ -226,12 +226,14 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                         )
                       : Image.asset(
                           "assets/images/Profile Image.png",
-                          width: 50.0,
+                          width: 70.0,
                         ),
                   title: Text(user?.username,
                       style: TextStyle(
                           color: Colors.white, fontWeight: FontWeight.bold)),
-                  trailing: user.msgToAll == true || isFollowing == true
+                  trailing: firebaseAuth.currentUser != null &&
+                              user.msgToAll == true ||
+                          isFollowing == true
                       ? GestureDetector(
                           onTap: () {
                             Navigator.push(

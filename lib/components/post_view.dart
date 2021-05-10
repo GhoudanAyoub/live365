@@ -250,31 +250,50 @@ class _PostsState extends State<Posts> {
   }
 
   buildPostHeader() {
-    bool isMe = currentUserId() == widget.post.ownerId;
-    return ListTile(
-      contentPadding: EdgeInsets.symmetric(horizontal: 5.0),
-      leading: buildUserDp(),
-      title: Text(
-        widget.post.username,
-        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-      ),
-      subtitle: Text(widget.post.tags == null ? 'LIVE365' : widget.post.tags,
-          style: TextStyle(fontWeight: FontWeight.normal, color: Colors.white)),
-      trailing: isMe
-          ? IconButton(
-              icon: Icon(
-                Feather.more_horizontal,
-                color: Colors.white,
+    if (firebaseAuth.currentUser != null) {
+      bool isMe = currentUserId() == widget.post.ownerId;
+      return ListTile(
+        contentPadding: EdgeInsets.symmetric(horizontal: 5.0),
+        leading: buildUserDp(),
+        title: Text(
+          widget.post.username,
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+        ),
+        subtitle: Text(widget.post.tags == null ? 'LIVE365' : widget.post.tags,
+            style:
+                TextStyle(fontWeight: FontWeight.normal, color: Colors.white)),
+        trailing: isMe
+            ? IconButton(
+                icon: Icon(
+                  Feather.more_horizontal,
+                  color: Colors.white,
+                ),
+                onPressed: () => handleDelete(context),
+              )
+            : IconButton(
+                ///Feature coming soon
+                icon: Icon(CupertinoIcons.bookmark,
+                    color: Colors.white, size: 25.0),
+                onPressed: () {},
               ),
-              onPressed: () => handleDelete(context),
-            )
-          : IconButton(
-              ///Feature coming soon
-              icon: Icon(CupertinoIcons.bookmark,
-                  color: Colors.white, size: 25.0),
-              onPressed: () {},
-            ),
-    );
+      );
+    } else
+      return ListTile(
+        contentPadding: EdgeInsets.symmetric(horizontal: 5.0),
+        leading: buildUserDp(),
+        title: Text(
+          widget.post.username,
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+        ),
+        subtitle: Text(widget.post.tags == null ? 'LIVE365' : widget.post.tags,
+            style:
+                TextStyle(fontWeight: FontWeight.normal, color: Colors.white)),
+        trailing: IconButton(
+          ///Feature coming soon
+          icon: Icon(CupertinoIcons.bookmark, color: Colors.white, size: 25.0),
+          onPressed: () {},
+        ),
+      );
   }
 
   buildUserDp() {
@@ -297,39 +316,42 @@ class _PostsState extends State<Posts> {
   }
 
   buildLikeButton() {
-    return StreamBuilder(
-      stream: likesRef
-          .where('postId', isEqualTo: widget.post.postId)
-          .where('userId', isEqualTo: currentUserId())
-          .snapshots(),
-      builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-        if (snapshot.hasData) {
-          List<QueryDocumentSnapshot> docs = snapshot?.data?.docs ?? [];
-          return IconButton(
-            onPressed: () {
-              if (docs.isEmpty) {
-                likesRef.add({
-                  'userId': currentUserId(),
-                  'postId': widget.post.postId,
-                  'dateCreated': Timestamp.now(),
-                });
-                addLikesToNotification();
-              } else {
-                likesRef.doc(docs[0].id).delete();
-                removeLikeFromNotification();
-              }
-            },
-            icon: docs.isEmpty
-                ? Icon(CupertinoIcons.heart, color: Colors.white)
-                : Icon(
-                    CupertinoIcons.heart_fill,
-                    color: Colors.red,
-                  ),
-          );
-        }
-        return Container();
-      },
-    );
+    if (firebaseAuth.currentUser != null)
+      return StreamBuilder(
+        stream: likesRef
+            .where('postId', isEqualTo: widget.post.postId)
+            .where('userId', isEqualTo: currentUserId())
+            .snapshots(),
+        builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          if (snapshot.hasData) {
+            List<QueryDocumentSnapshot> docs = snapshot?.data?.docs ?? [];
+            return IconButton(
+              onPressed: () {
+                if (docs.isEmpty) {
+                  likesRef.add({
+                    'userId': currentUserId(),
+                    'postId': widget.post.postId,
+                    'dateCreated': Timestamp.now(),
+                  });
+                  addLikesToNotification();
+                } else {
+                  likesRef.doc(docs[0].id).delete();
+                  removeLikeFromNotification();
+                }
+              },
+              icon: docs.isEmpty
+                  ? Icon(CupertinoIcons.heart, color: Colors.white)
+                  : Icon(
+                      CupertinoIcons.heart_fill,
+                      color: Colors.red,
+                    ),
+            );
+          }
+          return Container();
+        },
+      );
+    else
+      return Icon(CupertinoIcons.heart, color: Colors.white);
   }
 
   addLikesToNotification() async {

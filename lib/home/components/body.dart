@@ -206,58 +206,55 @@ class _BodyState extends State<Body>
     );
   }
 
-  Widget SignInForCamera() {
-    return Scaffold(
-        body: Container(
-      child: Align(
-        alignment: Alignment.center,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              CupertinoIcons.camera,
-              color: Colors.grey,
-              size: 50,
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            Text(
-              "Sign In To Access Camera",
-              style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.normal,
-                  color: Colors.grey),
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            SizedBox(
-              width: 300,
-              height: 45,
-              child: FlatButton(
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(5)),
-                color: Colors.redAccent,
-                onPressed: () {
-                  Navigator.pushNamed(context, SignInScreen.routeName);
-                },
-                child: Text(
-                  "Sign In",
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontFamily: 'Lato-Regular.ttf',
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
+  SignInForCamera() {
+    return showModalBottomSheet(
+      backgroundColor: GBottomNav,
+      context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10.0),
+      ),
+      builder: (BuildContext context) {
+        return FractionallySizedBox(
+          heightFactor: .3,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(height: 10.0),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                child: Center(
+                  child: Text(
+                    'SELECT',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold, color: Colors.white),
                   ),
                 ),
               ),
-            ),
-          ],
-        ),
-      ),
-    ));
+              Divider(
+                color: Colors.white,
+              ),
+              ListTile(
+                leading: Icon(
+                  Icons.login,
+                  color: Colors.white,
+                  size: 25.0,
+                ),
+                title: Text('Sign In',
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold, color: Colors.white)),
+                onTap: () async {
+                  ///Feature coming soon
+                  ///
+                  Navigator.pop(context);
+                  Navigator.pushNamed(context, SignInScreen.routeName);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   Widget SignInForProfile() {
@@ -278,7 +275,7 @@ class _BodyState extends State<Body>
               height: 20,
             ),
             Text(
-              "Sign Up For An Account",
+              "Sign In For An Account",
               style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.normal,
@@ -466,9 +463,6 @@ class _BodyState extends State<Body>
         padding: const EdgeInsets.only(top: 80.0, left: 10.0, right: 10.0),
         child: scrollFeed(),
       );
-    }
-    if (recommended) {
-      return recommendedFeed();
     } else {
       return TikTokScaffold(
         controller: tkController,

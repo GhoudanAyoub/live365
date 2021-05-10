@@ -1,4 +1,4 @@
-import 'package:LIVE365/SignIn/sign_in_screen.dart';
+import 'package:LIVE365/home/home_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../components/splash_content.dart';
@@ -17,7 +17,7 @@ class _BodyState extends State<Body> {
   @override
   void initState() {
     new Future.delayed(Duration(seconds: 3), () {
-      Navigator.pushNamed(context, SignInScreen.routeName);
+      Navigator.pushNamed(context, HomeScreen.routeName);
     });
   }
 

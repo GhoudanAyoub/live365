@@ -149,38 +149,44 @@ class _PostTileState extends State<PostTile> {
   }
 
   buildLikeButton() {
-    return StreamBuilder(
-      stream: likesRef
-          .where('postId', isEqualTo: widget.post.postId)
-          .where('userId', isEqualTo: currentUserId())
-          .snapshots(),
-      builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-        if (snapshot.hasData) {
-          List<QueryDocumentSnapshot> docs = snapshot?.data?.docs ?? [];
-          return IconButton(
-            onPressed: () {
-              if (docs.isEmpty) {
-                likesRef.add({
-                  'userId': currentUserId(),
-                  'postId': widget.post.postId,
-                  'dateCreated': Timestamp.now(),
-                });
-                addLikesToNotification();
-              } else {
-                likesRef.doc(docs[0].id).delete();
-                removeLikeFromNotification();
-              }
-            },
-            icon: docs.isEmpty
-                ? Icon(CupertinoIcons.heart, color: Colors.white)
-                : Icon(
-                    CupertinoIcons.heart_fill,
-                    color: Colors.red,
-                  ),
-          );
-        }
-        return Container();
-      },
-    );
+    if (firebaseAuth.currentUser != null)
+      return StreamBuilder(
+        stream: likesRef
+            .where('postId', isEqualTo: widget.post.postId)
+            .where('userId', isEqualTo: currentUserId())
+            .snapshots(),
+        builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          if (snapshot.hasData) {
+            List<QueryDocumentSnapshot> docs = snapshot?.data?.docs ?? [];
+            return IconButton(
+              onPressed: () {
+                if (docs.isEmpty) {
+                  likesRef.add({
+                    'userId': currentUserId(),
+                    'postId': widget.post.postId,
+                    'dateCreated': Timestamp.now(),
+                  });
+                  addLikesToNotification();
+                } else {
+                  likesRef.doc(docs[0].id).delete();
+                  removeLikeFromNotification();
+                }
+              },
+              icon: docs.isEmpty
+                  ? Icon(CupertinoIcons.heart, color: Colors.white)
+                  : Icon(
+                      CupertinoIcons.heart_fill,
+                      color: Colors.red,
+                    ),
+            );
+          }
+          return Container();
+        },
+      );
+    else
+      return IconButton(
+        onPressed: () {},
+        icon: Icon(CupertinoIcons.heart, size: 35, color: Colors.white),
+      );
   }
 }

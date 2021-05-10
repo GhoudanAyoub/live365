@@ -542,7 +542,8 @@ class _PlayPageState extends State<PlayPage> {
                     )
                   ]),
             ),
-            clip.ownerId == firebaseAuth.currentUser.uid
+            firebaseAuth.currentUser != null &&
+                    clip.ownerId == firebaseAuth.currentUser.uid
                 ? GestureDetector(
                     onTap: () {
                       deleteVideo(context, clip.videoId);
