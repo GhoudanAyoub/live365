@@ -1288,15 +1288,7 @@ class _BodyState extends State<Body>
       height: 390,
       child: Column(
         children: [
-          Flexible(
-            child: ListView(
-              children: [
-                Flexible(
-                  child: buildComments(video),
-                )
-              ],
-            ),
-          ),
+          buildComments(video),
           firebaseAuth.currentUser != null
               ? Align(
                   alignment: Alignment.bottomCenter,

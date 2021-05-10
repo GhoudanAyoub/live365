@@ -10,7 +10,7 @@ class CamIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.fromLTRB(30, 15, 10, 10),
+      margin: const EdgeInsets.fromLTRB(10, 15, 10, 10),
       width: 40,
       height: 35,
       child: Stack(
