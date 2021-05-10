@@ -10,7 +10,7 @@ class SignUpScreen extends StatelessWidget {
     SizeConfig().init(context);
     return Scaffold(
       body: new WillPopScope(
-        onWillPop: () async => false,
+        onWillPop: () async => true,
         child: Body(),
       ),
     );

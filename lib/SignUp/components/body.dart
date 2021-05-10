@@ -1,4 +1,3 @@
-import 'package:LIVE365/components/got_account_text.dart';
 import 'package:flutter/material.dart';
 
 import '../../SizeConfig.dart';
@@ -23,10 +22,9 @@ class Body extends StatelessWidget {
                   "Complete your details or continue \nwith social media",
                   textAlign: TextAlign.center,
                 ),
-                SizedBox(height: SizeConfig.screenHeight * 0.08),
+                SizedBox(height: 20),
                 SignUpForm(),
-                SizedBox(height: SizeConfig.screenHeight * 0.08),
-                GotAccountText(),
+                SizedBox(height: 20),
                 Text(
                   'By continuing your confirm that you agree \nwith our Term and Condition',
                   textAlign: TextAlign.center,

@@ -1,3 +1,4 @@
+import 'package:LIVE365/components/custom_card.dart';
 import 'package:LIVE365/components/no_account_text.dart';
 import 'package:LIVE365/components/socal_card.dart';
 import 'package:LIVE365/firebaseService/FirebaseService.dart';
@@ -46,19 +47,59 @@ class Body extends StatelessWidget {
                 SizedBox(height: SizeConfig.screenHeight * 0.08),
                 SignForm(),
                 SizedBox(height: SizeConfig.screenHeight * 0.08),
+                SizedBox(height: getProportionateScreenHeight(20)),
+                NoAccountText(),
+                SizedBox(height: 20),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    SocalCard(
-                      icon: "assets/icons/google-icon.svg",
-                      press: () async {
-                        await signInWithGoogle(context);
-                      },
+                    SizedBox(
+                      width: 150,
+                      height: 1,
+                      child: Container(
+                        color: Colors.white,
+                      ),
+                    ),
+                    Divider(
+                      indent: 5,
+                      endIndent: 5,
+                    ),
+                    Text(
+                      "OR",
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                          color: Colors.white),
+                    ),
+                    Divider(
+                      indent: 5,
+                      endIndent: 5,
+                    ),
+                    SizedBox(
+                      width: 150,
+                      height: 1,
+                      child: Container(
+                        color: Colors.white,
+                      ),
                     ),
                   ],
                 ),
-                SizedBox(height: getProportionateScreenHeight(20)),
-                NoAccountText(),
+                SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CustomCard(
+                      borderRadius: BorderRadius.circular(20.0),
+                      child: SocalCard(
+                        icon: "assets/icons/google-icon.svg",
+                        Name: "Join with Google",
+                        press: () async {
+                          await signInWithGoogle(context);
+                        },
+                      ),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
@@ -81,6 +122,7 @@ class Body extends StatelessWidget {
         await _firebaseAuth.signInWithCredential(credential).catchError((e) {
       print("Error===>" + e.toString());
     });
+    Scaffold.of(context).showSnackBar(SnackBar(content: Text("please Wait..")));
     FirebaseService.addUsers(userdata.user);
     Navigator.pushNamed(context, HomeScreen.routeName);
   }

@@ -974,14 +974,15 @@ class _BodyState extends State<Body> with SingleTickerProviderStateMixin {
                   GestureDetector(
                     child: VideoPlayer(controller),
                     onTap: _onTapVideo,
-                  ),
+                  ), /*
+                  UI THING
                   _controlAlpha > 0
                       ? AnimatedOpacity(
                           opacity: _controlAlpha,
                           duration: Duration(milliseconds: 250),
                           child: _controlView(context),
                         )
-                      : Container(),
+                      : Container(),*/
                 ],
               ),
             )),

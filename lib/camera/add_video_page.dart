@@ -36,7 +36,8 @@ class _AddVideoPageState extends State<AddVideoPage> {
   var currentPageValue = 0.0;
   bool _isRecording = false;
   String _filePath;
-  int time;
+  int time = 15;
+  int timetoshow = 15;
   bool _isVideo = true;
   bool submitted = false;
   @override
@@ -143,6 +144,9 @@ class _AddVideoPageState extends State<AddVideoPage> {
     } on CameraException catch (e) {
       print(e);
     }
+    new Future.delayed(Duration(seconds: time), () {
+      _stopVideoRecording(context);
+    });
   }
 
   Future<void> _stopVideoRecording(BuildContext context) async {
@@ -216,7 +220,7 @@ class _AddVideoPageState extends State<AddVideoPage> {
         ),
         builder: (BuildContext bc) {
           return FractionallySizedBox(
-            heightFactor: 2.3,
+            heightFactor: 2.5,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.start,
@@ -225,7 +229,7 @@ class _AddVideoPageState extends State<AddVideoPage> {
                   borderRadius: BorderRadius.all(
                     Radius.circular(30.0),
                   ),
-                  child: Stack(
+                  child: Column(
                     children: [
                       SizedBox(height: 20.0),
                       TextFormField(
@@ -255,7 +259,7 @@ class _AddVideoPageState extends State<AddVideoPage> {
                           floatingLabelBehavior: FloatingLabelBehavior.always,
                         ),
                       ),
-                      SizedBox(height: 20.0),
+                      SizedBox(height: 10.0),
                       TextFormField(
                         style: TextStyle(color: Colors.white),
                         initialValue: viewModel.description,
@@ -424,24 +428,34 @@ class _AddVideoPageState extends State<AddVideoPage> {
             Container(
               child: Column(
                 children: <Widget>[
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 2, vertical: 2),
-                    height: 30,
-                    width: 30,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(colors: [
-                        Colors.purple.withOpacity(.4),
-                        Colors.blue.withOpacity(.4)
-                      ]),
-                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        if (time == 15)
+                          time = 30;
+                        else
+                          time = 15;
+                      });
+                    },
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 2, vertical: 2),
+                      height: 30,
+                      width: 30,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(colors: [
+                          Colors.purple.withOpacity(.4),
+                          Colors.blue.withOpacity(.4)
+                        ]),
+                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                      ),
+                      child: Image.asset("assets/images/effects.png"),
                     ),
-                    child: Image.asset("assets/images/effects.png"),
                   ),
                   SizedBox(
                     height: 4,
                   ),
                   Text(
-                    "Effects",
+                    "${time.toString()} s",
                     style: _textStyle,
                   )
                 ],

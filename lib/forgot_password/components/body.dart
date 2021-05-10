@@ -1,7 +1,6 @@
 import 'package:LIVE365/components/custom_surfix_icon.dart';
 import 'package:LIVE365/components/default_button.dart';
 import 'package:LIVE365/components/form_error.dart';
-import 'package:LIVE365/components/no_account_text.dart';
 import 'package:LIVE365/firebaseService/FirebaseService.dart';
 import 'package:flutter/material.dart';
 
@@ -20,12 +19,12 @@ class Body extends StatelessWidget {
               EdgeInsets.symmetric(horizontal: getProportionateScreenWidth(20)),
           child: Column(
             children: [
-              SizedBox(height: SizeConfig.screenHeight * 0.04),
+              SizedBox(height: 60),
               Text(
                 "Forgot Password",
                 style: TextStyle(
                   fontSize: getProportionateScreenWidth(28),
-                  color: Colors.black,
+                  color: Colors.white,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -33,7 +32,7 @@ class Body extends StatelessWidget {
                 "Please enter your email and we will send \nyou a link to return to your account",
                 textAlign: TextAlign.center,
               ),
-              SizedBox(height: SizeConfig.screenHeight * 0.1),
+              SizedBox(height: 60),
               ForgotPassForm(),
             ],
           ),
@@ -100,9 +99,9 @@ class _ForgotPassFormState extends State<ForgotPassForm> {
               suffixIcon: CustomSurffixIcon(svgIcon: "assets/icons/Mail.svg"),
             ),
           ),
-          SizedBox(height: getProportionateScreenHeight(30)),
+          SizedBox(height: 10),
           FormError(errors: errors),
-          SizedBox(height: SizeConfig.screenHeight * 0.1),
+          SizedBox(height: 20),
           DefaultButton(
             text: "Continue",
             submitted: submitted,
@@ -117,8 +116,6 @@ class _ForgotPassFormState extends State<ForgotPassForm> {
               }
             },
           ),
-          SizedBox(height: SizeConfig.screenHeight * 0.1),
-          NoAccountText(),
         ],
       ),
     );

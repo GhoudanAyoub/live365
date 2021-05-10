@@ -204,6 +204,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.0"
+  fijkplayer:
+    dependency: "direct main"
+    description:
+      name: fijkplayer
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.8.7"
   file:
     dependency: transitive
     description:
@@ -716,6 +723,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.2.0+2"
+  safemap:
+    dependency: "direct main"
+    description:
+      name: safemap
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.2.3"
   screen:
     dependency: "direct main"
     description:
@@ -840,6 +854,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.2.0+2"
+  tapped:
+    dependency: "direct main"
+    description:
+      name: tapped
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.2"
   term_glyph:
     dependency: transitive
     description:

@@ -1,16 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-import '../SizeConfig.dart';
-
 class SocalCard extends StatelessWidget {
-  const SocalCard({
-    Key key,
-    this.icon,
-    this.press,
-  }) : super(key: key);
+  const SocalCard({Key key, this.icon, this.press, this.Name})
+      : super(key: key);
 
   final String icon;
+  final String Name;
   final Function press;
 
   @override
@@ -18,16 +14,25 @@ class SocalCard extends StatelessWidget {
     return GestureDetector(
       onTap: press,
       child: Container(
-        margin:
-            EdgeInsets.symmetric(horizontal: getProportionateScreenWidth(10)),
-        padding: EdgeInsets.all(getProportionateScreenWidth(12)),
-        height: getProportionateScreenHeight(40),
-        width: getProportionateScreenWidth(40),
-        decoration: BoxDecoration(
-          color: Colors.grey.withOpacity(0.1),
-          shape: BoxShape.circle,
+        margin: EdgeInsets.symmetric(horizontal: 10),
+        padding: EdgeInsets.all(10),
+        height: 40,
+        child: Row(
+          children: [
+            SvgPicture.asset(icon),
+            SizedBox(
+              width: 10,
+            ),
+            Text(
+              Name,
+              style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Lato-Bold.ttf',
+                  color: Colors.red[800]),
+            )
+          ],
         ),
-        child: SvgPicture.asset(icon),
       ),
     );
   }
