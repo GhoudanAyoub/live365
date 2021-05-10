@@ -1,6 +1,7 @@
 import 'package:LIVE365/Inbox/components/conversation_view_model.dart';
 import 'package:LIVE365/components/indicators.dart';
 import 'package:LIVE365/constants.dart';
+import 'package:LIVE365/firebaseService/FirebaseService.dart';
 import 'package:LIVE365/models/User.dart';
 import 'package:LIVE365/models/enum/message_type.dart';
 import 'package:LIVE365/models/new_message_system.dart';
@@ -37,6 +38,7 @@ class _ConversationState extends State<Conversation> {
   @override
   void initState() {
     super.initState();
+    FirebaseService.changeStatus("Online");
     scrollController.addListener(() {
       focusNode.unfocus();
     });

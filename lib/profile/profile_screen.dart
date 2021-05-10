@@ -13,6 +13,8 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
-    return Body(profileId: widget.profileUID);
+    return Scaffold(
+      body: Body(profileId: widget.profileUID),
+    );
   }
 }

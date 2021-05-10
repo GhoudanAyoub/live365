@@ -1,27 +1,37 @@
 import 'dart:async';
 import 'dart:collection';
-import 'dart:math';
 
+import 'package:LIVE365/Notification/notification.dart';
+import 'package:LIVE365/Upload/CameraAccessScreen.dart';
+import 'package:LIVE365/Upload/composents/create_post.dart';
 import 'package:LIVE365/Upload/composents/join.dart';
+import 'package:LIVE365/camera/add_video_page.dart';
 import 'package:LIVE365/components/indicators.dart';
 import 'package:LIVE365/components/picture_card.dart';
 import 'package:LIVE365/components/stream_builder_wrapper.dart';
 import 'package:LIVE365/components/stream_comments_wrapper.dart';
+import 'package:LIVE365/discover/discover_screen.dart';
 import 'package:LIVE365/firebaseService/FirebaseService.dart';
+import 'package:LIVE365/home/components/tiktokscafold.dart';
+import 'package:LIVE365/home/components/tiktoktabbar.dart';
+import 'package:LIVE365/home/components/tiktokvideopage.dart';
+import 'package:LIVE365/home/components/tiktokvideoplayer.dart';
 import 'package:LIVE365/models/User.dart';
 import 'package:LIVE365/models/live.dart';
 import 'package:LIVE365/models/post_comments.dart';
 import 'package:LIVE365/models/video.dart';
 import 'package:LIVE365/profile/profile_screen.dart';
 import 'package:LIVE365/services/video_service.dart';
+import 'package:LIVE365/style/style.dart';
 import 'package:LIVE365/utils/firebase.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flare_flutter/flare_controls.dart';
+import 'package:fijkplayer/fijkplayer.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:safemap/safemap.dart';
 import 'package:screen/screen.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:video_player/video_player.dart';
@@ -34,113 +44,79 @@ class Body extends StatefulWidget {
   _BodyState createState() => _BodyState();
 }
 
-class _BodyState extends State<Body> with SingleTickerProviderStateMixin {
-  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
-      GlobalKey<RefreshIndicatorState>();
+class _BodyState extends State<Body>
+    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
+  PageController _pageController = PageController();
+  VideoListController _videoListController = VideoListController();
+  TikTokScaffoldController tkController = TikTokScaffoldController();
+  TikTokPageTag tabBarType = TikTokPageTag.home;
+  Map<int, bool> favoriteMap = {};
+
   TextEditingController commentsTEC = TextEditingController();
   final auth = FirebaseService();
-  final FlareControls flareControls = FlareControls();
-  final databaseReference = FirebaseFirestore.instance;
-  static List<Video> listVideos = List<Video>();
-  List<DocumentSnapshot> v = [];
+  List<Video> listVideos = [];
   List<DocumentSnapshot> filteredv = [];
-  bool ready = false;
-  Live liveUser;
   bool followButton = false;
   bool liveButton = true;
   bool recommended = false;
-  bool play = true;
-  int videoIndex;
   VideoPlayerController _controller;
-  VideoPlayerController _controllerRec;
   AnimationController animationController;
   PageController pageController =
       PageController(initialPage: 0, viewportFraction: 0.8);
-  PageController foryouController = new PageController();
   bool loading = true;
   HashMap isFollowing = new HashMap<String, bool>();
   UserModel users;
   final DateTime timestamp = DateTime.now();
   UserModel user;
   String profileId;
-  String likeNum;
 
-//********
-  var _playingIndex = -1;
-  var _disposed = false;
-  var _isFullScreen = false;
-  var _isEndOfClip = false;
-  var _progress = 0.0;
-  var _showingDialog = false;
-  Timer _timerVisibleControl;
-  double _controlAlpha = 1.0;
-
-  var _updateProgressInterval = 0.0;
-  Duration _duration;
-  Duration _position;
-
-  var _playing = false;
-  bool get _isPlaying {
-    return _playing;
-  }
-
-  set _isPlaying(bool value) {
-    _playing = value;
-    _timerVisibleControl?.cancel();
-    if (value) {
-      _timerVisibleControl = Timer(Duration(seconds: 2), () {
-        if (_disposed) return;
-        setState(() {
-          _controlAlpha = 0.0;
-        });
-      });
-    } else {
-      _timerVisibleControl = Timer(Duration(milliseconds: 200), () {
-        if (_disposed) return;
-        setState(() {
-          _controlAlpha = 1.0;
-        });
-      });
-    }
-  }
-
-  void _onTapVideo() {
-    debugPrint("_onTapVideo $_controlAlpha");
-    setState(() {
-      _controlAlpha = _controlAlpha > 0 ? 0 : 1;
-    });
-    _timerVisibleControl?.cancel();
-    _timerVisibleControl = Timer(Duration(seconds: 2), () {
-      if (_isPlaying) {
-        setState(() {
-          _controlAlpha = 0.0;
-        });
-      }
-    });
-  }
-
-  //******
   currentUserId() {
     return firebaseAuth.currentUser.uid;
   }
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state) async {
+    if (state != AppLifecycleState.resumed) {
+      _videoListController.currentPlayer.pause();
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _videoListController.currentPlayer.pause();
+    Screen.keepOn(false);
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
+    super.dispose();
+  }
+
+  @override
   void initState() {
+    WidgetsBinding.instance.addObserver(this);
     Screen.keepOn(true);
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
     animationController = new AnimationController(
         duration: new Duration(seconds: 5), vsync: this);
     animationController.repeat();
-    if (_controller != null) _controller.play();
-    if (_controllerRec != null) _controllerRec.pause();
-
-    likeNum = '0';
-    getVideosList();
     callList();
-    _initializeAndPlay(0);
     super.initState();
-    WidgetsBinding.instance
-        .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
+  }
+
+  callList() async {
+    listVideos = await VideoService.getVideoList();
+    _videoListController.init(
+      _pageController,
+      listVideos,
+    );
+    tkController.addListener(
+      () {
+        if (tkController.value == TikTokPagePositon.middle) {
+          _videoListController.currentPlayer.start();
+        } else {
+          _videoListController.currentPlayer.pause();
+        }
+      },
+    );
   }
 
   checkIfFollowing(profileId) async {
@@ -154,153 +130,255 @@ class _BodyState extends State<Body> with SingleTickerProviderStateMixin {
     });
   }
 
-  void _initializeAndPlay(int index) async {
-    print("_initializeAndPlay ---------> $index");
-    if (index == -1) index = 0;
-    print("_initializeAndPlay ---------> $index");
-    final clip = listVideos[index];
-
-    final controller = clip.mediaUrl.startsWith("https")
-        ? VideoPlayerController.network(clip.mediaUrl)
-        : VideoPlayerController.asset(clip.mediaUrl);
-
-    final old = _controller;
-    _controller = controller;
-    if (old != null) {
-      old.removeListener(_onControllerUpdated);
-      old.pause();
-      debugPrint("---- old contoller paused.");
-    }
-
-    debugPrint("---- controller changed.");
-    setState(() {});
-
-    controller
-      ..initialize().then((_) {
-        debugPrint("---- controller initialized");
-        old?.dispose();
-        _playingIndex = index;
-        _duration = null;
-        _position = null;
-        controller.addListener(_onControllerUpdated);
-        controller.play();
-        setState(() {});
-      });
-  }
-
-  void _onControllerUpdated() async {
-    if (_disposed) return;
-    // blocking too many updation
-    // important !!
-    final now = DateTime.now().millisecondsSinceEpoch;
-    if (_updateProgressInterval > now) {
-      return;
-    }
-    _updateProgressInterval = now + 500.0;
-
-    final controller = _controller;
-    if (controller == null) return;
-    if (!controller.value.initialized) return;
-    if (_duration == null) {
-      _duration = _controller.value.duration;
-    }
-    var duration = _duration;
-    if (duration == null) return;
-
-    var position = await controller.position;
-    _position = position;
-    final playing = controller.value.isPlaying;
-    final isEndOfClip = position.inMilliseconds > 0 &&
-        position.inSeconds + 1 >= duration.inSeconds;
-    if (playing) {
-      // handle progress indicator
-      if (_disposed) return;
-      setState(() {
-        _progress = position.inMilliseconds.ceilToDouble() /
-            duration.inMilliseconds.ceilToDouble();
-      });
-    }
-
-    // handle clip end
-    if (_isPlaying != playing || _isEndOfClip != isEndOfClip) {
-      _isPlaying = playing;
-      _isEndOfClip = isEndOfClip;
-      debugPrint(
-          "updated -----> isPlaying=$playing / isEndOfClip=$isEndOfClip");
-      if (isEndOfClip && !playing) {
-        debugPrint(
-            "========================== End of Clip / Handle NEXT ========================== ");
-        final isComplete = _playingIndex == listVideos.length - 1;
-        if (isComplete) {
-          print("played all!!");
-          if (!_showingDialog) {
-            _showingDialog = true;
-            _showPlayedAllDialog().then((value) {
-              _showingDialog = false;
-            });
-          }
-        } else {
-          _initializeAndPlay(_playingIndex + 1);
-        }
-      }
-    }
-  }
-
-  Future<bool> _showPlayedAllDialog() async {
-    return showDialog<bool>(
-        context: context,
-        barrierDismissible: true,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            content: SingleChildScrollView(child: Text("Played all videos.")),
-            actions: <Widget>[
-              FlatButton(
-                child: Text("Close"),
-                onPressed: () => Navigator.pop(context, true),
-              )
-            ],
-          );
-        });
-  }
-
-  @override
-  void dispose() {
-    _disposed = true;
-    _timerVisibleControl.cancel();
-    Screen.keepOn(false);
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
-    _controller.pause(); // mute instantly
-    _controller.dispose();
-    _controller = null;
-    animationController.dispose();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
+    Widget currentPage;
+
+    switch (tabBarType) {
+      case TikTokPageTag.home:
+        break;
+      case TikTokPageTag.search:
+        currentPage = DiscoverScreen();
+        break;
+      case TikTokPageTag.msg:
+        currentPage = Activities();
+        break;
+      case TikTokPageTag.me:
+        currentPage = ProfileScreen(
+          profileUID: firebaseAuth.currentUser.uid,
+        );
+        break;
+    }
+
+    double a = MediaQuery.of(context).size.aspectRatio;
+    bool hasBottomPadding = a < 0.55;
+
+    bool hasBackground = hasBottomPadding;
+    hasBackground = tabBarType != TikTokPageTag.home;
+    if (hasBottomPadding) {
+      hasBackground = true;
+    }
+
+    var userPage = ProfileScreen(
+      profileUID: firebaseAuth.currentUser.uid,
+    );
+    var searchPage = Activities();
+    Widget tikTokTabBar = TikTokTabBar(
+      hasBackground: hasBackground,
+      current: tabBarType,
+      onTabSwitch: (type) async {
+        setState(() {
+          tabBarType = type;
+          if (type == TikTokPageTag.home) {
+            _videoListController.currentPlayer.start();
+          } else {
+            _videoListController.currentPlayer.pause();
+          }
+        });
+      },
+      onAddButton: () {
+        chooseUpload(context);
+      },
+    );
+
+    var header =
+        tabBarType == TikTokPageTag.home ? topScrollFeedRow() : Container();
+
     return Scaffold(
       body: Stack(
-        children: [homeScreen(), topScrollFeedRow()],
+        children: [
+          homeScreen(header, hasBottomPadding, currentPage, searchPage,
+              userPage, tikTokTabBar, hasBackground),
+          liveButton == true
+              ? topScrollFeedRow()
+              : Container(
+                  height: 0,
+                )
+        ],
       ),
     );
   }
 
-  Widget homeScreen() {
+  chooseUpload(BuildContext context) {
+    return showModalBottomSheet(
+      backgroundColor: GBottomNav,
+      context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10.0),
+      ),
+      builder: (BuildContext context) {
+        return FractionallySizedBox(
+          heightFactor: .6,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(height: 10.0),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                child: Center(
+                  child: Text(
+                    'SELECT',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold, color: Colors.white),
+                  ),
+                ),
+              ),
+              Divider(
+                color: Colors.white,
+              ),
+              ListTile(
+                leading: Icon(
+                  CupertinoIcons.video_camera,
+                  color: Colors.white,
+                  size: 25.0,
+                ),
+                title: Text('Go Live',
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold, color: Colors.white)),
+                onTap: () async {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CameraAccessScreen(),
+                    ),
+                  );
+                },
+              ),
+              ListTile(
+                leading: Icon(
+                  CupertinoIcons.videocam_circle_fill,
+                  color: Colors.white,
+                  size: 25.0,
+                ),
+                title: Text('Make Video',
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold, color: Colors.white)),
+                onTap: () async {
+                  ///Feature coming soon
+                  ///
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AddVideoPage(),
+                    ),
+                  );
+                },
+              ),
+              ListTile(
+                leading: Icon(
+                  CupertinoIcons.camera_on_rectangle,
+                  color: Colors.white,
+                  size: 25.0,
+                ),
+                title: Text('Make a Post',
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold, color: Colors.white)),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.of(context)
+                      .push(MaterialPageRoute(builder: (_) => CreatePost()));
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget homeScreen(header, hasBottomPadding, currentPage, searchPage, userPage,
+      tikTokTabBar, hasBackground) {
     if (liveButton) {
-      if (_controller != null) _controller.pause();
-      if (_controllerRec != null) _controllerRec.pause();
       return Padding(
         padding: const EdgeInsets.only(top: 80.0, left: 10.0, right: 10.0),
         child: scrollFeed(),
       );
     }
     if (recommended) {
-      if (_controller != null) _controller.pause();
-      if (_controllerRec != null) _controllerRec.pause();
       return recommendedFeed();
     } else {
-      if (_controller != null) _controller.play();
-      return followFeed();
+      return TikTokScaffold(
+        controller: tkController,
+        hasBottomPadding: hasBackground,
+        tabBar: tikTokTabBar,
+        rightPage: userPage,
+        header: header,
+        enableGesture: tabBarType == TikTokPageTag.home,
+        // onPullDownRefresh: _fetchData,
+        page: Stack(
+          // index: currentPage == null ? 0 : 1,
+          children: <Widget>[
+            PageView.builder(
+              key: Key('home'),
+              controller: _pageController,
+              pageSnapping: true,
+              physics: ClampingScrollPhysics(),
+              scrollDirection: Axis.vertical,
+              itemCount: _videoListController.videoCount,
+              itemBuilder: (context, i) {
+                var data = listVideos[i];
+                bool isF = SafeMap(favoriteMap)[i].boolean ?? false;
+                var player = _videoListController.playerOfIndex(i);
+
+                if (isF == true) {
+                  likesRef.add({
+                    'userId': currentUserId(),
+                    'postId': data.id,
+                    'dateCreated': Timestamp.now(),
+                  });
+                  addLikesToNotification(data);
+                }
+                print(isF);
+                Widget buttons = videoData(i);
+
+                // video
+                Widget currentVideo = Center(
+                  child: FijkView(
+                    fit: FijkFit.fitHeight,
+                    player: player,
+                    color: Colors.black,
+                    panelBuilder: (_, __, ___, ____, _____) => Container(),
+                  ),
+                );
+
+                currentVideo = TikTokVideoPage(
+                  hidePauseIcon: player.state != FijkState.paused,
+                  aspectRatio: 9 / 16.0,
+                  key: Key(data.mediaUrl + '$i'),
+                  tag: data.mediaUrl,
+                  bottomPadding: hasBottomPadding ? 16.0 : 16.0,
+                  onSingleTap: () async {
+                    if (player.state == FijkState.started) {
+                      await player.pause();
+                    } else {
+                      await player.start();
+                    }
+                    setState(() {});
+                  },
+                  onAddFavorite: () {
+                    setState(() {
+                      favoriteMap[i] = true;
+                    });
+                  },
+                  rightButtonColumn: buttons,
+                  video: currentVideo,
+                );
+                return currentVideo;
+              },
+            ),
+            Opacity(
+              opacity: 1,
+              child: currentPage ?? Container(),
+            ),
+            // Center(
+            //   child: Text(_currentIndex.toString()),
+            // )
+          ],
+        ),
+      );
     }
   }
 
@@ -465,376 +543,181 @@ class _BodyState extends State<Body> with SingleTickerProviderStateMixin {
     }
   }
 
-  Widget followFeed() {
-    return RefreshIndicator(
-        key: _refreshIndicatorKey,
-        onRefresh: _refresh,
-        child: BasicOverlayWidget());
-  }
-
-  Future<Null> _refresh() async {
-    return await VideoService.getVideoList().then((_user) {
-      setState(() => listVideos = _user);
-    });
-  }
-
-  Widget BasicOverlayWidget() {
-    return Stack(
-      fit: StackFit.expand,
-      children: <Widget>[_playView(context), videoData(_playingIndex)],
-    );
-  }
-
   Widget videoData(index) {
     return listVideos.length != 0
-        ? index == -1
-            ? Stack(
-                children: [
-                  Padding(
-                    padding: EdgeInsets.only(bottom: 5),
-                    child: Align(
-                      alignment: Alignment.bottomLeft,
-                      child: Container(
-                        width: MediaQuery.of(context).size.width - 100,
-                        height: 100,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Padding(
-                              padding: EdgeInsets.only(left: 10, bottom: 10),
-                              child: Text(
-                                listVideos[0].username,
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ),
-                            Padding(
-                                padding: EdgeInsets.only(left: 10, bottom: 10),
-                                child: Text.rich(
-                                  TextSpan(children: <TextSpan>[
-                                    TextSpan(text: listVideos[0].videoTitle),
-                                    TextSpan(
-                                        text: '${listVideos[0].tags ?? ''}\n',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold)),
-                                  ]),
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 14),
-                                )),
-                            Container(
-                              padding: EdgeInsets.only(left: 10),
-                              child: Row(
-                                children: <Widget>[
-                                  Icon(Icons.music_note,
-                                      size: 16, color: Colors.white),
-                                  Text(listVideos[0].songName ?? '',
-                                      style: TextStyle(color: Colors.white))
-                                ],
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  Padding(
-                      padding: EdgeInsets.only(bottom: 15, right: 10),
-                      child: Align(
-                        alignment: Alignment.bottomRight,
-                        child: Container(
-                          width: getProportionateScreenWidth(50),
-                          height: 350,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: <Widget>[
-                              GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => ProfileScreen(
-                                          profileUID: listVideos[0].ownerId,
-                                        ),
-                                      ));
-                                },
-                                child: Container(
-                                  margin: EdgeInsets.only(bottom: 5),
-                                  width: 40,
-                                  height: getProportionateScreenHeight(50),
-                                  child: Stack(
-                                    children: <Widget>[
-                                      CircleAvatar(
-                                        radius: 20,
-                                        backgroundColor: Colors.white,
-                                        child: CircleAvatar(
-                                          radius: 19,
-                                          backgroundColor: Colors.black,
-                                          backgroundImage: NetworkImage(
-                                              listVideos[0].userPic),
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              buildLikeButton(listVideos[0]),
-                              SizedBox(height: 3.0),
-                              StreamBuilder(
-                                stream: likesRef
-                                    .where('postId',
-                                        isEqualTo: listVideos[0].id)
-                                    .snapshots(),
-                                builder: (context,
-                                    AsyncSnapshot<QuerySnapshot> snapshot) {
-                                  if (snapshot.hasData) {
-                                    QuerySnapshot snap = snapshot.data;
-                                    List<DocumentSnapshot> docs = snap.docs;
-                                    return buildLikesCount(
-                                        context, docs?.length ?? 0);
-                                  } else {
-                                    return buildLikesCount(context, 0);
-                                  }
-                                },
-                              ),
-                              SizedBox(height: 3.0),
-                              IconButton(
-                                icon: Icon(
-                                  Icons.sms,
-                                  size: 35,
-                                  color: Colors.white,
-                                ),
-                                onPressed: () {
-                                  commentClicked(listVideos[0]);
-                                },
-                              ),
-                              SizedBox(height: 3.0),
-                              StreamBuilder(
-                                stream: commentRef
-                                    .doc(listVideos[0].id)
-                                    .collection("comments")
-                                    .snapshots(),
-                                builder: (context,
-                                    AsyncSnapshot<QuerySnapshot> snapshot) {
-                                  if (snapshot.hasData) {
-                                    QuerySnapshot snap = snapshot.data;
-                                    List<DocumentSnapshot> docs = snap.docs;
-                                    return buildCommentsCount(
-                                        context, docs?.length ?? 0);
-                                  } else {
-                                    return buildCommentsCount(context, 0);
-                                  }
-                                },
-                              ),
-                              SizedBox(height: 3.0),
-                              IconButton(
-                                icon: Icon(
-                                  CupertinoIcons.ellipsis,
-                                  size: 35,
-                                  color: Colors.white,
-                                ),
-                                onPressed: () {
-                                  settingClicked(
-                                      listVideos[0], listVideos[0].id);
-                                },
-                              ),
-                              SizedBox(height: 3.0),
-                              AnimatedBuilder(
-                                animation: animationController,
-                                child: CircleAvatar(
-                                  radius: 22,
-                                  backgroundColor:
-                                      Colors.grey[400].withOpacity(0.1),
-                                  child: CircleAvatar(
-                                    radius: 12,
-                                    backgroundImage:
-                                        AssetImage('assets/images/effects.png'),
-                                  ),
-                                ),
-                                builder: (context, _widget) {
-                                  return Transform.rotate(
-                                      angle: animationController.value * 6.3,
-                                      child: _widget);
-                                },
-                              )
-                            ],
+        ? Stack(
+            children: [
+              Padding(
+                padding: EdgeInsets.only(bottom: 50),
+                child: Align(
+                  alignment: Alignment.bottomLeft,
+                  child: Container(
+                    width: MediaQuery.of(context).size.width - 100,
+                    height: 100,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Padding(
+                          padding: EdgeInsets.only(left: 10, bottom: 10),
+                          child: Text(
+                            '@${listVideos[index].username}',
+                            style: StandardTextStyle.big,
                           ),
                         ),
-                      ))
-                ],
-              )
-            : Stack(
-                children: [
-                  Padding(
-                    padding: EdgeInsets.only(bottom: 5),
-                    child: Align(
-                      alignment: Alignment.bottomLeft,
-                      child: Container(
-                        width: MediaQuery.of(context).size.width - 100,
-                        height: 100,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Padding(
-                              padding: EdgeInsets.only(left: 10, bottom: 10),
-                              child: Text(
-                                listVideos[index].username,
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ),
-                            Padding(
-                                padding: EdgeInsets.only(left: 10, bottom: 10),
-                                child: Text.rich(
-                                  TextSpan(children: <TextSpan>[
-                                    TextSpan(
-                                        text: listVideos[index].videoTitle),
-                                    TextSpan(
-                                        text: '${listVideos[index].tags}\n',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold)),
-                                  ]),
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 14),
-                                )),
-                            Container(
-                              padding: EdgeInsets.only(left: 10),
-                              child: Row(
-                                children: <Widget>[
-                                  Icon(Icons.music_note,
-                                      size: 16, color: Colors.white),
-                                  Text(listVideos[index].songName ?? '',
-                                      style: TextStyle(color: Colors.white))
-                                ],
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  Padding(
-                      padding: EdgeInsets.only(bottom: 15, right: 10),
-                      child: Align(
-                        alignment: Alignment.bottomRight,
-                        child: Container(
-                          width: getProportionateScreenWidth(50),
-                          height: getProportionateScreenHeight(350),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.end,
+                        Padding(
+                            padding: EdgeInsets.only(left: 10, bottom: 10),
+                            child: Text.rich(
+                              TextSpan(children: <TextSpan>[
+                                TextSpan(
+                                    text: listVideos[index].videoTitle,
+                                    style: StandardTextStyle.normal),
+                                TextSpan(
+                                    text: '${listVideos[index].tags}\n',
+                                    style: StandardTextStyle.normal),
+                              ]),
+                              style: StandardTextStyle.normal,
+                            )),
+                        Container(
+                          padding: EdgeInsets.only(left: 10),
+                          child: Row(
                             children: <Widget>[
-                              GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => ProfileScreen(
-                                          profileUID: listVideos[index].ownerId,
-                                        ),
-                                      ));
-                                },
-                                child: Container(
-                                  margin: EdgeInsets.only(bottom: 5),
-                                  width: 40,
-                                  height: getProportionateScreenHeight(50),
-                                  child: Stack(
-                                    children: <Widget>[
-                                      CircleAvatar(
-                                        radius: 20,
-                                        backgroundColor: Colors.white,
-                                        child: CircleAvatar(
-                                          radius: 19,
-                                          backgroundColor: Colors.black,
-                                          backgroundImage: NetworkImage(
-                                              listVideos[index].userPic),
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              buildLikeButton(listVideos[index]),
-                              SizedBox(height: 3.0),
-                              StreamBuilder(
-                                stream: likesRef
-                                    .where('postId',
-                                        isEqualTo: listVideos[index].id)
-                                    .snapshots(),
-                                builder: (context,
-                                    AsyncSnapshot<QuerySnapshot> snapshot) {
-                                  if (snapshot.hasData) {
-                                    QuerySnapshot snap = snapshot.data;
-                                    List<DocumentSnapshot> docs = snap.docs;
-                                    return buildLikesCount(
-                                        context, docs?.length ?? 0);
-                                  } else {
-                                    return buildLikesCount(context, 0);
-                                  }
-                                },
-                              ),
-                              SizedBox(height: 3.0),
-                              IconButton(
-                                icon: Icon(
-                                  Icons.sms,
-                                  size: 35,
-                                  color: Colors.white,
-                                ),
-                                onPressed: () {
-                                  commentClicked(listVideos[index]);
-                                },
-                              ),
-                              SizedBox(height: 3.0),
-                              StreamBuilder(
-                                stream: commentRef
-                                    .doc(listVideos[index].id)
-                                    .collection("comments")
-                                    .snapshots(),
-                                builder: (context,
-                                    AsyncSnapshot<QuerySnapshot> snapshot) {
-                                  if (snapshot.hasData) {
-                                    QuerySnapshot snap = snapshot.data;
-                                    List<DocumentSnapshot> docs = snap.docs;
-                                    return buildCommentsCount(
-                                        context, docs?.length ?? 0);
-                                  } else {
-                                    return buildCommentsCount(context, 0);
-                                  }
-                                },
-                              ),
-                              SizedBox(height: 3.0),
-                              IconButton(
-                                icon: Icon(
-                                  CupertinoIcons.ellipsis,
-                                  size: 35,
-                                  color: Colors.white,
-                                ),
-                                onPressed: () {
-                                  settingClicked(
-                                      listVideos[index], listVideos[index].id);
-                                },
-                              ),
-                              SizedBox(height: 3.0),
-                              AnimatedBuilder(
-                                animation: animationController,
-                                child: CircleAvatar(
-                                  radius: 22,
-                                  backgroundColor:
-                                      Colors.grey[400].withOpacity(0.1),
-                                  child: CircleAvatar(
-                                    radius: 12,
-                                    backgroundImage:
-                                        AssetImage('assets/images/effects.png'),
-                                  ),
-                                ),
-                                builder: (context, _widget) {
-                                  return Transform.rotate(
-                                      angle: animationController.value * 6.3,
-                                      child: _widget);
-                                },
-                              )
+                              Icon(Icons.music_note,
+                                  size: 16, color: Colors.white),
+                              Text(listVideos[index].songName ?? '',
+                                  style: StandardTextStyle.normal)
                             ],
                           ),
-                        ),
-                      ))
-                ],
-              )
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              Padding(
+                  padding: EdgeInsets.only(bottom: 100, right: 10),
+                  child: Align(
+                    alignment: Alignment.bottomRight,
+                    child: Container(
+                      width: getProportionateScreenWidth(50),
+                      height: getProportionateScreenHeight(350),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: <Widget>[
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => ProfileScreen(
+                                      profileUID: listVideos[index].ownerId,
+                                    ),
+                                  ));
+                            },
+                            child: Container(
+                              margin: EdgeInsets.only(bottom: 5),
+                              width: 40,
+                              height: getProportionateScreenHeight(50),
+                              child: Stack(
+                                children: <Widget>[
+                                  CircleAvatar(
+                                    radius: 20,
+                                    backgroundColor: Colors.white,
+                                    child: CircleAvatar(
+                                      radius: 19,
+                                      backgroundColor: Colors.black,
+                                      backgroundImage: NetworkImage(
+                                          listVideos[index].userPic),
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ),
+                          ),
+                          buildLikeButton(listVideos[index]),
+                          SizedBox(height: 3.0),
+                          StreamBuilder(
+                            stream: likesRef
+                                .where('postId',
+                                    isEqualTo: listVideos[index].id)
+                                .snapshots(),
+                            builder: (context,
+                                AsyncSnapshot<QuerySnapshot> snapshot) {
+                              if (snapshot.hasData) {
+                                QuerySnapshot snap = snapshot.data;
+                                List<DocumentSnapshot> docs = snap.docs;
+                                return buildLikesCount(
+                                    context, docs?.length ?? 0);
+                              } else {
+                                return buildLikesCount(context, 0);
+                              }
+                            },
+                          ),
+                          SizedBox(height: 3.0),
+                          IconButton(
+                            icon: Icon(
+                              Icons.sms,
+                              size: 35,
+                              color: Colors.white,
+                            ),
+                            onPressed: () {
+                              commentClicked(listVideos[index]);
+                            },
+                          ),
+                          SizedBox(height: 3.0),
+                          StreamBuilder(
+                            stream: commentRef
+                                .doc(listVideos[index].id)
+                                .collection("comments")
+                                .snapshots(),
+                            builder: (context,
+                                AsyncSnapshot<QuerySnapshot> snapshot) {
+                              if (snapshot.hasData) {
+                                QuerySnapshot snap = snapshot.data;
+                                List<DocumentSnapshot> docs = snap.docs;
+                                return buildCommentsCount(
+                                    context, docs?.length ?? 0);
+                              } else {
+                                return buildCommentsCount(context, 0);
+                              }
+                            },
+                          ),
+                          SizedBox(height: 3.0),
+                          IconButton(
+                            icon: Icon(
+                              CupertinoIcons.ellipsis,
+                              size: 35,
+                              color: Colors.white,
+                            ),
+                            onPressed: () {
+                              settingClicked(
+                                  listVideos[index], listVideos[index].id);
+                            },
+                          ),
+                          SizedBox(height: 3.0),
+                          AnimatedBuilder(
+                            animation: animationController,
+                            child: CircleAvatar(
+                              radius: 22,
+                              backgroundColor:
+                                  Colors.grey[400].withOpacity(0.1),
+                              child: CircleAvatar(
+                                radius: 12,
+                                backgroundImage:
+                                    AssetImage('assets/images/effects.png'),
+                              ),
+                            ),
+                            builder: (context, _widget) {
+                              return Transform.rotate(
+                                  angle: animationController.value * 6.3,
+                                  child: _widget);
+                            },
+                          )
+                        ],
+                      ),
+                    ),
+                  ))
+            ],
+          )
         : Container();
   }
 
@@ -959,368 +842,6 @@ class _BodyState extends State<Body> with SingleTickerProviderStateMixin {
     );
   }
 
-  Widget _playView(BuildContext context) {
-    final controller = _controller;
-    if (controller != null && controller.value.initialized) {
-      return FittedBox(
-        fit: BoxFit.cover,
-        child: SizedBox(
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height,
-            child: AspectRatio(
-              aspectRatio: controller.value.aspectRatio,
-              child: Stack(
-                children: <Widget>[
-                  GestureDetector(
-                    child: VideoPlayer(controller),
-                    onTap: _onTapVideo,
-                  ), /*
-                  UI THING
-                  _controlAlpha > 0
-                      ? AnimatedOpacity(
-                          opacity: _controlAlpha,
-                          duration: Duration(milliseconds: 250),
-                          child: _controlView(context),
-                        )
-                      : Container(),*/
-                ],
-              ),
-            )),
-      );
-    } else {
-      return AspectRatio(
-        aspectRatio: 16.0 / 9.0,
-        child: Center(child: circularProgress(context)),
-      );
-    }
-  }
-
-  Widget _controlView(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        _topUI(),
-        Expanded(
-          child: _centerUI(),
-        ),
-      ],
-    );
-  }
-
-  Widget _centerUI() {
-    return Center(
-        child: Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        FlatButton(
-          onPressed: () async {
-            final index = _playingIndex - 1;
-            if (index > 0 && listVideos.length > 0) {
-              _initializeAndPlay(index);
-            }
-          },
-          child: Icon(
-            Icons.fast_rewind,
-            size: 36.0,
-            color: Colors.white,
-          ),
-        ),
-        FlatButton(
-          onPressed: () async {
-            if (_isPlaying) {
-              _controller?.pause();
-              _isPlaying = false;
-            } else {
-              final controller = _controller;
-              if (controller != null) {
-                final pos = _position?.inSeconds ?? 0;
-                final dur = _duration?.inSeconds ?? 0;
-                final isEnd = pos == dur;
-                if (isEnd) {
-                  _initializeAndPlay(_playingIndex);
-                } else {
-                  controller.play();
-                }
-              }
-            }
-            setState(() {});
-          },
-          child: Icon(
-            _isPlaying ? Icons.pause : Icons.play_arrow,
-            size: 56.0,
-            color: Colors.white,
-          ),
-        ),
-        FlatButton(
-          onPressed: () async {
-            final index = _playingIndex + 1;
-            if (index < listVideos.length - 1) {
-              _initializeAndPlay(index);
-            }
-          },
-          child: Icon(
-            Icons.fast_forward,
-            size: 36.0,
-            color: Colors.white,
-          ),
-        ),
-      ],
-    ));
-  }
-
-  String convertTwo(int value) {
-    return value < 10 ? "0$value" : "$value";
-  }
-
-  Widget _topUI() {
-    final noMute = (_controller?.value?.volume ?? 0) > 0;
-    final duration = _duration?.inSeconds ?? 0;
-    final head = _position?.inSeconds ?? 0;
-    final remained = max(0, duration - head);
-    final min = convertTwo(remained ~/ 60.0);
-    final sec = convertTwo(remained % 60);
-    return Row(
-      children: <Widget>[
-        InkWell(
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 100),
-            child: Container(
-                decoration: BoxDecoration(shape: BoxShape.circle, boxShadow: [
-                  BoxShadow(
-                      offset: const Offset(0.0, 0.0),
-                      blurRadius: 4.0,
-                      color: Color.fromARGB(50, 0, 0, 0)),
-                ]),
-                child: Icon(
-                  noMute ? Icons.volume_up : Icons.volume_off,
-                  color: Colors.white,
-                )),
-          ),
-          onTap: () {
-            if (noMute) {
-              _controller?.setVolume(0);
-            } else {
-              _controller?.setVolume(1.0);
-            }
-            setState(() {});
-          },
-        ),
-        Expanded(
-          child: Container(),
-        ),
-        Text(
-          "$min:$sec",
-          style: TextStyle(
-            color: Colors.white,
-            shadows: <Shadow>[
-              Shadow(
-                offset: Offset(0.0, 1.0),
-                blurRadius: 4.0,
-                color: Color.fromARGB(150, 0, 0, 0),
-              ),
-            ],
-          ),
-        ),
-        SizedBox(width: 10)
-      ],
-    );
-  }
-
-  //*******************************
-  /*
-  Widget followFeed2() {
-    return listVideos.isNotEmpty
-        ? PageView.builder(
-            controller: foryouController,
-            scrollDirection: Axis.vertical,
-            itemCount: listVideos.length,
-            itemBuilder: (context, index) {
-              return Stack(
-                children: <Widget>[
-                  Container(
-                    width: MediaQuery.of(context).size.width,
-                    height: MediaQuery.of(context).size.height,
-                    child: VideosPlayer(
-                      playlistStyle: Style.Style2,
-                      maxVideoPlayerHeight:
-                          MediaQuery.of(context).size.height - 200,
-                      networkVideos: [
-                        NetworkVideo(
-                            id: listVideos[index].videoId,
-                            name: listVideos[index].videoTitle,
-                            videoUrl: listVideos[index].mediaUrl,
-                            thumbnailUrl: listVideos[index].userPic)
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(bottom: 5),
-                    child: Align(
-                      alignment: Alignment.bottomLeft,
-                      child: Container(
-                        width: MediaQuery.of(context).size.width - 100,
-                        height: 100,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Padding(
-                              padding: EdgeInsets.only(left: 10, bottom: 10),
-                              child: Text(
-                                listVideos[index].username,
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ),
-                            Padding(
-                                padding: EdgeInsets.only(left: 10, bottom: 10),
-                                child: Text.rich(
-                                  TextSpan(children: <TextSpan>[
-                                    TextSpan(
-                                        text: listVideos[index].videoTitle),
-                                    TextSpan(
-                                        text: '${listVideos[index].tags}\n',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold)),
-                                  ]),
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 14),
-                                )),
-                            Container(
-                              padding: EdgeInsets.only(left: 10),
-                              child: Row(
-                                children: <Widget>[
-                                  Icon(Icons.music_note,
-                                      size: 16, color: Colors.white),
-                                  Text(listVideos[index].songName,
-                                      style: TextStyle(color: Colors.white))
-                                ],
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  Padding(
-                      padding: EdgeInsets.only(bottom: 15, right: 10),
-                      child: Align(
-                        alignment: Alignment.bottomRight,
-                        child: Container(
-                          width: getProportionateScreenWidth(50),
-                          height: getProportionateScreenHeight(300),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: <Widget>[
-                              GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => ProfileScreen(
-                                          profileUID: listVideos[index].ownerId,
-                                        ),
-                                      ));
-                                },
-                                child: Container(
-                                  margin: EdgeInsets.only(bottom: 5),
-                                  width: 40,
-                                  height: getProportionateScreenHeight(50),
-                                  child: Stack(
-                                    children: <Widget>[
-                                      CircleAvatar(
-                                        radius: 20,
-                                        backgroundColor: Colors.white,
-                                        child: CircleAvatar(
-                                          radius: 19,
-                                          backgroundColor: Colors.black,
-                                          backgroundImage: NetworkImage(
-                                              listVideos[index].userPic),
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              buildLikeButton(listVideos[index]),
-                              SizedBox(height: 3.0),
-                              StreamBuilder(
-                                stream: likesRef
-                                    .where('postId',
-                                        isEqualTo: listVideos[index].id)
-                                    .snapshots(),
-                                builder: (context,
-                                    AsyncSnapshot<QuerySnapshot> snapshot) {
-                                  if (snapshot.hasData) {
-                                    QuerySnapshot snap = snapshot.data;
-                                    List<DocumentSnapshot> docs = snap.docs;
-                                    return buildLikesCount(
-                                        context, docs?.length ?? 0);
-                                  } else {
-                                    return buildLikesCount(context, 0);
-                                  }
-                                },
-                              ),
-                              SizedBox(height: 3.0),
-                              IconButton(
-                                icon: Icon(
-                                  Icons.sms,
-                                  size: 35,
-                                  color: Colors.white,
-                                ),
-                                onPressed: () {
-                                  commentClicked(listVideos[index]);
-                                },
-                              ),
-                              SizedBox(height: 3.0),
-                              StreamBuilder(
-                                stream: commentRef
-                                    .doc(listVideos[index].id)
-                                    .collection("comments")
-                                    .snapshots(),
-                                builder: (context,
-                                    AsyncSnapshot<QuerySnapshot> snapshot) {
-                                  if (snapshot.hasData) {
-                                    QuerySnapshot snap = snapshot.data;
-                                    List<DocumentSnapshot> docs = snap.docs;
-                                    return buildCommentsCount(
-                                        context, docs?.length ?? 0);
-                                  } else {
-                                    return buildCommentsCount(context, 0);
-                                  }
-                                },
-                              ),
-                              SizedBox(height: 3.0),
-                              AnimatedBuilder(
-                                animation: animationController,
-                                child: CircleAvatar(
-                                  radius: 22,
-                                  backgroundColor:
-                                      Colors.grey[400].withOpacity(0.1),
-                                  child: CircleAvatar(
-                                    radius: 12,
-                                    backgroundImage:
-                                        AssetImage('assets/images/effects.png'),
-                                  ),
-                                ),
-                                builder: (context, _widget) {
-                                  return Transform.rotate(
-                                      angle: animationController.value * 6.3,
-                                      child: _widget);
-                                },
-                              )
-                            ],
-                          ),
-                        ),
-                      ))
-                ],
-              );
-            })
-        : Center(
-            child: Container(
-              child:
-                  Text('Rush and Be The First \n To Upload The First Video 😊'),
-            ),
-          );
-  }*/
-
   Widget buildCommentsCount(BuildContext context, int count) {
     return Padding(
       padding: const EdgeInsets.only(top: 0.5),
@@ -1341,56 +862,6 @@ class _BodyState extends State<Body> with SingleTickerProviderStateMixin {
             fontWeight: FontWeight.bold, fontSize: 10.0, color: Colors.white),
       ),
     );
-  }
-
-  Widget recommendedFeed() {
-    return Container(
-        width: double.infinity,
-        height: double.infinity,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Container(
-                    padding: EdgeInsets.only(bottom: 14),
-                    child: Text(
-                      'Trending Creators',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontFamily: "SFProDisplay-Regular",
-                          fontSize: 20),
-                    ))
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Center(
-                  child: Container(
-                    child: Column(
-                      children: <Widget>[
-                        Center(
-                          child: Text(
-                              'Follow an account to see their latest video',
-                              style: TextStyle(
-                                  fontFamily: "SFProDisplay-Regular",
-                                  color: Colors.white.withOpacity(0.8))),
-                        )
-                      ],
-                    ),
-                  ),
-                )
-              ],
-            ),
-            Container(
-              height: 372,
-              margin: EdgeInsets.only(top: 25),
-              child: buildVideoSlider(),
-            )
-          ],
-        ));
   }
 
   Widget buildLikeButton(video) {
@@ -1794,6 +1265,56 @@ class _BodyState extends State<Body> with SingleTickerProviderStateMixin {
     }
   }
 
+  Widget recommendedFeed() {
+    return Container(
+        width: double.infinity,
+        height: double.infinity,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Container(
+                    padding: EdgeInsets.only(bottom: 14),
+                    child: Text(
+                      'Trending Creators',
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontFamily: "SFProDisplay-Regular",
+                          fontSize: 20),
+                    ))
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Center(
+                  child: Container(
+                    child: Column(
+                      children: <Widget>[
+                        Center(
+                          child: Text(
+                              'Follow an account to see their latest video',
+                              style: TextStyle(
+                                  fontFamily: "SFProDisplay-Regular",
+                                  color: Colors.white.withOpacity(0.8))),
+                        )
+                      ],
+                    ),
+                  ),
+                )
+              ],
+            ),
+            Container(
+              height: 372,
+              margin: EdgeInsets.only(top: 25),
+              child: buildVideoSlider(),
+            )
+          ],
+        ));
+  }
+
   buildVideoSlider() {
     if (!loading) {
       if (filteredv.isEmpty) {
@@ -1897,26 +1418,5 @@ class _BodyState extends State<Body> with SingleTickerProviderStateMixin {
         );
       });
     }
-  }
-
-  callList() async {
-    listVideos = await VideoService.getVideoList();
-    if (listVideos.isNotEmpty) {
-      _controllerRec = VideoPlayerController.network(listVideos[0].mediaUrl);
-      _controller = VideoPlayerController.network(listVideos[0].mediaUrl)
-        ..addListener(() => setState(() {}))
-        ..setLooping(true)
-        ..initialize().then((_) => _controller.play());
-    }
-  }
-
-  getVideosList() async {
-    QuerySnapshot snap = await videoRef.get();
-    List<DocumentSnapshot> doc = snap.docs;
-    v = doc;
-    filteredv = doc;
-    setState(() {
-      loading = false;
-    });
   }
 }

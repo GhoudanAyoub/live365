@@ -72,7 +72,9 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return getAllUsers();
+    return Scaffold(
+      body: getAllUsers(),
+    );
   }
 
   Widget getVideosAndUsers() {
@@ -182,7 +184,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
               height: 10,
             ),
             Container(
-                margin: EdgeInsets.fromLTRB(0, 60, 0, 0), child: buildUsers())
+                margin: EdgeInsets.fromLTRB(0, 60, 0, 70), child: buildUsers())
           ],
         ),
       ));
@@ -217,10 +219,15 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                 ListTile(
                   onTap: () => showProfile(context, profileId: user?.id),
                   contentPadding: EdgeInsets.symmetric(horizontal: 25.0),
-                  leading: CircleAvatar(
-                    radius: 35.0,
-                    backgroundImage: NetworkImage(user?.photoUrl),
-                  ),
+                  leading: user.photoUrl != null && user.photoUrl != ""
+                      ? CircleAvatar(
+                          radius: 35.0,
+                          backgroundImage: NetworkImage(user?.photoUrl),
+                        )
+                      : Image.asset(
+                          "assets/images/Profile Image.png",
+                          width: 50.0,
+                        ),
                   title: Text(user?.username,
                       style: TextStyle(
                           color: Colors.white, fontWeight: FontWeight.bold)),

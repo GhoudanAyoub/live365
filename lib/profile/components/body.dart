@@ -72,11 +72,13 @@ class _BodyState extends State<Body> {
     return Scaffold(
       appBar: AppBar(
         elevation: 2,
+        toolbarHeight: 30,
         leading: widget.profileId == firebaseAuth.currentUser.uid
             ? IconButton(
                 icon: Icon(
-                  Icons.settings_outlined,
+                  CupertinoIcons.text_justify,
                   color: Colors.white,
+                  size: 20,
                 ),
                 onPressed: () {
                   Navigator.push(
@@ -101,21 +103,12 @@ class _BodyState extends State<Body> {
           SliverAppBar(
             automaticallyImplyLeading: false,
             pinned: true,
-            floating: false,
+            floating: true,
             toolbarHeight: 1.0,
-            collapsedHeight: 2.0,
-            expandedHeight: 310.0,
+            collapsedHeight: 1.0,
+            expandedHeight: 330.0,
             flexibleSpace: FlexibleSpaceBar(
-              background: StreamBuilder(
-                stream: usersRef.doc(widget.profileId).snapshots(),
-                builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-                  if (snapshot.hasData) {
-                    user1 = UserModel.fromJson(snapshot.data.data());
-                    return displayUserInfo();
-                  }
-                  return Container();
-                },
-              ),
+              background: displayUserInfo(),
             ),
           ),
           SliverList(delegate:
@@ -149,7 +142,7 @@ class _BodyState extends State<Body> {
                   ],
                 ),
               ),
-              buildPostView()
+              buildPostView(),
             ]);
           })),
         ],
@@ -286,7 +279,7 @@ class _BodyState extends State<Body> {
               context,
               MaterialPageRoute(
                 builder: (context) => EditProfile(
-                  user: user1,
+                  user: user,
                 ),
               ));
         },
