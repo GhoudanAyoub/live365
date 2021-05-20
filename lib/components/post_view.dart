@@ -351,7 +351,9 @@ class _PostsState extends State<Posts> {
         },
       );
     else
-      return Icon(CupertinoIcons.heart, color: Colors.white);
+      return IconButton(
+          onPressed: () {},
+          icon: Icon(CupertinoIcons.heart, color: Colors.white));
   }
 
   addLikesToNotification() async {

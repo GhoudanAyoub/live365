@@ -5,7 +5,6 @@ import 'package:LIVE365/components/indicators.dart';
 import 'package:LIVE365/models/User.dart';
 import 'package:LIVE365/utils/firebase.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
@@ -40,8 +39,7 @@ class _CreateVideoState extends State<CreateVideo> {
   @override
   Widget build(BuildContext context) {
     currentUserId() {
-      var firebaseAuth;
-      return FirebaseAuth.instance.currentUser.uid;
+      return firebaseAuth.currentUser.uid;
     }
 
     viewModel = Provider.of<VideoViewModel>(context);
@@ -118,10 +116,15 @@ class _CreateVideoState extends State<CreateVideo> {
                   if (snapshot.hasData) {
                     UserModel user = UserModel.fromJson(snapshot.data.data());
                     return ListTile(
-                      leading: CircleAvatar(
-                        radius: 25.0,
-                        backgroundImage: NetworkImage(user?.photoUrl),
-                      ),
+                      leading: user.photoUrl != null && user.photoUrl != ""
+                          ? CircleAvatar(
+                              radius: 35.0,
+                              backgroundImage: NetworkImage(user?.photoUrl),
+                            )
+                          : Image.asset(
+                              "assets/images/Profile Image.png",
+                              width: 70.0,
+                            ),
                       title: Text(
                         user?.username,
                         style: TextStyle(

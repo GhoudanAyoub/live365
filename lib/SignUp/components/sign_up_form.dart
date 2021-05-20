@@ -1,6 +1,7 @@
 import 'package:LIVE365/components/custom_surfix_icon.dart';
 import 'package:LIVE365/components/default_button.dart';
 import 'package:LIVE365/components/form_error.dart';
+import 'package:LIVE365/home/home_screen.dart';
 import 'package:LIVE365/services/auth_service.dart';
 import 'package:flutter/material.dart';
 
@@ -75,9 +76,8 @@ class _SignUpFormState extends State<SignUpForm> {
                   );
                   print(success);
                   if (success) {
-                    /* Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => HomeScreen()));*/
-                    Navigator.pop(context);
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => HomeScreen()));
                     Scaffold.of(context).showSnackBar(SnackBar(
                         content: Text('Congratulation Your Account Created')));
                   }

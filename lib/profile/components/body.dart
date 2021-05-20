@@ -40,7 +40,6 @@ class _BodyState extends State<Body> {
   bool isToggle = true;
   bool isFollowing = false;
   UserModel users;
-  UserModel user1;
   final DateTime timestamp = DateTime.now();
   ScrollController controller = ScrollController();
 
@@ -70,38 +69,6 @@ class _BodyState extends State<Body> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        elevation: 2,
-        toolbarHeight: 30,
-        leading: firebaseAuth.currentUser != null
-            ? widget.profileId == firebaseAuth.currentUser.uid
-                ? IconButton(
-                    icon: Icon(
-                      CupertinoIcons.text_justify,
-                      color: Colors.white,
-                      size: 20,
-                    ),
-                    onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => SettingScreen(
-                              users: user1,
-                            ),
-                          ));
-                    })
-                : IconButton(
-                    icon: Icon(
-                      Icons.list,
-                      color: Colors.white,
-                    ),
-                    onPressed: () {
-                      reportSystem();
-                    })
-            : Container(
-                height: 0,
-              ),
-      ),
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
@@ -154,262 +121,6 @@ class _BodyState extends State<Body> {
     );
   }
 
-  Widget buildText(String text) => Center(
-        child: Text(
-          text,
-          style: TextStyle(fontSize: 24, color: Colors.white),
-        ),
-      );
-
-  buildIcons() {
-    if (isToggle) {
-      return IconButton(
-          icon: Icon(
-            Icons.list,
-            color: Colors.white,
-          ),
-          onPressed: () {
-            setState(() {
-              isToggle = false;
-            });
-          });
-    } else if (isToggle == false) {
-      return IconButton(
-        icon: Icon(
-          Icons.grid_on,
-          color: Colors.white,
-        ),
-        onPressed: () {
-          setState(() {
-            isToggle = true;
-          });
-        },
-      );
-    }
-  }
-
-  buildCount(String label, int count) {
-    return Column(
-      children: <Widget>[
-        Text(
-          count.toString(),
-          style: TextStyle(
-              fontSize: 14.0,
-              fontWeight: FontWeight.w900,
-              fontFamily: 'Ubuntu-Regular'),
-        ),
-        SizedBox(height: 3.0),
-        Text(
-          label,
-          style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w400,
-              fontFamily: 'Ubuntu-Regular'),
-        )
-      ],
-    );
-  }
-
-  buildPostView() {
-    if (isToggle == true) {
-      return buildGridPost();
-    } else if (isToggle == false) {
-      return buildPosts();
-    }
-  }
-
-/*
-  buildVideos() {
-    return StreamBuilderWrapper(
-      shrinkWrap: true,
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      text: "No Posts For The Moment",
-      stream:
-          videoRef.where('ownerId', isEqualTo: widget.profileId).snapshots(),
-      physics: NeverScrollableScrollPhysics(),
-      itemBuilder: (_, DocumentSnapshot snapshot) {
-        Video video = Video.fromJson(snapshot.data());
-        return Padding(
-          padding: const EdgeInsets.only(bottom: 15.0),
-          child: Videos(
-            video: video,
-          ),
-        );
-      },
-    );
-  }
-*/
-  buildPosts() {
-    return StreamBuilderWrapper(
-      shrinkWrap: true,
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      text: "No Posts For The Moment",
-      stream: postRef.where('ownerId', isEqualTo: widget.profileId).snapshots(),
-      physics: NeverScrollableScrollPhysics(),
-      itemBuilder: (_, DocumentSnapshot snapshot) {
-        PostModel posts = PostModel.fromJson(snapshot.data());
-        return Padding(
-          padding: const EdgeInsets.only(bottom: 15.0),
-          child: Posts(
-            post: posts,
-          ),
-        );
-      },
-    );
-  }
-
-  buildGridPost() {
-    return StreamGridWrapper(
-      shrinkWrap: true,
-      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-      stream: postRef.where('ownerId', isEqualTo: widget.profileId).snapshots(),
-      physics: NeverScrollableScrollPhysics(),
-      itemBuilder: (_, DocumentSnapshot snapshot) {
-        PostModel posts = PostModel.fromJson(snapshot.data());
-        return PostTile(
-          post: posts,
-        );
-      },
-    );
-  }
-
-  buildProfileButton(user) {
-    bool isMe = false;
-    if (firebaseAuth.currentUser != null)
-      isMe = widget.profileId == firebaseAuth.currentUser.uid;
-    if (isMe) {
-      return buildButton(
-        text: "Change Bio",
-        function: () {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => EditProfile(
-                  user: user,
-                ),
-              ));
-        },
-      );
-      //if you are already following the user then "unfollow"
-    } else if (isFollowing) {
-      return buildButton(
-        text: "Unfollow",
-        function: handleUnfollow,
-      );
-      //if you are not following the user then "follow"
-    } else if (!isFollowing) {
-      return buildButton(
-        text: "Follow",
-        function: handleFollow,
-      );
-    }
-  }
-
-  handleUnfollow() async {
-    DocumentSnapshot doc = await usersRef.doc(currentUserId()).get();
-    users = UserModel.fromJson(doc.data());
-    setState(() {
-      isFollowing = false;
-    });
-    //remove follower
-    followersRef
-        .doc(widget.profileId)
-        .collection('userFollowers')
-        .doc(currentUserId())
-        .get()
-        .then((doc) {
-      if (doc.exists) {
-        doc.reference.delete();
-      }
-    });
-    //remove following
-    followingRef
-        .doc(currentUserId())
-        .collection('userFollowing')
-        .doc(widget.profileId)
-        .get()
-        .then((doc) {
-      if (doc.exists) {
-        doc.reference.delete();
-      }
-    });
-    //remove from notifications feeds
-    notificationRef
-        .doc(widget.profileId)
-        .collection('notifications')
-        .doc(currentUserId())
-        .get()
-        .then((doc) {
-      if (doc.exists) {
-        doc.reference.delete();
-      }
-    });
-  }
-
-  handleFollow() async {
-    if (firebaseAuth.currentUser != null) {
-      DocumentSnapshot doc = await usersRef.doc(currentUserId()).get();
-      users = UserModel.fromJson(doc.data());
-      setState(() {
-        isFollowing = true;
-      });
-      //updates the followers collection of the followed user
-      followersRef
-          .doc(widget.profileId)
-          .collection('userFollowers')
-          .doc(currentUserId())
-          .set({});
-      //updates the following collection of the currentUser
-      followingRef
-          .doc(currentUserId())
-          .collection('userFollowing')
-          .doc(widget.profileId)
-          .set({});
-      //update the notification feeds
-      notificationRef
-          .doc(widget.profileId)
-          .collection('notifications')
-          .doc(currentUserId())
-          .set({
-        "type": "follow",
-        "ownerId": widget.profileId,
-        "username": users.username,
-        "userId": users.id,
-        "userDp": users.photoUrl,
-        "timestamp": timestamp,
-      });
-    }
-  }
-
-  buildButton({String text, Function function}) {
-    return Center(
-      child: GestureDetector(
-        onTap: function,
-        child: Container(
-          height: 40.0,
-          width: 200.0,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(5.0),
-            gradient: LinearGradient(
-              begin: Alignment.topRight,
-              end: Alignment.bottomLeft,
-              colors: [
-                Colors.white,
-                Colors.white,
-              ],
-            ),
-          ),
-          child: Center(
-            child: Text(
-              text,
-              style: TextStyle(color: Colors.black),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget displayUserInfo() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -421,6 +132,40 @@ class _BodyState extends State<Body> {
               UserModel user = UserModel.fromJson(snapshot.data.data());
               return Column(
                 children: <Widget>[
+                  SizedBox(height: 15),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      firebaseAuth.currentUser != null
+                          ? widget.profileId == firebaseAuth.currentUser.uid
+                              ? IconButton(
+                                  icon: Icon(
+                                    CupertinoIcons.text_justify,
+                                    color: Colors.white,
+                                    size: 20,
+                                  ),
+                                  onPressed: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => SettingScreen(
+                                            users: user,
+                                          ),
+                                        ));
+                                  })
+                              : IconButton(
+                                  icon: Icon(
+                                    Icons.list,
+                                    color: Colors.white,
+                                  ),
+                                  onPressed: () {
+                                    reportSystem();
+                                  })
+                          : Container(
+                              height: 0,
+                            )
+                    ],
+                  ),
                   ProfilePic(
                     image: firebaseAuth.currentUser != null &&
                             firebaseAuth.currentUser.uid == user.id
@@ -571,6 +316,239 @@ class _BodyState extends State<Body> {
           },
         ),
       ],
+    );
+  }
+
+  Widget buildText(String text) => Center(
+        child: Text(
+          text,
+          style: TextStyle(fontSize: 24, color: Colors.white),
+        ),
+      );
+
+  buildIcons() {
+    if (isToggle) {
+      return IconButton(
+          icon: Icon(
+            Icons.list,
+            color: Colors.white,
+          ),
+          onPressed: () {
+            setState(() {
+              isToggle = false;
+            });
+          });
+    } else if (isToggle == false) {
+      return IconButton(
+        icon: Icon(
+          Icons.grid_on,
+          color: Colors.white,
+        ),
+        onPressed: () {
+          setState(() {
+            isToggle = true;
+          });
+        },
+      );
+    }
+  }
+
+  buildCount(String label, int count) {
+    return Column(
+      children: <Widget>[
+        Text(
+          count.toString(),
+          style: TextStyle(
+              fontSize: 14.0,
+              fontWeight: FontWeight.w900,
+              fontFamily: 'Ubuntu-Regular'),
+        ),
+        SizedBox(height: 3.0),
+        Text(
+          label,
+          style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w400,
+              fontFamily: 'Ubuntu-Regular'),
+        )
+      ],
+    );
+  }
+
+  buildPostView() {
+    if (isToggle == true) {
+      return buildGridPost();
+    } else if (isToggle == false) {
+      return buildPosts();
+    }
+  }
+
+  buildPosts() {
+    return StreamBuilderWrapper(
+      shrinkWrap: true,
+      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      text: "No Posts For The Moment",
+      stream: postRef.where('ownerId', isEqualTo: widget.profileId).snapshots(),
+      physics: NeverScrollableScrollPhysics(),
+      itemBuilder: (_, DocumentSnapshot snapshot) {
+        PostModel posts = PostModel.fromJson(snapshot.data());
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 15.0),
+          child: Posts(
+            post: posts,
+          ),
+        );
+      },
+    );
+  }
+
+  buildGridPost() {
+    return StreamGridWrapper(
+      shrinkWrap: true,
+      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+      stream: postRef.where('ownerId', isEqualTo: widget.profileId).snapshots(),
+      physics: NeverScrollableScrollPhysics(),
+      itemBuilder: (_, DocumentSnapshot snapshot) {
+        PostModel posts = PostModel.fromJson(snapshot.data());
+        return PostTile(
+          post: posts,
+        );
+      },
+    );
+  }
+
+  buildProfileButton(user) {
+    bool isMe = false;
+    if (firebaseAuth.currentUser != null)
+      isMe = widget.profileId == firebaseAuth.currentUser.uid;
+    if (isMe) {
+      return buildButton(
+        text: "Change Bio",
+        function: () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => EditProfile(
+                  user: user,
+                ),
+              ));
+        },
+      );
+      //if you are already following the user then "unfollow"
+    } else if (isFollowing) {
+      return buildButton(
+        text: "Unfollow",
+        function: handleUnfollow,
+      );
+      //if you are not following the user then "follow"
+    } else if (!isFollowing) {
+      return buildButton(
+        text: "Follow",
+        function: handleFollow,
+      );
+    }
+  }
+
+  handleUnfollow() async {
+    DocumentSnapshot doc = await usersRef.doc(currentUserId()).get();
+    users = UserModel.fromJson(doc.data());
+    setState(() {
+      isFollowing = false;
+    });
+    //remove follower
+    followersRef
+        .doc(widget.profileId)
+        .collection('userFollowers')
+        .doc(currentUserId())
+        .get()
+        .then((doc) {
+      if (doc.exists) {
+        doc.reference.delete();
+      }
+    });
+    //remove following
+    followingRef
+        .doc(currentUserId())
+        .collection('userFollowing')
+        .doc(widget.profileId)
+        .get()
+        .then((doc) {
+      if (doc.exists) {
+        doc.reference.delete();
+      }
+    });
+    //remove from notifications feeds
+    notificationRef
+        .doc(widget.profileId)
+        .collection('notifications')
+        .doc(currentUserId())
+        .get()
+        .then((doc) {
+      if (doc.exists) {
+        doc.reference.delete();
+      }
+    });
+  }
+
+  handleFollow() async {
+    DocumentSnapshot doc = await usersRef.doc(currentUserId()).get();
+    users = UserModel.fromJson(doc.data());
+    setState(() {
+      isFollowing = true;
+    });
+    //updates the followers collection of the followed user
+    followersRef
+        .doc(widget.profileId)
+        .collection('userFollowers')
+        .doc(currentUserId())
+        .set({});
+    //updates the following collection of the currentUser
+    followingRef
+        .doc(currentUserId())
+        .collection('userFollowing')
+        .doc(widget.profileId)
+        .set({});
+    //update the notification feeds
+    notificationRef
+        .doc(widget.profileId)
+        .collection('notifications')
+        .doc(currentUserId())
+        .set({
+      "type": "follow",
+      "ownerId": widget.profileId,
+      "username": users.username,
+      "userId": users.id,
+      "userDp": users.photoUrl,
+      "timestamp": timestamp,
+    });
+  }
+
+  buildButton({String text, Function function}) {
+    return Center(
+      child: GestureDetector(
+        onTap: function,
+        child: Container(
+          height: 40.0,
+          width: 200.0,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(5.0),
+            gradient: LinearGradient(
+              begin: Alignment.topRight,
+              end: Alignment.bottomLeft,
+              colors: [
+                Colors.white,
+                Colors.white,
+              ],
+            ),
+          ),
+          child: Center(
+            child: Text(
+              text,
+              style: TextStyle(color: Colors.black),
+            ),
+          ),
+        ),
+      ),
     );
   }
 

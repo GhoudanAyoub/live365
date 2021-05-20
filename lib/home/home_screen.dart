@@ -19,7 +19,12 @@ class _State extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(body: Body());
+    return Scaffold(
+      body: new WillPopScope(
+        onWillPop: () async => false,
+        child: Body(),
+      ),
+    );
   }
 
   @override

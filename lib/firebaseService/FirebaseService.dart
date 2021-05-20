@@ -1,3 +1,4 @@
+import 'package:LIVE365/models/User.dart';
 import 'package:LIVE365/models/message.dart';
 import 'package:LIVE365/models/message_list.dart';
 import 'package:LIVE365/utils/firebase.dart';
@@ -52,21 +53,45 @@ class FirebaseService {
     await liveRef.doc(firebaseAuth.currentUser.uid).delete();
   }
 
-  // USER DATA
-  static Future addUsers(User user) async {
-    final snapShot = await usersRef.doc(user.uid).get();
-    if (!snapShot.exists) {
-      usersRef.doc(user.uid).set({
-        'username': user.displayName,
-        'email': user.email,
-        'time': Timestamp.now(),
-        'id': user.uid,
-        'bio': "",
-        'country': "",
-        'photoUrl': user.photoURL ?? '',
-        'msgToAll': true
+  static void addLiveToNotification(id, image) async {
+    QuerySnapshot doc1 = await followersRef
+        .doc(firebaseAuth.currentUser.uid)
+        .collection('userFollowers')
+        .get();
+
+    for (var d in doc1.docs) {
+      DocumentSnapshot doc = await usersRef.doc(d.id).get();
+      UserModel user = UserModel.fromJson(doc.data());
+      notificationRef.doc(d.id).collection('notifications').doc(id).set({
+        "type": "live",
+        "username": user.username,
+        "userId": firebaseAuth.currentUser.uid,
+        "userDp": user.photoUrl,
+        "postId": id,
+        "mediaUrl": image,
+        "timestamp": DateTime.now(),
       });
     }
+  }
+
+  // USER DATA
+  static Future addUsers(User user) async {
+    if (user != null) {
+      final snapShot = await usersRef.doc(user.uid).get();
+      if (!snapShot.exists) {
+        usersRef.doc(user.uid).set({
+          'username': user.displayName,
+          'email': user.email,
+          'time': Timestamp.now(),
+          'id': user.uid,
+          'bio': "",
+          'country': "",
+          'photoUrl': user.photoURL ?? '',
+          'msgToAll': true
+        });
+      }
+    }
+    return user.uid;
   }
 
   static Stream<List<MessageList>> getUsers() => FirebaseFirestore.instance

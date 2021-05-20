@@ -80,10 +80,15 @@ class _CreatePostState extends State<CreatePost> {
                   if (snapshot.hasData) {
                     UserModel user = UserModel.fromJson(snapshot.data.data());
                     return ListTile(
-                      leading: CircleAvatar(
-                        radius: 25.0,
-                        backgroundImage: NetworkImage(user?.photoUrl),
-                      ),
+                      leading: user.photoUrl != null && user.photoUrl != ""
+                          ? CircleAvatar(
+                              radius: 35.0,
+                              backgroundImage: NetworkImage(user?.photoUrl),
+                            )
+                          : Image.asset(
+                              "assets/images/Profile Image.png",
+                              width: 70.0,
+                            ),
                       title: Text(
                         user?.username,
                         style: TextStyle(

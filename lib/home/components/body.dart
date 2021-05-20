@@ -469,10 +469,10 @@ class _BodyState extends State<Body>
         hasBottomPadding: hasBackground,
         tabBar: tikTokTabBar,
         header: header,
+        //rightPage: scrollFeed(),
         enableGesture: tabBarType == TikTokPageTag.home,
-        // onPullDownRefresh: _fetchData,
+        //onPullDownRefresh: callList,
         page: Stack(
-          // index: currentPage == null ? 0 : 1,
           children: <Widget>[
             PageView.builder(
               key: Key('home'),
@@ -536,9 +536,6 @@ class _BodyState extends State<Body>
               opacity: 1,
               child: currentPage ?? Container(),
             ),
-            // Center(
-            //   child: Text(_currentIndex.toString()),
-            // )
           ],
         ),
       );
@@ -659,7 +656,7 @@ class _BodyState extends State<Body>
                 shrinkWrap: true,
                 stream: liveRef.snapshots(),
                 text:
-                    "\n\n\n\n\n\n\n\nRush and Be The First To\nUpload The First Video 😊",
+                    "\n\n\n\n\n\n\n\nRush and Be The First To\nUpload The First Live 😊",
                 physics: NeverScrollableScrollPhysics(),
                 itemBuilder: (_, DocumentSnapshot snapshot) {
                   Live live = Live.fromJson(snapshot.data());
