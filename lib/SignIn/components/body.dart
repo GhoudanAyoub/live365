@@ -203,8 +203,6 @@ class _BodyState extends State<Body> {
         print('''
          Logged in!
          
-         Token: ${accessToken.token}
-         User id: ${accessToken.userId}
          Expires: ${accessToken.expires}
          Permissions: ${accessToken.permissions}
          Declined permissions: ${accessToken.declinedPermissions}

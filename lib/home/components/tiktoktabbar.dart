@@ -1,6 +1,7 @@
 import 'package:LIVE365/components/cam_icon.dart';
 import 'package:LIVE365/components/selectedtext.dart';
 import 'package:LIVE365/style/style.dart';
+import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -19,6 +20,7 @@ class TikTokTabBar extends StatelessWidget {
 
   final bool hasBackground;
   final TikTokPageTag current;
+  static String num;
 
   const TikTokTabBar({
     Key key,
@@ -82,13 +84,30 @@ class TikTokTabBar extends StatelessWidget {
             child: InkWell(
           onTap: () => onTabSwitch?.call(TikTokPageTag.msg),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              IconButton(
-                icon: SvgPicture.asset(
-                  "assets/icons/Chat bubble Icon.svg",
-                  color: white,
-                ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: num != null
+                    ? Badge(
+                        badgeContent: Text(
+                          num,
+                          style: TextStyle(
+                            color: Colors.white,
+                          ),
+                        ),
+                        badgeColor: Colors.red,
+                        child: SvgPicture.asset(
+                          "assets/icons/Chat bubble Icon.svg",
+                          color: white,
+                          height: 24,
+                        ),
+                      )
+                    : SvgPicture.asset(
+                        "assets/icons/Chat bubble Icon.svg",
+                        color: white,
+                        height: 24,
+                      ),
               ),
               Center(
                 child: SelectText(

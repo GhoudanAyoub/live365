@@ -459,6 +459,8 @@ class _BodyState extends State<Body>
   Widget homeScreen(header, hasBottomPadding, currentPage, searchPage,
       tikTokTabBar, hasBackground) {
     if (liveButton) {
+      if (_videoListController.currentPlayer != null)
+        _videoListController.currentPlayer.pause();
       return Padding(
         padding: const EdgeInsets.only(top: 80.0, left: 10.0, right: 10.0),
         child: scrollFeed(),
