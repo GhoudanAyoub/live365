@@ -11,6 +11,8 @@ dependencies:
   flutter:
     sdk: flutter
 
+  firebase_messaging:
+  flutter_local_notifications:
 
   fijkplayer: ^0.8.3
   tapped:

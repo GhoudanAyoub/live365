@@ -16,6 +16,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_builder/responsive_builder.dart';
 
+import '../camera/share_video.dart';
 import '../theme.dart';
 
 class AddVideoPage extends StatefulWidget {
@@ -157,8 +158,15 @@ class _AddVideoPageState extends State<AddVideoPage> {
     try {
       await _cameraController.stopVideoRecording();
       setState(() {
-        _showBottomSheet(context);
         viewModel.setMediaUrl(File(_filePath));
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ShareVideo(
+                file: _filePath,
+                viewModel: viewModel,
+              ),
+            ));
       });
     } on CameraException catch (e) {
       print(e);
@@ -307,36 +315,6 @@ class _AddVideoPageState extends State<AddVideoPage> {
         });
   }
 
-/*
-  void onNewCameraSelected(CameraDescription cameraDescription) async {
-    if (_cameraController != null) {
-      await controller.dispose();
-    }
-    _cameraController = CameraController(
-      cameraDescription,
-      ResolutionPreset.high,
-      enableAudio: enableAudio,
-    );
-
-// If the controller is updated then update the UI.
-    controller.addListener(() {
-      if (mounted) setState(() {});
-      if (controller.value.hasError) {
-        showInSnackBar('Camera error ${controller.value.errorDescription}');
-      }
-    });
-
-    try {
-      await controller.initialize();
-    } on CameraException catch (e) {
-      _showCameraException(e);
-    }
-
-    if (mounted) {
-      setState(() {});
-    }
-  }
-*/
   @override
   Widget build(BuildContext context) {
     viewModel = Provider.of<VideoViewModel>(context);

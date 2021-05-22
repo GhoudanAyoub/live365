@@ -1,6 +1,6 @@
 var admin = require("firebase-admin");
 
-var serviceAccount = require("C:/Users/ayoub/Documents/flutter_projects/fcm_notifications/serviceAccountKey.json");
+var serviceAccount = require("C:/Users/ayoub/StudioProjects/live365/serviceAccountKey.json");
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount)
