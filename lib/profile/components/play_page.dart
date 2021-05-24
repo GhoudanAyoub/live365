@@ -23,9 +23,10 @@ import '../../SizeConfig.dart';
 import '../../constants.dart';
 
 class PlayPage extends StatefulWidget {
-  PlayPage({Key key, @required this.clips}) : super(key: key);
+  PlayPage({Key key, @required this.clips, this.user}) : super(key: key);
 
   final List<Video> clips;
+  final UserModel user;
 
   @override
   _PlayPageState createState() => _PlayPageState();
@@ -98,6 +99,12 @@ class _PlayPageState extends State<PlayPage>
     bool hasBottomPadding = a < 0.55;
 
     return Scaffold(
+      appBar: AppBar(
+        title: Center(
+          child:
+              Text("${widget.user.username} Post ${listVideos.length} Videos"),
+        ),
+      ),
       body: widget.clips != null
           ? TikTokScaffold(
               controller: tkController,
@@ -172,7 +179,8 @@ class _PlayPageState extends State<PlayPage>
             )
           : Container(
               child: Center(
-                child: Text("You Didn't Post Any Video yet"),
+                child:
+                    Text("${widget.user.username} Didn't Post Any Video yet"),
               ),
             ),
     );
@@ -672,9 +680,16 @@ class _PlayPageState extends State<PlayPage>
                   SizedBox(width: 10.0),
                   Column(
                     children: [
-                      buildBookButton(video),
+                      IconButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                          deleteVideo(context, video.id);
+                        },
+                        icon: Icon(CupertinoIcons.delete,
+                            size: 25, color: Colors.white),
+                      ),
                       Center(
-                          child: Text('Save',
+                          child: Text('Delete',
                               style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   color: Colors.white))),

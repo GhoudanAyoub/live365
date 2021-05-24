@@ -12,7 +12,6 @@ import 'package:LIVE365/profile/components/play_page.dart';
 import 'package:LIVE365/profile/components/profile_pic.dart';
 import 'package:LIVE365/utils/firebase.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -32,7 +31,7 @@ class Body extends StatefulWidget {
 
 class _BodyState extends State<Body> {
   final auth = FirebaseService();
-  User user;
+  UserModel user;
   bool isLoading = false;
   int postCount = 0;
   int followersCount = 0;
@@ -106,6 +105,7 @@ class _BodyState extends State<Body> {
                               MaterialPageRoute(
                                 builder: (context) => PlayPage(
                                   clips: listvideo,
+                                  user: user,
                                 ),
                               ));
                         }),
@@ -129,7 +129,7 @@ class _BodyState extends State<Body> {
           stream: usersRef.doc(widget.profileId).snapshots(),
           builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
             if (snapshot.hasData) {
-              UserModel user = UserModel.fromJson(snapshot.data.data());
+              user = UserModel.fromJson(snapshot.data.data());
               return Column(
                 children: <Widget>[
                   SizedBox(height: 15),
@@ -173,13 +173,26 @@ class _BodyState extends State<Body> {
                         : user.photoUrl,
                   ),
                   SizedBox(height: 5),
-                  Text("${user.username ?? 'Anonymous'}",
-                      style: TextStyle(
-                        fontSize: getProportionateScreenWidth(22),
-                        color: GTextColorWhite,
-                        fontFamily: "SFProDisplay-Bold",
-                        fontWeight: FontWeight.bold,
-                      )),
+                  Column(
+                    children: [
+                      Center(
+                        child: Align(
+                          alignment: Alignment.center,
+                          child: Container(
+                            padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
+                            child: Text("${user.username ?? 'Anonymous'}",
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: getProportionateScreenWidth(22),
+                                  color: GTextColorWhite,
+                                  fontFamily: "SFProDisplay-Bold",
+                                  fontWeight: FontWeight.bold,
+                                )),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                   SizedBox(height: 5),
                   Column(
                     children: [
@@ -187,10 +200,12 @@ class _BodyState extends State<Body> {
                         child: Align(
                           alignment: Alignment.center,
                           child: Container(
-                            padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
+                            padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
+                            width: 300.0,
                             child: Text(
                                 "${user.bio.isEmpty ? 'Everyday LIVE365' : user.bio}",
                                 textAlign: TextAlign.center,
+                                overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
                                   fontSize: getProportionateScreenWidth(12),
                                   color: GTextColorWhite,

@@ -3,6 +3,7 @@ import 'package:LIVE365/components/default_button.dart';
 import 'package:LIVE365/components/form_error.dart';
 import 'package:LIVE365/home/home_screen.dart';
 import 'package:LIVE365/services/auth_service.dart';
+import 'package:country_list_pick/country_list_pick.dart';
 import 'package:flutter/material.dart';
 
 import '../../SizeConfig.dart';
@@ -50,8 +51,30 @@ class _SignUpFormState extends State<SignUpForm> {
       key: _formKey,
       child: Column(
         children: [
-          buildECountryFormField(),
-          SizedBox(height: getProportionateScreenHeight(30)),
+          Container(
+              height: 120,
+              alignment: Alignment.center,
+              child: Card(
+                  child: Padding(
+                padding: EdgeInsets.all(5),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: CountryListPick(
+                    theme: CountryTheme(
+                      isShowFlag: true,
+                      isShowTitle: true,
+                      isShowCode: false,
+                      isDownIcon: true,
+                    ),
+                    onChanged: (CountryCode code) {
+                      print(code.name); //get the country name eg: Antarctica
+                      setState(() {
+                        _countryContoller.text = code.name;
+                      });
+                    },
+                  ),
+                ),
+              ))),
           buildENameFormField(),
           SizedBox(height: getProportionateScreenHeight(30)),
           buildEmailFormField(),
