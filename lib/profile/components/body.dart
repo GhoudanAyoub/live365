@@ -253,8 +253,28 @@ class _BodyState extends State<Body> {
                                       if (snapshot.hasData) {
                                         QuerySnapshot snap = snapshot.data;
                                         List<DocumentSnapshot> docs = snap.docs;
-                                        return buildCount(
-                                            "POSTS", docs?.length ?? 0);
+                                        return StreamBuilder(
+                                          stream: videoRef
+                                              .where('ownerId',
+                                                  isEqualTo: widget.profileId)
+                                              .snapshots(),
+                                          builder: (context,
+                                              AsyncSnapshot<QuerySnapshot>
+                                                  snapshot) {
+                                            if (snapshot.hasData) {
+                                              QuerySnapshot snap =
+                                                  snapshot.data;
+                                              List<DocumentSnapshot> docs1 =
+                                                  snap.docs;
+                                              return buildCount(
+                                                  "POSTS",
+                                                  docs.length + docs1?.length ??
+                                                      0);
+                                            } else {
+                                              return buildCount("POSTS", 0);
+                                            }
+                                          },
+                                        );
                                       } else {
                                         return buildCount("POSTS", 0);
                                       }
