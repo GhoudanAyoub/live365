@@ -647,7 +647,7 @@ class _BodyState extends State<Body>
       );
 
   Widget scrollFeed() {
-    if (firebaseAuth.currentUser != null)
+    if (firebaseAuth.currentUser != null) {
       return CustomScrollView(
         slivers: <Widget>[
           SliverList(
@@ -684,57 +684,58 @@ class _BodyState extends State<Body>
           ),
         ],
       );
-    else
-      return Container(
-        child: Align(
-          alignment: Alignment.center,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                CupertinoIcons.tv_circle,
-                color: Colors.grey,
-                size: 50,
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              Text(
-                "Sign In To Access Live",
-                style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.normal,
-                    color: Colors.grey),
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              SizedBox(
-                width: 300,
-                height: 45,
-                child: FlatButton(
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(5)),
-                  color: Colors.redAccent,
-                  onPressed: () {
-                    Navigator.pushNamed(context, SignInScreen.routeName);
-                  },
-                  child: Text(
-                    "Sign In",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontFamily: 'Lato-Regular.ttf',
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
+    } else
+      _videoListController.currentPlayer.pause();
+    return Container(
+      child: Align(
+        alignment: Alignment.center,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              CupertinoIcons.tv_circle,
+              color: Colors.grey,
+              size: 50,
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            Text(
+              "Sign In To Access Live",
+              style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.normal,
+                  color: Colors.grey),
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            SizedBox(
+              width: 300,
+              height: 45,
+              child: FlatButton(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(5)),
+                color: Colors.redAccent,
+                onPressed: () {
+                  Navigator.pushNamed(context, SignInScreen.routeName);
+                },
+                child: Text(
+                  "Sign In",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontFamily: 'Lato-Regular.ttf',
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
-      );
+      ),
+    );
   }
 
   Future<void> onJoin(

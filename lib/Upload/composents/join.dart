@@ -998,7 +998,7 @@ class _JoinPageState extends State<JoinPage> {
                           if (heart == true && completed == false) heartPop(),
                           if (requested == true) requestedWidget(),
                           if (accepted == true) stopSharing(),
-                          if (giftBool == true) GiftList(),
+                          // if (giftBool == true) GiftList(),
                           //_ending()
                         ],
                       ),
