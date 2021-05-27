@@ -207,6 +207,7 @@ class _BodyState extends State<Body>
   }
 
   SignInForCamera() {
+    _videoListController.currentPlayer.pause();
     return showModalBottomSheet(
       backgroundColor: GBottomNav,
       context: context,
@@ -367,6 +368,7 @@ class _BodyState extends State<Body>
   }
 
   chooseUpload(BuildContext context) {
+    _videoListController.currentPlayer.pause();
     return showModalBottomSheet(
       backgroundColor: GBottomNav,
       context: context,

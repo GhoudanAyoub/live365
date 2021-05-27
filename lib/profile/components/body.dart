@@ -38,7 +38,7 @@ class _BodyState extends State<Body> {
   int followingCount = 0;
   bool isToggle = true;
   bool isFollowing = false;
-  UserModel users;
+  UserModel users, users2;
   final DateTime timestamp = DateTime.now();
   ScrollController controller = ScrollController();
 
@@ -94,21 +94,31 @@ class _BodyState extends State<Body> {
                       style: TextStyle(fontWeight: FontWeight.w900),
                     ),
                     Spacer(),
-                    IconButton(
-                        icon: Icon(
-                          Icons.video_collection_outlined,
-                          color: Colors.white,
-                        ),
-                        onPressed: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => PlayPage(
-                                  clips: listvideo,
-                                  user: user,
-                                ),
-                              ));
-                        }),
+                    StreamBuilder(
+                      stream: usersRef.doc(widget.profileId).snapshots(),
+                      builder:
+                          (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                        if (snapshot.hasData) {
+                          users2 = UserModel.fromJson(snapshot.data.data());
+                          return IconButton(
+                              icon: Icon(
+                                Icons.video_collection_outlined,
+                                color: Colors.white,
+                              ),
+                              onPressed: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => PlayPage(
+                                        clips: listvideo,
+                                        user: users2,
+                                      ),
+                                    ));
+                              });
+                        }
+                        return Container();
+                      },
+                    ),
                     buildIcons(),
                   ],
                 ),

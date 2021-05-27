@@ -678,23 +678,27 @@ class _PlayPageState extends State<PlayPage>
                     ],
                   ),
                   SizedBox(width: 10.0),
-                  Column(
-                    children: [
-                      IconButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                          deleteVideo(context, video.id);
-                        },
-                        icon: Icon(CupertinoIcons.delete,
-                            size: 25, color: Colors.white),
-                      ),
-                      Center(
-                          child: Text('Delete',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white))),
-                    ],
-                  ),
+                  firebaseAuth.currentUser.uid == widget.user.id
+                      ? Column(
+                          children: [
+                            IconButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                                deleteVideo(context, video.id);
+                              },
+                              icon: Icon(CupertinoIcons.delete,
+                                  size: 25, color: Colors.white),
+                            ),
+                            Center(
+                                child: Text('Delete',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white))),
+                          ],
+                        )
+                      : Container(
+                          height: 0,
+                        ),
                 ],
               )
             ],
