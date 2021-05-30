@@ -286,8 +286,7 @@ class _PlayPageState extends State<PlayPage>
                     child: Container(
                       width: getProportionateScreenWidth(50),
                       height: getProportionateScreenHeight(350),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
+                      child: ListView(
                         children: <Widget>[
                           buildLikeButton(listVideos[index]),
                           SizedBox(height: 3.0),
@@ -380,10 +379,12 @@ class _PlayPageState extends State<PlayPage>
   Widget buildLikesCount(BuildContext context, int count) {
     return Padding(
       padding: const EdgeInsets.only(left: 7.0),
-      child: Text(
-        '$count likes',
-        style: TextStyle(
-            fontWeight: FontWeight.bold, fontSize: 10.0, color: Colors.white),
+      child: Center(
+        child: Text(
+          '$count likes',
+          style: TextStyle(
+              fontWeight: FontWeight.bold, fontSize: 10.0, color: Colors.white),
+        ),
       ),
     );
   }
@@ -619,10 +620,12 @@ class _PlayPageState extends State<PlayPage>
   Widget buildCommentsCount(BuildContext context, int count) {
     return Padding(
       padding: const EdgeInsets.only(top: 0.5),
-      child: Text(
-        '${count}comm',
-        style: TextStyle(
-            fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white),
+      child: Center(
+        child: Text(
+          '${count}comm',
+          style: TextStyle(
+              fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white),
+        ),
       ),
     );
   }
@@ -636,7 +639,9 @@ class _PlayPageState extends State<PlayPage>
       ),
       builder: (BuildContext context) {
         return FractionallySizedBox(
-          heightFactor: .3,
+          heightFactor: SizeConfig.screenHeight < 500
+              ? 0.5
+              : getProportionateScreenHeight(.3),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

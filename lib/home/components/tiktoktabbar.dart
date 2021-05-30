@@ -78,7 +78,11 @@ class TikTokTabBar extends StatelessWidget {
           ),
         )),
         Expanded(
-          child: InkWell(onTap: () => onAddButton?.call(), child: CamIcon()),
+          child: InkWell(
+              onTap: () => onAddButton?.call(),
+              child: Center(
+                child: CamIcon(),
+              )),
         ),
         Expanded(
             child: InkWell(

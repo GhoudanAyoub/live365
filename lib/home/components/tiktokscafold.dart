@@ -92,6 +92,9 @@ class _TikTokScaffoldState extends State<TikTokScaffold>
       return null;
     }
     switch (p) {
+      case TikTokPagePositon.left:
+        await animateTo(screenWidth);
+        break;
       case TikTokPagePositon.middle:
         await animateTo();
         break;
@@ -109,6 +112,10 @@ class _TikTokScaffoldState extends State<TikTokScaffold>
     screenWidth = MediaQuery.of(context).size.width;
     Widget body = Stack(
       children: <Widget>[
+        _LeftPageTransform(
+          offsetX: offsetX,
+          content: widget.leftPage,
+        ),
         _MiddlePage(
           absorbing: absorbing,
           onTopDrag: () {
@@ -117,9 +124,9 @@ class _TikTokScaffoldState extends State<TikTokScaffold>
           },
           offsetX: offsetX,
           offsetY: offsetY,
-          isStack: !widget.hasBottomPadding,
           header: widget.header,
           tabBar: widget.tabBar,
+          isStack: !widget.hasBottomPadding,
           page: widget.page,
         ),
         _RightPageTransform(
@@ -144,6 +151,7 @@ class _TikTokScaffoldState extends State<TikTokScaffold>
         details,
         screenWidth,
       ),
+      // 水平方向滑动开始
       onHorizontalDragStart: (_) {
         if (!widget.enableGesture) return;
         animationControllerX?.stop();
@@ -165,19 +173,7 @@ class _TikTokScaffoldState extends State<TikTokScaffold>
         return false;
       },
       child: Scaffold(
-        body: _MiddlePage(
-          absorbing: absorbing,
-          onTopDrag: () {
-            // absorbing = true;
-            setState(() {});
-          },
-          offsetX: offsetX,
-          offsetY: offsetY,
-          isStack: !widget.hasBottomPadding,
-          header: widget.header,
-          tabBar: widget.tabBar,
-          page: widget.page,
-        ),
+        body: body,
         backgroundColor: Colors.black,
         resizeToAvoidBottomInset: false,
       ),
@@ -187,6 +183,7 @@ class _TikTokScaffoldState extends State<TikTokScaffold>
 
   void onHorizontalDragUpdate(details, screenWidth) {
     if (!widget.enableGesture) return;
+    // 控制 offsetX 的值在 -screenWidth 到 screenWidth 之间
     if (offsetX + details.delta.dx >= screenWidth) {
       setState(() {
         offsetX = screenWidth;
@@ -206,20 +203,28 @@ class _TikTokScaffoldState extends State<TikTokScaffold>
     if (!widget.enableGesture) return;
     print('velocity:${details.velocity}');
     var vOffset = details.velocity.pixelsPerSecond.dx;
+
+    // 速度很快时
     if (vOffset > scrollSpeed && inMiddle == 0) {
+      // 去右边页面
       return animateToPage(TikTokPagePositon.left);
     } else if (vOffset < -scrollSpeed && inMiddle == 0) {
+      // 去左边页面
       return animateToPage(TikTokPagePositon.right);
     } else if (inMiddle > 0 && vOffset < -scrollSpeed) {
       return animateToPage(TikTokPagePositon.middle);
     } else if (inMiddle < 0 && vOffset > scrollSpeed) {
       return animateToPage(TikTokPagePositon.middle);
     }
+    // 当滑动停止的时候 根据 offsetX 的偏移量进行动画
     if (offsetX.abs() < screenWidth * 0.5) {
+      // 中间页面
       return animateToPage(TikTokPagePositon.middle);
     } else if (offsetX > 0) {
+      // 去左边页面
       return animateToPage(TikTokPagePositon.left);
     } else {
+      // 去右边页面
       return animateToPage(TikTokPagePositon.right);
     }
   }
@@ -317,18 +322,21 @@ class _MiddlePage extends StatelessWidget {
     this.offsetX,
     this.offsetY,
     this.isStack: false,
-    this.header,
-    this.tabBar,
+    @required this.header,
+    @required this.tabBar,
     this.page,
   }) : super(key: key);
   @override
   Widget build(BuildContext context) {
     Widget tabBarContainer = tabBar ??
         Container(
-          height: 10,
+          height: 44,
         );
     Widget mainVideoList = Container(
-      color: Color(0xff1D1F22),
+      color: ColorPlate.back1,
+      padding: EdgeInsets.only(
+        bottom: isStack ? 0 : 10 + MediaQuery.of(context).padding.bottom,
+      ),
       child: page,
     );
     Widget _headerContain;
@@ -338,10 +346,10 @@ class _MiddlePage extends StatelessWidget {
         child: Transform.translate(
           offset: Offset(0, offsetY),
           child: Container(
-            height: 50,
+            height: 44,
             child: Center(
               child: const Text(
-                "yeah",
+                "Pull down to refresh content",
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: SysSize.normal,
@@ -358,10 +366,8 @@ class _MiddlePage extends StatelessWidget {
           offset: Offset(0, offsetY),
           child: SafeArea(
             child: Container(
-              child: header ??
-                  Container(
-                    height: 10,
-                  ),
+              height: 80,
+              child: header,
             ),
           ),
         ),
@@ -375,7 +381,10 @@ class _MiddlePage extends StatelessWidget {
           Container(
             child: Stack(
               alignment: Alignment.bottomCenter,
-              children: <Widget>[mainVideoList, tabBarContainer],
+              children: <Widget>[
+                mainVideoList,
+                tabBarContainer,
+              ],
             ),
           ),
           _headerContain,
