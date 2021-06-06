@@ -754,7 +754,7 @@ class _State extends State<HomeScreen>
       builder: (BuildContext context) {
         return FractionallySizedBox(
           heightFactor: SizeConfig.screenHeight < 500
-              ? 0.5
+              ? 0.6
               : getProportionateScreenHeight(.3),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -797,16 +797,20 @@ class _State extends State<HomeScreen>
                     ],
                   ),
                   SizedBox(width: 10.0),
-                  Column(
-                    children: [
-                      buildBookButton(video),
-                      Center(
-                          child: Text('Save',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white))),
-                    ],
-                  ),
+                  firebaseAuth.currentUser != null
+                      ? Column(
+                          children: [
+                            buildBookButton(video),
+                            Center(
+                                child: Text('Save',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white))),
+                          ],
+                        )
+                      : Container(
+                          height: 0,
+                        ),
                 ],
               )
             ],

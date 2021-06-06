@@ -55,26 +55,31 @@ class _SignUpFormState extends State<SignUpForm> {
               height: 120,
               alignment: Alignment.center,
               child: Card(
+                  color: GBottomNav,
+                  elevation: 6,
                   child: Padding(
-                padding: EdgeInsets.all(5),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: CountryListPick(
-                    theme: CountryTheme(
-                      isShowFlag: true,
-                      isShowTitle: true,
-                      isShowCode: false,
-                      isDownIcon: true,
+                    padding: EdgeInsets.all(5),
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: CountryListPick(
+                        theme: CountryTheme(
+                          alphabetSelectedBackgroundColor: black,
+                          alphabetTextColor: Colors.black,
+                          isShowFlag: true,
+                          isShowTitle: true,
+                          isShowCode: false,
+                          isDownIcon: true,
+                        ),
+                        onChanged: (CountryCode code) {
+                          print(
+                              code.name); //get the country name eg: Antarctica
+                          setState(() {
+                            _countryContoller.text = code.name;
+                          });
+                        },
+                      ),
                     ),
-                    onChanged: (CountryCode code) {
-                      print(code.name); //get the country name eg: Antarctica
-                      setState(() {
-                        _countryContoller.text = code.name;
-                      });
-                    },
-                  ),
-                ),
-              ))),
+                  ))),
           buildENameFormField(),
           SizedBox(height: getProportionateScreenHeight(30)),
           buildEmailFormField(),

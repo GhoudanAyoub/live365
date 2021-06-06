@@ -133,21 +133,19 @@ class _CallPageState extends State<CallPage> {
         _infoString.add(info);
       });
     }, joinChannelSuccess: (channel, uid, elapsed) async {
-      setState(() async {
-        final info = 'onJoinChannel: $channel, uid: $uid';
-        _infoString.add(info);
-        final documentId = widget.channelName;
-        channelName = documentId;
-        if (widget.role == ClientRole.Broadcaster) {
-          FirebaseService.createLiveUser(
-              username: widget.userName,
-              name: documentId,
-              id: uid,
-              time: widget.time,
-              image: widget.image);
-        }
-        userJoinChannelSuccess();
-      });
+      final documentId = widget.channelName;
+      final info = 'onJoinChannel: $channel, uid: $uid';
+      _infoString.add(info);
+      if (widget.role == ClientRole.Broadcaster) {
+        FirebaseService.createLiveUser(
+            username: widget.userName,
+            name: documentId,
+            id: uid,
+            time: widget.time,
+            image: widget.image);
+      }
+      userJoinChannelSuccess();
+      channelName = documentId;
     }, leaveChannel: (stats) {
       setState(() {
         _infoString.add('onLeaveChannel');

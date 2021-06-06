@@ -68,6 +68,11 @@ class _BodyState extends State<Body> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        elevation: 2,
+        toolbarHeight: 30,
+      ),
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
