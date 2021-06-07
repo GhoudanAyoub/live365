@@ -461,23 +461,47 @@ class _State extends State<HomeScreen>
               Divider(
                 color: Colors.white,
               ),
-              ListTile(
-                leading: Icon(
-                  CupertinoIcons.video_camera,
-                  color: Colors.white,
-                  size: 25.0,
-                ),
-                title: Text('Go Live',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.white)),
-                onTap: () async {
-                  Navigator.pop(context);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => CameraAccessScreen(),
-                    ),
-                  );
+              StreamBuilder(
+                stream: liveStreamRef.doc('PuDM26cM07bsz4o8ZKs3').snapshots(),
+                builder: (BuildContext context, AsyncSnapshot snapshot) {
+                  debugPrint(snapshot.data.data()['stream'].toString());
+                  if (snapshot.data.data()['stream'] == true) {
+                    return ListTile(
+                      leading: Icon(
+                        CupertinoIcons.video_camera,
+                        color: Colors.white,
+                        size: 25.0,
+                      ),
+                      title: Text('Go Live',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white)),
+                      onTap: () async {
+                        Navigator.pop(context);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => CameraAccessScreen(),
+                          ),
+                        );
+                      },
+                    );
+                  } else {
+                    return ListTile(
+                      leading: Icon(
+                        CupertinoIcons.video_camera,
+                        color: Colors.white,
+                        size: 25.0,
+                      ),
+                      title: Text('Live Stream Is Disabled',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white)),
+                      onTap: () async {
+                        Navigator.pop(context);
+                      },
+                    );
+                  }
                 },
               ),
               ListTile(

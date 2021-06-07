@@ -1,6 +1,9 @@
 import 'package:LIVE365/home/home_screen.dart';
+import 'package:LIVE365/utils/firebase.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../../SizeConfig.dart';
 import '../components/splash_content.dart';
 
 class Body extends StatefulWidget {
@@ -15,23 +18,37 @@ class _BodyState extends State<Body> {
   ];
 
   @override
-  void initState() {
-    new Future.delayed(Duration(seconds: 3), () {
-      Navigator.pushNamed(context, HomeScreen.routeName);
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: SizedBox(
-        width: double.infinity,
-        child: Center(
-          child: SplashContent(
-            image: splashData[0]["image"],
-            text: splashData[0]['text'],
-          ),
-        ),
+      child: StreamBuilder(
+        stream: killAppRef.doc('hybiVAdgJ3WvciPEAlV9').snapshots(),
+        builder: (BuildContext context, AsyncSnapshot snapshot) {
+          if (snapshot.data.data()['kill'] == false) {
+            new Future.delayed(Duration(seconds: 3), () {
+              Navigator.pushNamed(context, HomeScreen.routeName);
+            });
+            return SizedBox(
+              width: double.infinity,
+              child: Center(
+                child: SplashContent(
+                  image: splashData[0]["image"],
+                  text: splashData[0]['text'],
+                ),
+              ),
+            );
+          } else {
+            return Stack(
+              fit: StackFit.expand,
+              children: [
+                Image.asset(
+                  "assets/images/error.png",
+                  fit: BoxFit.cover,
+                  height: SizeConfig.screenHeight - 100,
+                ),
+              ],
+            );
+          }
+        },
       ),
     );
   }

@@ -147,7 +147,6 @@ class _BodyState extends State<Body> {
               user = UserModel.fromJson(snapshot.data.data());
               return Column(
                 children: <Widget>[
-                  SizedBox(height: 15),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
