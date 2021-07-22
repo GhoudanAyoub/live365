@@ -47,8 +47,8 @@ android {
         applicationId "com.ghoudan.live365"
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 12
-        versionName "12"
+        versionCode 15
+        versionName "15"
         multiDexEnabled true
     }
     signingConfigs {

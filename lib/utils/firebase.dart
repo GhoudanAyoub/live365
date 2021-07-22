@@ -17,6 +17,7 @@ CollectionReference postRef = firestore.collection('posts');
 CollectionReference videoRef = firestore.collection('videos');
 CollectionReference liveRef = firestore.collection('live');
 CollectionReference commentRef = firestore.collection('comments');
+CollectionReference killAppRef = firestore.collection('kilApp');
 CollectionReference notificationRef = firestore.collection('notifications');
 CollectionReference followersRef = firestore.collection('followers');
 CollectionReference followingRef = firestore.collection('following');
