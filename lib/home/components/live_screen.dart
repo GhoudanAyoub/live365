@@ -2,6 +2,7 @@ import 'package:LIVE365/SignIn/sign_in_screen.dart';
 import 'package:LIVE365/Upload/composents/join.dart';
 import 'package:LIVE365/components/picture_card.dart';
 import 'package:LIVE365/components/stream_builder_wrapper.dart';
+import 'package:LIVE365/home/home_screen.dart';
 import 'package:LIVE365/models/live.dart';
 import 'package:LIVE365/utils/firebase.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -21,7 +22,66 @@ class _LiveScreenState extends State<LiveScreen> {
         elevation: 3,
         automaticallyImplyLeading: false,
       ),
-      body: scrollFeed(),
+      body: StreamBuilder(
+        stream: liveStreamRef.doc('PuDM26cM07bsz4o8ZKs3').snapshots(),
+        builder: (BuildContext context, AsyncSnapshot snapshot) {
+          debugPrint(snapshot.data.data()['stream'].toString());
+          if (snapshot.data.data()['stream'] == true) {
+            return scrollFeed();
+          } else {
+            return Container(
+              child: Align(
+                alignment: Alignment.center,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      CupertinoIcons.tv_circle,
+                      color: Colors.grey,
+                      size: 50,
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Text(
+                      "Live Stream Is Disabled",
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.normal,
+                          color: Colors.grey),
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    SizedBox(
+                      width: 300,
+                      height: 45,
+                      child: FlatButton(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5)),
+                        color: Colors.redAccent,
+                        onPressed: () {
+                          Navigator.pushNamed(context, HomeScreen.routeName);
+                        },
+                        child: Text(
+                          "Coming Soon",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontFamily: 'Lato-Regular.ttf',
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+        },
+      ),
     );
   }
 
