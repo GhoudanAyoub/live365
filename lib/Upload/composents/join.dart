@@ -1026,7 +1026,6 @@ class _JoinPageState extends State<JoinPage> {
               child: new TextField(
                   cursorColor: Colors.blue,
                   textInputAction: TextInputAction.go,
-                  onSubmitted: _sendMessage,
                   style: TextStyle(
                     color: Colors.white,
                   ),
@@ -1048,7 +1047,7 @@ class _JoinPageState extends State<JoinPage> {
               padding: const EdgeInsets.fromLTRB(8.0, 0, 0, 0),
               child: MaterialButton(
                 minWidth: 0,
-                onPressed: _toggleSendChannelMessage,
+                onPressed: () => _toggleSendChannelMessage(_channel),
                 child: Icon(
                   Icons.send,
                   color: Colors.white,
@@ -1103,31 +1102,36 @@ class _JoinPageState extends State<JoinPage> {
     }
   }
 
-  void _toggleSendChannelMessage() async {
+  void _toggleSendChannelMessage(_channel) async {
+    print('8855 $_channel');
     String text = _channelMessageController.text;
     if (text.isEmpty) {
       return;
     }
-    try {
-      _channelMessageController.clear();
-      await _channel.sendMessage(AgoraRtmMessage.fromText(text));
-      _log(user: widget.username, info: text, type: 'message');
-    } catch (errorCode) {
-      //_log('Send channel message error: ' + errorCode.toString());
-    }
+    if (_channel != null)
+      try {
+        _channelMessageController.clear();
+        await _channel.sendMessage(AgoraRtmMessage.fromText(text));
+        _log(user: widget.username, info: text, type: 'message');
+      } catch (errorCode) {
+        print('8855 ${errorCode.toString()}');
+      }
   }
 
   void _sendMessage(text) async {
+    print('8855 $_channel');
     if (text.isEmpty) {
       return;
     }
-    try {
-      _channelMessageController.clear();
-      await _channel.sendMessage(AgoraRtmMessage.fromText(text));
-      _log(user: widget.channelName, info: text, type: 'message');
-    } catch (errorCode) {
-      //_log('Send channel message error: ' + errorCode.toString());
-    }
+    if (_channel != null)
+      try {
+        _channelMessageController.clear();
+        await _channel.sendMessage(AgoraRtmMessage.fromText(text));
+        _log(user: widget.channelName, info: text, type: 'message');
+      } catch (errorCode) {
+        print('8855 ${errorCode.toString()}');
+        // _log('Send channel message error: ${ errorCode.toString()}');
+      }
   }
 
   void _createClient() async {
@@ -1148,7 +1152,12 @@ class _JoinPageState extends State<JoinPage> {
       }
     };
     await _client.login(null, widget.username);
-    _channel = await _createChannel(widget.channelName);
+
+    await _createChannel(widget.channelName).then((value) {
+      setState(() {
+        _channel = value;
+      });
+    });
     await _channel.join();
     var len;
     _channel.getMembers().then((value) {
@@ -1193,25 +1202,31 @@ class _JoinPageState extends State<JoinPage> {
   }
 
   void _log({String info, String type, String user}) {
+    print('8855 daz');
     if (type == 'message' && info.contains('m1x2y3z4p5t6l7k8')) {
       popUp();
+      print('8855 1');
     } else if (type == 'message' && info.contains('E1m2I3l4i5E6')) {
       stopFunction();
+      print('8855 2');
     } else {
       comments m;
       var image = userMap[user];
       if (info.contains('d1a2v3i4s5h6')) {
         var mess = info.split(' ');
-        if (mess[1] == widget.username) {
-          /*m = new Message(
-              message: 'working', type: type, user: user, image: image);*/
+        if (mess[1] == widget.userImage) {
+          print('8855 3');
+          m = new comments(
+              message: 'working', type: type, user: user, image: image);
           setState(() {
-            //_infoStrings.insert(0, m);
+            _infoStrings.insert(0, m);
             requested = true;
           });
         }
       } else {
         m = new comments(message: info, type: type, user: user, image: image);
+
+        print('8855 4');
         setState(() {
           _infoStrings.insert(0, m);
         });

@@ -37,20 +37,25 @@ class FirebaseService {
   //USER LIVE
   static void createLiveUser({username, name, id, time, image}) async {
     var ref = liveRef.doc();
-    await liveRef.doc(firebaseAuth.currentUser.uid).set({
+    await liveRef.doc().set({
       'id': ref.id,
       'ownerId': firebaseAuth.currentUser.uid,
       'username': username,
       'channelName': name,
       'channelId': id,
-      'time': time,
+      'startAt': Timestamp.now(),
       'hostImage': image,
-      'image': image
+      'image': image,
+      'endAt': null
     });
   }
 
-  static void deleteUser({username}) async {
-    await liveRef.doc(firebaseAuth.currentUser.uid).delete();
+  static void updateLive() async {
+    QuerySnapshot v = await liveRef.get();
+    for (DocumentSnapshot d in v.docs) {
+      if (d.data()["ownerId"].toString().contains(firebaseAuth.currentUser.uid))
+        liveRef.doc(d.id).update({'endAt': Timestamp.now()});
+    }
   }
 
   static void addLiveToNotification(id, image) async {

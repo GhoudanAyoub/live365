@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math' as math;
 
+import 'package:LIVE365/SizeConfig.dart';
 import 'package:LIVE365/firebaseService/FirebaseService.dart';
 import 'package:LIVE365/home/home_screen.dart';
 import 'package:LIVE365/models/live_comments.dart';
@@ -77,12 +78,13 @@ class _CallPageState extends State<CallPage> {
   final _infoString = <String>[];
 
   @override
-  void dispose() {
-    // clear users
-    _users.clear();
-    // destroy sdk
+  Future<void> dispose() async {
+    await Wakelock.disable();
+    _logout();
+    _leaveChannel();
     _engine.leaveChannel();
     _engine.destroy();
+    FirebaseService.updateLive();
     super.dispose();
   }
 
@@ -109,7 +111,8 @@ class _CallPageState extends State<CallPage> {
     await _initAgoraRtcEngine();
     _addAgoraEventHandlers();
     VideoEncoderConfiguration configuration = VideoEncoderConfiguration();
-    configuration.dimensions = VideoDimensions(720, 520);
+    configuration.dimensions = VideoDimensions(
+        SizeConfig.screenWidth.toInt(), SizeConfig.screenHeight.toInt());
     await _engine.setVideoEncoderConfiguration(configuration);
     await _engine.joinChannel(Token, widget.channelName, null, 0);
   }
@@ -179,7 +182,6 @@ class _CallPageState extends State<CallPage> {
     await Wakelock.enable();
   }
 
-  /// Helper function to get list of native views
   List<Widget> _getRenderViews() {
     final List<StatefulWidget> list = [];
     if (widget.role == ClientRole.Broadcaster) {
@@ -472,7 +474,7 @@ class _CallPageState extends State<CallPage> {
                           width: 5,
                         ),
                         Text(
-                          '${userNo}',
+                          '${_users != null ? _users.length : userNo}',
                           style: TextStyle(color: Colors.white, fontSize: 11),
                         ),
                       ],
@@ -526,7 +528,7 @@ class _CallPageState extends State<CallPage> {
                         _leaveChannel();
                         _engine.leaveChannel();
                         _engine.destroy();
-                        FirebaseService.deleteUser(username: channelName);
+                        FirebaseService.updateLive();
                         Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -581,7 +583,7 @@ class _CallPageState extends State<CallPage> {
                   _leaveChannel();
                   _engine.leaveChannel();
                   _engine.destroy();
-                  FirebaseService.deleteUser(username: channelName);
+                  FirebaseService.updateLive();
                   Navigator.push(context,
                       MaterialPageRoute(builder: (context) => HomeScreen()));
                 },
@@ -886,36 +888,40 @@ class _CallPageState extends State<CallPage> {
     if (!_isLogin || !_isInChannel) {
       return Container();
     }
-    return Container(
-      alignment: Alignment.bottomRight,
+    return Positioned(
+      bottom: 5,
+      left: 5,
+      right: 5,
       child: Container(
         color: Colors.black.withOpacity(0),
         child: Padding(
           padding: const EdgeInsets.only(left: 8, top: 5, right: 8, bottom: 5),
           child:
               Row(mainAxisAlignment: MainAxisAlignment.end, children: <Widget>[
-            new Expanded(
-                child: Padding(
-              padding: const EdgeInsets.fromLTRB(0.0, 0, 0, 0),
-              child: new TextField(
-                  cursorColor: Colors.blue,
-                  textInputAction: TextInputAction.send,
-                  onSubmitted: _sendMessage,
-                  style: TextStyle(color: Colors.white),
-                  controller: _channelMessageController,
-                  textCapitalization: TextCapitalization.sentences,
-                  decoration: InputDecoration(
-                    isDense: true,
-                    hintText: 'Say something...',
-                    hintStyle: TextStyle(color: Colors.white),
-                    enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(50.0),
-                        borderSide: BorderSide(color: Colors.white)),
-                    focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(50.0),
-                        borderSide: BorderSide(color: Colors.white)),
-                  )),
-            )),
+            Container(
+              width: 200,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(0.0, 0, 0, 0),
+                child: new TextField(
+                    cursorColor: Colors.blue,
+                    textInputAction: TextInputAction.send,
+                    onSubmitted: _sendMessage,
+                    style: TextStyle(color: Colors.white),
+                    controller: _channelMessageController,
+                    textCapitalization: TextCapitalization.sentences,
+                    decoration: InputDecoration(
+                      isDense: true,
+                      hintText: 'Say something...',
+                      hintStyle: TextStyle(color: Colors.white),
+                      enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(50.0),
+                          borderSide: BorderSide(color: Colors.white)),
+                      focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(50.0),
+                          borderSide: BorderSide(color: Colors.white)),
+                    )),
+              ),
+            ),
             Padding(
               padding: const EdgeInsets.fromLTRB(4.0, 0, 0, 0),
               child: MaterialButton(
@@ -1065,7 +1071,11 @@ class _CallPageState extends State<CallPage> {
       }
     };
     await _client.login(null, widget.channelName);
-    _channel = await _createChannel(widget.channelName);
+    await _createChannel(widget.channelName).then((value) {
+      setState(() {
+        _channel = value;
+      });
+    });
     await _channel.join();
     var len;
     _channel.getMembers().then((value) {

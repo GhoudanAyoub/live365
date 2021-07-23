@@ -100,6 +100,7 @@ class _LiveScreenState extends State<LiveScreen> {
                 physics: NeverScrollableScrollPhysics(),
                 itemBuilder: (_, DocumentSnapshot snapshot) {
                   Live live = Live.fromJson(snapshot.data());
+                  if (live.endAt != null) return Container();
                   return GestureDetector(
                       onTap: () {
                         onJoin(
