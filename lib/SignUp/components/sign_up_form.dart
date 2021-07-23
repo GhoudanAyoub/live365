@@ -71,8 +71,6 @@ class _SignUpFormState extends State<SignUpForm> {
                           isDownIcon: true,
                         ),
                         onChanged: (CountryCode code) {
-                          print(
-                              code.name); //get the country name eg: Antarctica
                           setState(() {
                             _countryContoller.text = code.name;
                           });
@@ -102,7 +100,6 @@ class _SignUpFormState extends State<SignUpForm> {
                     password: _passwordController.text,
                     country: _countryContoller.text,
                   );
-                  print(success);
                   if (success) {
                     Navigator.push(context,
                         MaterialPageRoute(builder: (context) => HomeScreen()));
@@ -111,7 +108,6 @@ class _SignUpFormState extends State<SignUpForm> {
                   }
                 }
               } catch (e) {
-                print(e);
                 showInSnackBar(
                     '${authService.handleFirebaseAuthError(e.toString())}');
               }
@@ -123,8 +119,10 @@ class _SignUpFormState extends State<SignUpForm> {
   }
 
   void showInSnackBar(String value) {
-    scaffoldKey.currentState.removeCurrentSnackBar();
-    scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(value)));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text("$value"),
+      duration: Duration(seconds: 2),
+    ));
   }
 
   void emailExists() {

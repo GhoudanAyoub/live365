@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:collection';
 
 import 'package:LIVE365/Notification/notification.dart';
@@ -6,7 +5,6 @@ import 'package:LIVE365/SignIn/sign_in_screen.dart';
 import 'package:LIVE365/Upload/CameraAccessScreen.dart';
 import 'package:LIVE365/Upload/composents/create_post.dart';
 import 'package:LIVE365/camera/add_video_page.dart';
-import 'package:LIVE365/components/indicators.dart';
 import 'package:LIVE365/components/stream_comments_wrapper.dart';
 import 'package:LIVE365/discover/discover_screen.dart';
 import 'package:LIVE365/firebaseService/FirebaseService.dart';
@@ -461,7 +459,6 @@ class _State extends State<HomeScreen>
               StreamBuilder(
                 stream: liveStreamRef.doc('PuDM26cM07bsz4o8ZKs3').snapshots(),
                 builder: (BuildContext context, AsyncSnapshot snapshot) {
-                  debugPrint(snapshot.data.data()['stream'].toString());
                   if (snapshot.data.data()['stream'] == true) {
                     return ListTile(
                       leading: Icon(
@@ -1323,161 +1320,6 @@ class _State extends State<HomeScreen>
           .then((doc) => {
                 if (doc.exists) {doc.reference.delete()}
               });
-    }
-  }
-
-  Widget recommendedFeed() {
-    return Container(
-        width: double.infinity,
-        height: double.infinity,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Container(
-                    padding: EdgeInsets.only(bottom: 14),
-                    child: Text(
-                      'Trending Creators',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontFamily: "SFProDisplay-Regular",
-                          fontSize: 20),
-                    ))
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Center(
-                  child: Container(
-                    child: Column(
-                      children: <Widget>[
-                        Center(
-                          child: Text(
-                              'Follow an account to see their latest video',
-                              style: TextStyle(
-                                  fontFamily: "SFProDisplay-Regular",
-                                  color: Colors.white.withOpacity(0.8))),
-                        )
-                      ],
-                    ),
-                  ),
-                )
-              ],
-            ),
-            Container(
-              height: 372,
-              margin: EdgeInsets.only(top: 25),
-              child: buildVideoSlider(),
-            )
-          ],
-        ));
-  }
-
-  buildVideoSlider() {
-    if (!loading) {
-      if (filteredv.isEmpty) {
-        return Center(
-          child: Text("You Got Every Last Videos Found",
-              style: TextStyle(fontWeight: FontWeight.bold)),
-        );
-      } else {
-        return PageView.builder(
-            dragStartBehavior: DragStartBehavior.down,
-            controller: pageController,
-            itemCount: filteredv.length,
-            itemBuilder: (context, position) {
-              return videoSlider(filteredv, position);
-            });
-      }
-    } else {
-      return Center(
-        child: circularProgress(context),
-      );
-    }
-  }
-
-  Widget videoSlider(filteredv, int index) {
-    if (index != null) {
-      DocumentSnapshot doc = filteredv[index];
-      Video video = Video.fromJson(doc.data());
-      profileId = video.ownerId;
-      checkIfFollowing(profileId);
-      if (isFollowing[profileId] == true) {
-        Timer(Duration(milliseconds: 1), () {
-          setState(() {
-            removeFromList(index);
-          });
-        });
-      }
-      Timer(Duration(milliseconds: 5), () {
-        return AnimatedBuilder(
-          animation: pageController,
-          builder: (context, widget) {
-            double value = 1;
-            if (pageController.position.haveDimensions) {
-              value = pageController.page - index;
-              value = (1 - (value.abs() * 0.3)).clamp(0.0, 1.0);
-            }
-            return Center(
-              child: SizedBox(
-                height: Curves.easeInOut.transform(value) * 372,
-                width: Curves.easeInOut.transform(value) * 300,
-                child: widget,
-              ),
-            );
-          },
-          child: Stack(
-            children: <Widget>[
-              ClipRRect(
-                borderRadius: BorderRadius.all(Radius.circular(10)),
-                child: VideoPlayer(_controller),
-              ),
-              Align(
-                  alignment: Alignment.topRight,
-                  child: Padding(
-                    padding: EdgeInsets.all(5),
-                    child: Icon(
-                      Icons.close,
-                      size: 15,
-                      color: Colors.white,
-                    ),
-                  )),
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: Container(
-                  margin: EdgeInsets.only(bottom: 15),
-                  height: 370 / 2,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: <Widget>[
-                      Padding(
-                          padding: EdgeInsets.only(bottom: 15),
-                          child: CircleAvatar(
-                            backgroundColor: Colors.black,
-                            backgroundImage: NetworkImage(video?.userPic),
-                            radius: 30,
-                          )),
-                      Padding(
-                          padding: EdgeInsets.only(bottom: 6),
-                          child: Text(
-                              video.username == null ? '' : video.username,
-                              style: TextStyle(color: Colors.white))),
-                      Text(video.videoTitle == null ? '' : video.videoTitle,
-                          style:
-                              TextStyle(color: Colors.white.withOpacity(0.5))),
-                      SizedBox(height: 10),
-                      buildRecButton(video?.ownerId, index),
-                    ],
-                  ),
-                ),
-              )
-            ],
-          ),
-        );
-      });
     }
   }
 }

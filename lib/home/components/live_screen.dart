@@ -25,7 +25,6 @@ class _LiveScreenState extends State<LiveScreen> {
       body: StreamBuilder(
         stream: liveStreamRef.doc('PuDM26cM07bsz4o8ZKs3').snapshots(),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
-          debugPrint(snapshot.data.data()['stream'].toString());
           if (snapshot.data.data()['stream'] == true) {
             return scrollFeed();
           } else {

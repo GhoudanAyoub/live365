@@ -34,8 +34,6 @@ class PostService extends Service {
       "description": description == null ? "" : description,
       "tags": tags == null ? "" : tags,
       "timestamp": Timestamp.now(),
-    }).catchError((e) {
-      print(e);
     });
   }
 

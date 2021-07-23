@@ -131,7 +131,6 @@ class _PlayPageState extends State<PlayPage>
                         });
                         addLikesToNotification(data);
                       }
-                      print(isF);
                       Widget buttons = videoData(i);
 
                       // video
@@ -797,10 +796,6 @@ class _PlayPageState extends State<PlayPage>
   }
 
   void deleteVideoList(videoid) async {
-    videoRef
-        .doc(videoid)
-        .delete()
-        .then((value) => print("Video Delete Deleted"))
-        .catchError((error) => print("Failed to delete user: $error"));
+    videoRef.doc(videoid).delete();
   }
 }

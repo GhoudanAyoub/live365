@@ -3,9 +3,6 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
-/// 视频手势封装
-/// 单击：暂停
-/// 双击：点赞，双击后再次单击也是增加点赞爱心
 class TikTokVideoGesture extends StatefulWidget {
   const TikTokVideoGesture({
     Key key,
@@ -25,7 +22,6 @@ class TikTokVideoGesture extends StatefulWidget {
 class _TikTokVideoGestureState extends State<TikTokVideoGesture> {
   GlobalKey _key = GlobalKey();
 
-  // 内部转换坐标点
   Offset _p(Offset p) {
     RenderBox getBox = _key.currentContext.findRenderObject();
     return getBox.globalToLocal(p);
@@ -57,7 +53,6 @@ class _TikTokVideoGestureState extends State<TikTokVideoGesture> {
       onTapDown: (detail) {
         setState(() {
           if (canAddFavorite) {
-            print('添加爱心，当前爱心数量:${icons.length}');
             icons.add(_p(detail.globalPosition));
             widget.onAddFavorite?.call();
             justAddFavorite = true;
@@ -78,9 +73,7 @@ class _TikTokVideoGestureState extends State<TikTokVideoGesture> {
         });
         canAddFavorite = true;
       },
-      onTapCancel: () {
-        print('onTapCancel');
-      },
+      onTapCancel: () {},
       child: Stack(
         children: <Widget>[
           widget.child,
@@ -119,7 +112,6 @@ class _TikTokFavoriteAnimationIconState
 
   @override
   void didChangeDependencies() {
-    print('didChangeDependencies');
     super.didChangeDependencies();
   }
 

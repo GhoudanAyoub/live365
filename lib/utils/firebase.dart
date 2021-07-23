@@ -25,7 +25,6 @@ CollectionReference followingRef = firestore.collection('following');
 CollectionReference likesRef = firestore.collection('likes');
 CollectionReference bookRef = firestore.collection('book');
 CollectionReference favUsersRef = firestore.collection('favoriteUsers');
-CollectionReference killAppRef = firestore.collection('kilApp');
 
 // Storage refs
 Reference profilePic = storage.ref().child('profilePic');

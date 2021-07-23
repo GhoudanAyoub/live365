@@ -161,7 +161,6 @@ class _SignFormState extends State<SignForm> {
                     email: _emailContoller.text,
                     password: _passwordController.text,
                   );
-                  print(success);
                   if (success == firebaseAuth.currentUser.uid) {
                     /* Navigator.push(context,
                         MaterialPageRoute(builder: (context) => HomeScreen()));*/
@@ -174,7 +173,6 @@ class _SignFormState extends State<SignForm> {
                   }
                 } catch (e) {
                   submitted = false;
-                  print("=====" + success);
                   addError(error: success);
                   showInSnackBar(
                       '${auth.handleFirebaseAuthError(e.toString())}');
@@ -188,7 +186,9 @@ class _SignFormState extends State<SignForm> {
   }
 
   void showInSnackBar(String value) {
-    scaffoldKey.currentState.removeCurrentSnackBar();
-    scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(value)));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text("$value"),
+      duration: Duration(seconds: 2),
+    ));
   }
 }

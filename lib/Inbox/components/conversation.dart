@@ -333,7 +333,6 @@ class _ConversationState extends State<Conversation> {
 
     if (msg.isNotEmpty) {
       if (isFirst) {
-        print("FIRST");
         String id = await viewModel.sendFirstMessage(widget.userId, message);
         setState(() {
           isFirst = false;

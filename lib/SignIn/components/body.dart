@@ -161,9 +161,11 @@ class _BodyState extends State<Body> {
     setState(() {
       isSignIn = true;
     });
-    Scaffold.of(context)
+
+    ScaffoldMessenger.of(context)
         .showSnackBar(SnackBar(content: Text("Checking Your Account..")));
-    Scaffold.of(context).showSnackBar(SnackBar(content: Text("please Wait..")));
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text("please Wait..")));
     final GoogleSignInAccount account = await _googleSignIn.signIn();
     final GoogleSignInAuthentication _googleAuth = await account.authentication;
     final AuthCredential credential = GoogleAuthProvider.credential(
@@ -171,10 +173,11 @@ class _BodyState extends State<Body> {
       accessToken: _googleAuth.accessToken,
     );
     UserCredential userdata =
-        await _firebaseAuth.signInWithCredential(credential).catchError((e) {
-      print("Error===>" + e.toString());
-    });
-    Scaffold.of(context).showSnackBar(SnackBar(content: Text("please Wait..")));
+        await _firebaseAuth.signInWithCredential(credential);
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text("please Wait.."),
+      duration: Duration(seconds: 2),
+    ));
   }
 
   Future loginWithFacebook(context) async {
@@ -189,7 +192,6 @@ class _BodyState extends State<Body> {
         final graphResponse = await http.get(
             'https://graph.facebook.com/v2.12/me?fields=first_name,picture&access_token=${accessToken.token}');
         final profile = jsonDecode(graphResponse.body);
-        print(profile);
         setState(() {
           name = profile['first_name'];
           image = profile['picture']['data']['url'];
@@ -197,29 +199,28 @@ class _BodyState extends State<Body> {
 
         AuthCredential credential =
             FacebookAuthProvider.credential(accessToken.token);
-        await _auth.signInWithCredential(credential).catchError((e) {
-          print(e.toString());
-        });
-        print('''
-         Logged in!
-         
-         Expires: ${accessToken.expires}
-         Permissions: ${accessToken.permissions}
-         Declined permissions: ${accessToken.declinedPermissions}
-         ''');
+        await _auth.signInWithCredential(credential);
         break;
       case FacebookLoginStatus.cancelledByUser:
-        print('Login cancelled by the user.');
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text("Login cancelled by the user."),
+          duration: Duration(seconds: 2),
+        ));
         break;
       case FacebookLoginStatus.error:
-        print('Something went wrong with the login process.\n'
-            'Here\'s the error Facebook gave us: ${result.errorMessage}');
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Something went wrong with the login process.\n'
+              'Here\'s the error Facebook gave us: ${result.errorMessage}'),
+          duration: Duration(seconds: 2),
+        ));
         break;
     }
   }
 
   void showInSnackBar(String value) {
-    scaffoldKey.currentState.removeCurrentSnackBar();
-    scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(value)));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text("$value"),
+      duration: Duration(seconds: 2),
+    ));
   }
 }

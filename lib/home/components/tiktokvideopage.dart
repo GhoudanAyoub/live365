@@ -3,14 +3,6 @@ import 'package:LIVE365/style/style.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
-///
-/// TikTok风格的一个视频页组件，覆盖在video上，提供以下功能：
-/// 播放按钮的遮罩
-/// 单击事件
-/// 点赞事件回调（每次）
-/// 长宽比控制
-/// 底部padding（用于适配有沉浸式底部状态栏时）
-///
 class TikTokVideoPage extends StatelessWidget {
   final Widget video;
   final double aspectRatio;

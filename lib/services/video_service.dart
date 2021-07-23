@@ -49,8 +49,6 @@ class VideoService extends Service {
       "description": description,
       "tags": tags,
       "timestamp": Timestamp.now(),
-    }).catchError((e) {
-      print(e);
     });
   }
 

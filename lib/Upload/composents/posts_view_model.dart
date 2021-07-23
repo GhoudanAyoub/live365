@@ -62,25 +62,21 @@ class PostsViewModel extends ChangeNotifier {
   }
 
   setUsername(String val) {
-    print('SetName $val');
     username = val;
     notifyListeners();
   }
 
   setDescription(String val) {
-    print('SetDescription $val');
     description = val;
     notifyListeners();
   }
 
   setBio(String val) {
-    print('SetBio $val');
     bio = val;
     notifyListeners();
   }
 
   setTags(String val) {
-    print('SetTags $val');
     tags = val;
     notifyListeners();
   }
@@ -132,7 +128,6 @@ class PostsViewModel extends ChangeNotifier {
       resetPost();
       notifyListeners();
     } catch (e) {
-      print(e);
       loading = false;
       resetPost();
       showInSnackBar('Uploaded successfully!');
@@ -154,7 +149,6 @@ class PostsViewModel extends ChangeNotifier {
             .pushReplacement(MaterialPageRoute(builder: (_) => HomeScreen()));
         notifyListeners();
       } catch (e) {
-        print(e);
         loading = false;
         showInSnackBar('Uploaded successfully!');
         notifyListeners();

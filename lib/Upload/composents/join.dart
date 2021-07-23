@@ -459,7 +459,6 @@ class _JoinPageState extends State<JoinPage> {
       children: [
         GestureDetector(
           onTap: () {
-            print(price.toString());
             checkPacket(price);
           },
           child: Container(

@@ -230,9 +230,7 @@ class FirebaseService {
       idToken: _googleAuth.idToken,
       accessToken: _googleAuth.accessToken,
     );
-    await _firebaseAuth.signInWithCredential(credential).catchError((e) {
-      print(e.toString());
-    }).then((value) => () {
+    await _firebaseAuth.signInWithCredential(credential).then((value) => () {
           addUsers(value.user);
           uid = value.user.uid;
         });

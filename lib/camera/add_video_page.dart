@@ -54,7 +54,10 @@ class _AddVideoPageState extends State<AddVideoPage> {
         });
         _initCameraController(cameras[selectedCameraIndex]).then((void v) {});
       } else {
-        print('No camera available');
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text("No Camera Available"),
+          duration: Duration(seconds: 2),
+        ));
       }
     }).catchError((err) {
       print('Error :${err.code}Error message : ${err.message}');
@@ -73,7 +76,6 @@ class _AddVideoPageState extends State<AddVideoPage> {
     }
     _cameraController =
         CameraController(cameraDescription, ResolutionPreset.high);
-    print('heloooo $cameraDescription');
 
     _cameraController.addListener(() {
       if (mounted) {
@@ -97,7 +99,6 @@ class _AddVideoPageState extends State<AddVideoPage> {
 
   void _showCameraException(CameraException e) {
     String errorText = 'Error:${e.code}\nError message : ${e.description}';
-    print(errorText);
   }
 
   void _onPlay() => OpenFile.open(_filePath);
