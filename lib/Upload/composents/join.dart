@@ -1026,6 +1026,7 @@ class _JoinPageState extends State<JoinPage> {
               child: new TextField(
                   cursorColor: Colors.blue,
                   textInputAction: TextInputAction.go,
+                  enabled: false,
                   style: TextStyle(
                     color: Colors.white,
                   ),
@@ -1103,7 +1104,6 @@ class _JoinPageState extends State<JoinPage> {
   }
 
   void _toggleSendChannelMessage(_channel) async {
-    print('8855 $_channel');
     String text = _channelMessageController.text;
     if (text.isEmpty) {
       return;
@@ -1113,13 +1113,10 @@ class _JoinPageState extends State<JoinPage> {
         _channelMessageController.clear();
         await _channel.sendMessage(AgoraRtmMessage.fromText(text));
         _log(user: widget.username, info: text, type: 'message');
-      } catch (errorCode) {
-        print('8855 ${errorCode.toString()}');
-      }
+      } catch (errorCode) {}
   }
 
   void _sendMessage(text) async {
-    print('8855 $_channel');
     if (text.isEmpty) {
       return;
     }
@@ -1129,7 +1126,6 @@ class _JoinPageState extends State<JoinPage> {
         await _channel.sendMessage(AgoraRtmMessage.fromText(text));
         _log(user: widget.channelName, info: text, type: 'message');
       } catch (errorCode) {
-        print('8855 ${errorCode.toString()}');
         // _log('Send channel message error: ${ errorCode.toString()}');
       }
   }
@@ -1145,7 +1141,6 @@ class _JoinPageState extends State<JoinPage> {
     _client.onConnectionStateChanged = (int state, int reason) {
       if (state == 5) {
         _client.logout();
-        // _log('Logout.');
         setState(() {
           _isLogin = false;
         });
@@ -1202,20 +1197,16 @@ class _JoinPageState extends State<JoinPage> {
   }
 
   void _log({String info, String type, String user}) {
-    print('8855 daz');
     if (type == 'message' && info.contains('m1x2y3z4p5t6l7k8')) {
       popUp();
-      print('8855 1');
     } else if (type == 'message' && info.contains('E1m2I3l4i5E6')) {
       stopFunction();
-      print('8855 2');
     } else {
       comments m;
       var image = userMap[user];
       if (info.contains('d1a2v3i4s5h6')) {
         var mess = info.split(' ');
         if (mess[1] == widget.userImage) {
-          print('8855 3');
           m = new comments(
               message: 'working', type: type, user: user, image: image);
           setState(() {
@@ -1226,7 +1217,6 @@ class _JoinPageState extends State<JoinPage> {
       } else {
         m = new comments(message: info, type: type, user: user, image: image);
 
-        print('8855 4');
         setState(() {
           _infoStrings.insert(0, m);
         });

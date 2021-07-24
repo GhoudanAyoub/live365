@@ -120,7 +120,7 @@ class _BodyState extends State<Body> {
                                 });
                               },
                             ),
-                          ),
+                          ), /*
                           SizedBox(
                             width: 5,
                           ),
@@ -145,7 +145,7 @@ class _BodyState extends State<Body> {
                                               builder: (context) =>
                                                   HomeScreen()));
                                     });
-                                  })),
+                                  })),*/
                         ],
                       )
                     : SizedBox(height: 1),

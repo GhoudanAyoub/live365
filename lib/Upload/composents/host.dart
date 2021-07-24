@@ -908,6 +908,7 @@ class _CallPageState extends State<CallPage> {
                     onSubmitted: _sendMessage,
                     style: TextStyle(color: Colors.white),
                     controller: _channelMessageController,
+                    enabled: false,
                     textCapitalization: TextCapitalization.sentences,
                     decoration: InputDecoration(
                       isDense: true,
