@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Live {
   String id;
   String ownerId;
@@ -8,17 +10,22 @@ class Live {
   String views;
   int channelId;
   bool me = false;
+  Timestamp startAt;
+  Timestamp endAt;
 
-  Live(
-      {this.id,
-      this.ownerId,
-      this.username,
-      this.channelName,
-      this.hostImage,
-      this.image,
-      this.channelId,
-      this.views,
-      this.me});
+  Live({
+    this.id,
+    this.ownerId,
+    this.username,
+    this.channelName,
+    this.hostImage,
+    this.image,
+    this.channelId,
+    this.views,
+    this.me,
+    this.startAt,
+    this.endAt,
+  });
 
   static Live fromJson(Map<String, dynamic> json) => Live(
         id: json['id'],
@@ -30,5 +37,7 @@ class Live {
         hostImage: json['hostImage'],
         views: json['views'],
         me: json['me'],
+        startAt: json['startAt'],
+        endAt: json['endAt'],
       );
 }

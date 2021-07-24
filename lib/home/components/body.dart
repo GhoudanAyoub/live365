@@ -57,8 +57,8 @@ class _BodyState extends State<Body>
   final auth = FirebaseService();
   List<Video> listVideos = [];
   List<DocumentSnapshot> filteredv = [];
-  bool followButton = false;
-  bool liveButton = true;
+  bool followButton = true;
+  bool liveButton = false;
   bool recommended = false;
   VideoPlayerController _controller;
   AnimationController animationController;
@@ -646,9 +646,8 @@ class _BodyState extends State<Body>
           style: TextStyle(fontSize: 24, color: Colors.white),
         ),
       );
-
   Widget scrollFeed() {
-    if (firebaseAuth.currentUser != null)
+    if (firebaseAuth.currentUser != null) {
       return CustomScrollView(
         slivers: <Widget>[
           SliverList(
@@ -659,10 +658,11 @@ class _BodyState extends State<Body>
                 shrinkWrap: true,
                 stream: liveRef.snapshots(),
                 text:
-                    "\n\n\n\n\n\n\n\nRush and Be The First To\nUpload The First Video 😊",
+                    "\n\n\n\n\n\n\n\nRush and Be The First To\nUpload The First Live 😊",
                 physics: NeverScrollableScrollPhysics(),
                 itemBuilder: (_, DocumentSnapshot snapshot) {
                   Live live = Live.fromJson(snapshot.data());
+                  if (live.endAt != null) return Container();
                   return GestureDetector(
                       onTap: () {
                         onJoin(
@@ -685,7 +685,7 @@ class _BodyState extends State<Body>
           ),
         ],
       );
-    else
+    } else
       return Container(
         child: Align(
           alignment: Alignment.center,

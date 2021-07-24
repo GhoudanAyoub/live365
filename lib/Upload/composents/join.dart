@@ -110,7 +110,6 @@ class _JoinPageState extends State<JoinPage> {
 
     await _initAgoraRtcEngine();
     _addAgoraEventHandlers();
-    await _engine.enableWebSdkInteroperability(true);
     VideoEncoderConfiguration configuration = VideoEncoderConfiguration();
     configuration.dimensions = VideoDimensions(1920, 1080);
     await _engine.setVideoEncoderConfiguration(configuration);
@@ -122,7 +121,7 @@ class _JoinPageState extends State<JoinPage> {
     _engine = await RtcEngine.create(APP_ID);
     await _engine.enableVideo();
     await _engine.setChannelProfile(ChannelProfile.LiveBroadcasting);
-    await _engine.setClientRole(widget.role);
+    await _engine.setClientRole(ClientRole.Audience);
     await _engine.enableLocalAudio(false);
     await _engine.enableLocalVideo(!muted);
   }
@@ -459,7 +458,6 @@ class _JoinPageState extends State<JoinPage> {
       children: [
         GestureDetector(
           onTap: () {
-            print(price.toString());
             checkPacket(price);
           },
           child: Container(
@@ -998,7 +996,7 @@ class _JoinPageState extends State<JoinPage> {
                           if (heart == true && completed == false) heartPop(),
                           if (requested == true) requestedWidget(),
                           if (accepted == true) stopSharing(),
-                          if (giftBool == true) GiftList(),
+                          // if (giftBool == true) GiftList(),
                           //_ending()
                         ],
                       ),
@@ -1017,7 +1015,7 @@ class _JoinPageState extends State<JoinPage> {
     return Container(
       alignment: Alignment.bottomRight,
       child: Container(
-        color: Colors.black,
+        color: Colors.black.withOpacity(0),
         child: Padding(
           padding: const EdgeInsets.only(left: 8, top: 5, right: 8, bottom: 5),
           child:
@@ -1062,23 +1060,6 @@ class _JoinPageState extends State<JoinPage> {
                 padding: const EdgeInsets.all(12.0),
               ),
             ),
-            if (giftBool == false)
-              Padding(
-                padding: const EdgeInsets.fromLTRB(4.0, 0, 0, 0),
-                child: MaterialButton(
-                  minWidth: 0,
-                  onPressed: _addGift,
-                  child: Icon(
-                    Icons.lock_clock,
-                    color: Colors.red[900],
-                    size: 20.0,
-                  ),
-                  shape: CircleBorder(),
-                  elevation: 2.0,
-                  color: Colors.grey[400].withOpacity(0.2),
-                  padding: const EdgeInsets.all(12.0),
-                ),
-              ),
             Padding(
               padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
               child: MaterialButton(
@@ -1127,26 +1108,26 @@ class _JoinPageState extends State<JoinPage> {
     if (text.isEmpty) {
       return;
     }
-    try {
-      _channelMessageController.clear();
-      await _channel.sendMessage(AgoraRtmMessage.fromText(text));
-      _log(user: widget.username, info: text, type: 'message');
-    } catch (errorCode) {
-      //_log('Send channel message error: ' + errorCode.toString());
-    }
+    if (_channel != null)
+      try {
+        _channelMessageController.clear();
+        await _channel.sendMessage(AgoraRtmMessage.fromText(text));
+        _log(user: widget.username, info: text, type: 'message');
+      } catch (errorCode) {}
   }
 
   void _sendMessage(text) async {
     if (text.isEmpty) {
       return;
     }
-    try {
-      _channelMessageController.clear();
-      await _channel.sendMessage(AgoraRtmMessage.fromText(text));
-      _log(user: widget.channelName, info: text, type: 'message');
-    } catch (errorCode) {
-      //_log('Send channel message error: ' + errorCode.toString());
-    }
+    if (_channel != null)
+      try {
+        _channelMessageController.clear();
+        await _channel.sendMessage(AgoraRtmMessage.fromText(text));
+        _log(user: widget.channelName, info: text, type: 'message');
+      } catch (errorCode) {
+        // _log('Send channel message error: ${ errorCode.toString()}');
+      }
   }
 
   void _createClient() async {
@@ -1167,7 +1148,12 @@ class _JoinPageState extends State<JoinPage> {
       }
     };
     await _client.login(null, widget.username);
-    _channel = await _createChannel(widget.channelName);
+
+    await _createChannel(widget.channelName).then((value) {
+      setState(() {
+        _channel = value;
+      });
+    });
     await _channel.join();
     var len;
     _channel.getMembers().then((value) {

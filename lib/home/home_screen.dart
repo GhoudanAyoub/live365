@@ -19,7 +19,7 @@ class _State extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(body: Body());
+    return SafeArea(child: Scaffold(body: Body()));
   }
 
   @override

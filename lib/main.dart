@@ -4,6 +4,7 @@ import 'package:LIVE365/theme.dart';
 import 'package:LIVE365/utils/providers.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import 'SplashScreen/splash_screen.dart';
@@ -12,6 +13,10 @@ import 'components/life_cycle_event_handler.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
   runApp(MyApp());
 }
 

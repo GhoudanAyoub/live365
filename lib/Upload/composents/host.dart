@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math' as math;
 
+import 'package:LIVE365/SizeConfig.dart';
 import 'package:LIVE365/firebaseService/FirebaseService.dart';
 import 'package:LIVE365/home/home_screen.dart';
 import 'package:LIVE365/models/live_comments.dart';
@@ -50,11 +51,10 @@ class _CallPageState extends State<CallPage> {
 
   bool _isLogin = true;
   bool _isInChannel = true;
-  int userNo;
+  int userNo = 0;
   var userMap;
   var tryingToEnd = false;
   bool personBool = false;
-  bool giftBool = false;
   bool accepted = false;
 
   final _channelMessageController = TextEditingController();
@@ -78,12 +78,13 @@ class _CallPageState extends State<CallPage> {
   final _infoString = <String>[];
 
   @override
-  void dispose() {
-    // clear users
-    _users.clear();
-    // destroy sdk
+  Future<void> dispose() async {
+    await Wakelock.disable();
+    _logout();
+    _leaveChannel();
     _engine.leaveChannel();
     _engine.destroy();
+    FirebaseService.updateLive();
     super.dispose();
   }
 
@@ -109,16 +110,16 @@ class _CallPageState extends State<CallPage> {
 
     await _initAgoraRtcEngine();
     _addAgoraEventHandlers();
-    await _engine.enableWebSdkInteroperability(true);
     VideoEncoderConfiguration configuration = VideoEncoderConfiguration();
-    configuration.dimensions = VideoDimensions(720, 520);
+    configuration.dimensions = VideoDimensions(
+        SizeConfig.screenWidth.toInt(), SizeConfig.screenHeight.toInt());
     await _engine.setVideoEncoderConfiguration(configuration);
     await _engine.joinChannel(Token, widget.channelName, null, 0);
   }
 
   /// Create agora sdk instance and initialize
   Future<void> _initAgoraRtcEngine() async {
-    _engine = await RtcEngine.create(APP_ID);
+    _engine = await RtcEngine.createWithConfig(RtcEngineConfig(APP_ID));
     await _engine.enableVideo();
     await _engine.setChannelProfile(ChannelProfile.LiveBroadcasting);
     await _engine.setClientRole(widget.role);
@@ -133,21 +134,19 @@ class _CallPageState extends State<CallPage> {
         _infoString.add(info);
       });
     }, joinChannelSuccess: (channel, uid, elapsed) async {
-      setState(() async {
-        final info = 'onJoinChannel: $channel, uid: $uid';
-        _infoString.add(info);
-        final documentId = widget.channelName;
-        channelName = documentId;
-        if (widget.role == ClientRole.Broadcaster) {
-          FirebaseService.createLiveUser(
-              username: widget.userName,
-              name: documentId,
-              id: uid,
-              time: widget.time,
-              image: widget.image);
-        }
-        userJoinChannelSuccess();
-      });
+      final documentId = widget.channelName;
+      final info = 'onJoinChannel: $channel, uid: $uid';
+      _infoString.add(info);
+      if (widget.role == ClientRole.Broadcaster) {
+        FirebaseService.createLiveUser(
+            username: widget.userName,
+            name: documentId,
+            id: uid,
+            time: widget.time,
+            image: widget.image);
+      }
+      userJoinChannelSuccess();
+      channelName = documentId;
     }, leaveChannel: (stats) {
       setState(() {
         _infoString.add('onLeaveChannel');
@@ -476,7 +475,7 @@ class _CallPageState extends State<CallPage> {
                           width: 5,
                         ),
                         Text(
-                          '${_users.length ?? userNo}',
+                          '${_users != null ? _users.length : userNo}',
                           style: TextStyle(color: Colors.white, fontSize: 11),
                         ),
                       ],
@@ -514,7 +513,9 @@ class _CallPageState extends State<CallPage> {
                   child: Padding(
                     padding: const EdgeInsets.only(
                         left: 8.0, right: 4.0, top: 8.0, bottom: 8.0),
-                    child: RaisedButton(
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                          elevation: 2, primary: GBottomNav),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(vertical: 15),
                         child: Text(
@@ -522,15 +523,13 @@ class _CallPageState extends State<CallPage> {
                           style: TextStyle(color: Colors.white),
                         ),
                       ),
-                      elevation: 2.0,
-                      color: GBottomNav,
                       onPressed: () async {
                         await Wakelock.disable();
                         _logout();
                         _leaveChannel();
                         _engine.leaveChannel();
                         _engine.destroy();
-                        FirebaseService.deleteUser(username: channelName);
+                        FirebaseService.updateLive();
                         Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -543,7 +542,9 @@ class _CallPageState extends State<CallPage> {
                   child: Padding(
                     padding: const EdgeInsets.only(
                         left: 4.0, right: 8.0, top: 8.0, bottom: 8.0),
-                    child: RaisedButton(
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                          elevation: 2, primary: GBottomNav),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(vertical: 15),
                         child: Text(
@@ -551,8 +552,6 @@ class _CallPageState extends State<CallPage> {
                           style: TextStyle(color: Colors.white),
                         ),
                       ),
-                      elevation: 2.0,
-                      color: GBottomNav,
                       onPressed: () {
                         setState(() {
                           tryingToEnd = false;
@@ -585,7 +584,7 @@ class _CallPageState extends State<CallPage> {
                   _leaveChannel();
                   _engine.leaveChannel();
                   _engine.destroy();
-                  FirebaseService.deleteUser(username: channelName);
+                  FirebaseService.updateLive();
                   Navigator.push(context,
                       MaterialPageRoute(builder: (context) => HomeScreen()));
                 },
@@ -875,7 +874,6 @@ class _CallPageState extends State<CallPage> {
                     if (tryingToEnd == false) messageList(),
                     if (tryingToEnd == true) endLive2(), // view message
                     if (personBool == true && waiting == false) personList(),
-                    if (giftBool == true && waiting == false) GiftList(),
                     if (accepted == true) stopSharing(),
                     if (waiting == true) guestWaiting(),
                   ],
@@ -886,110 +884,15 @@ class _CallPageState extends State<CallPage> {
         ),
         onWillPop: _willPopCallback);
   }
-// Agora RTM
-
-  Widget GiftList() {
-    return Container(
-      alignment: Alignment.bottomRight,
-      child: Container(
-        height: 2 * MediaQuery.of(context).size.height / 3,
-        width: MediaQuery.of(context).size.height,
-        decoration: new BoxDecoration(
-          color: Colors.grey[850],
-          borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(25), topRight: Radius.circular(25)),
-        ),
-        child: Stack(
-          children: <Widget>[
-            Container(
-              height: 2 * MediaQuery.of(context).size.height / 3 - 50,
-              child: Column(
-                children: <Widget>[
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(4.0, 0, 0, 0),
-                    child: MaterialButton(
-                      minWidth: 0,
-                      onPressed: () {},
-                      child: Icon(
-                        Icons.lock_clock,
-                        color: Colors.white,
-                        size: 20.0,
-                      ),
-                      shape: CircleBorder(),
-                      elevation: 2.0,
-                      color: Colors.red,
-                      padding: const EdgeInsets.all(12.0),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Container(
-                    padding: EdgeInsets.symmetric(vertical: 12),
-                    width: MediaQuery.of(context).size.width,
-                    alignment: Alignment.center,
-                    child: Text(
-                      'Purchase Coins',
-                      style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Divider(
-                    color: Colors.grey[800],
-                    thickness: 0.5,
-                    height: 0,
-                  ),
-                ],
-              ),
-            ),
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: GestureDetector(
-                onTap: () {
-                  setState(() {
-                    giftBool = !giftBool;
-                  });
-                },
-                child: Container(
-                  color: Colors.grey[850],
-                  alignment: Alignment.bottomCenter,
-                  height: 50,
-                  child: Stack(
-                    children: <Widget>[
-                      Container(
-                          height: double.maxFinite,
-                          alignment: Alignment.center,
-                          child: Text(
-                            'Cancel',
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white),
-                          )),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 
   Widget _bottomBar() {
     if (!_isLogin || !_isInChannel) {
       return Container();
     }
-    return Container(
-      alignment: Alignment.bottomRight,
+    return Positioned(
+      bottom: 5,
+      left: 5,
+      right: 5,
       child: Container(
         color: Colors.black.withOpacity(0),
         child: Padding(
@@ -1086,12 +989,6 @@ class _CallPageState extends State<CallPage> {
     );
   }
 
-  void _addGift() {
-    setState(() {
-      giftBool = !giftBool;
-    });
-  }
-
   void _addPerson() {
     setState(() {
       personBool = !personBool;
@@ -1107,20 +1004,20 @@ class _CallPageState extends State<CallPage> {
   void _logout() async {
     try {
       await _client.logout();
-      //_log(info:'Logout success.',type: 'logout');
+      _log(info: 'Logout success.', type: 'logout');
     } catch (errorCode) {
-      //_log(info: 'Logout error: ' + errorCode.toString(), type: 'error');
+      _log(info: 'Logout error: ' + errorCode.toString(), type: 'error');
     }
   }
 
   void _leaveChannel() async {
     try {
       await _channel.leave();
-      //_log(info: 'Leave channel success.',type: 'leave');
+      _log(info: 'Leave channel success.', type: 'leave');
       _client.releaseChannel(_channel.channelId);
       _channelMessageController.text = null;
     } catch (errorCode) {
-      // _log(info: 'Leave channel error: ' + errorCode.toString(),type: 'error');
+      _log(info: 'Leave channel error: ' + errorCode.toString(), type: 'error');
     }
   }
 
@@ -1173,8 +1070,19 @@ class _CallPageState extends State<CallPage> {
       }
     };
     await _client.login(null, widget.channelName);
-    _channel = await _createChannel(widget.channelName);
+    await _createChannel(widget.channelName).then((value) {
+      setState(() {
+        _channel = value;
+      });
+    });
     await _channel.join();
+    var len;
+    _channel.getMembers().then((value) {
+      len = value.length;
+      setState(() {
+        userNo = len - 1;
+      });
+    });
   }
 
   Future<AgoraRtmChannel> _createChannel(String name) async {

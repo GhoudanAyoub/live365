@@ -1,3 +1,4 @@
+import 'package:LIVE365/models/User.dart';
 import 'package:LIVE365/models/message.dart';
 import 'package:LIVE365/models/message_list.dart';
 import 'package:LIVE365/utils/firebase.dart';
@@ -36,37 +37,66 @@ class FirebaseService {
   //USER LIVE
   static void createLiveUser({username, name, id, time, image}) async {
     var ref = liveRef.doc();
-    await liveRef.doc(firebaseAuth.currentUser.uid).set({
+    await liveRef.doc().set({
       'id': ref.id,
       'ownerId': firebaseAuth.currentUser.uid,
       'username': username,
       'channelName': name,
       'channelId': id,
-      'time': time,
+      'startAt': Timestamp.now(),
       'hostImage': image,
-      'image': image
+      'image': image,
+      'endAt': null
     });
   }
 
-  static void deleteUser({username}) async {
-    await liveRef.doc(firebaseAuth.currentUser.uid).delete();
+  static void updateLive() async {
+    QuerySnapshot v = await liveRef.get();
+    for (DocumentSnapshot d in v.docs) {
+      if (d.data()["ownerId"].toString().contains(firebaseAuth.currentUser.uid))
+        liveRef.doc(d.id).update({'endAt': Timestamp.now()});
+    }
+  }
+
+  static void addLiveToNotification(id, image) async {
+    QuerySnapshot doc1 = await followersRef
+        .doc(firebaseAuth.currentUser.uid)
+        .collection('userFollowers')
+        .get();
+
+    for (var d in doc1.docs) {
+      DocumentSnapshot doc = await usersRef.doc(d.id).get();
+      UserModel user = UserModel.fromJson(doc.data());
+      notificationRef.doc(d.id).collection('notifications').doc(id).set({
+        "type": "live",
+        "username": user.username,
+        "userId": firebaseAuth.currentUser.uid,
+        "userDp": user.photoUrl,
+        "postId": id,
+        "mediaUrl": image,
+        "timestamp": DateTime.now(),
+      });
+    }
   }
 
   // USER DATA
   static Future addUsers(User user) async {
-    final snapShot = await usersRef.doc(user.uid).get();
-    if (!snapShot.exists) {
-      usersRef.doc(user.uid).set({
-        'username': user.displayName,
-        'email': user.email,
-        'time': Timestamp.now(),
-        'id': user.uid,
-        'bio': "",
-        'country': "",
-        'photoUrl': user.photoURL ?? '',
-        'msgToAll': true
-      });
+    if (user != null) {
+      final snapShot = await usersRef.doc(user.uid).get();
+      if (!snapShot.exists) {
+        usersRef.doc(user.uid).set({
+          'username': user.displayName,
+          'email': user.email,
+          'time': Timestamp.now(),
+          'id': user.uid,
+          'bio': "",
+          'country': "",
+          'photoUrl': user.photoURL ?? '',
+          'msgToAll': true
+        });
+      }
     }
+    return user.uid;
   }
 
   static Stream<List<MessageList>> getUsers() => FirebaseFirestore.instance
@@ -205,9 +235,7 @@ class FirebaseService {
       idToken: _googleAuth.idToken,
       accessToken: _googleAuth.accessToken,
     );
-    await _firebaseAuth.signInWithCredential(credential).catchError((e) {
-      print(e.toString());
-    }).then((value) => () {
+    await _firebaseAuth.signInWithCredential(credential).then((value) => () {
           addUsers(value.user);
           uid = value.user.uid;
         });
