@@ -11,13 +11,11 @@ class VideoListController {
       if (p % 1 == 0) {
         int target = p ~/ 1;
         if (index.value == target) return;
-        // 播放当前的，暂停其他的
         var oldIndex = index.value;
         var newIndex = target;
         playerOfIndex(oldIndex).seekTo(0);
         playerOfIndex(oldIndex).pause();
         playerOfIndex(newIndex).start();
-        // 完成
         index.value = target;
       }
     });

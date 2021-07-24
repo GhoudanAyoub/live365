@@ -102,7 +102,9 @@ class _ActivityItemsState extends State<ActivityItems> {
   }
 
   previewConfiguration() {
-    if (widget.activity.type == "like" || widget.activity.type == "comment") {
+    if (widget.activity.type == "like" ||
+        widget.activity.type == "live" ||
+        widget.activity.type == "comment") {
       return buildPreviewImage();
     } else {
       return Text('');

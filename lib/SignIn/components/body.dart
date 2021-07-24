@@ -1,24 +1,34 @@
+import 'dart:convert';
+
 import 'package:LIVE365/components/custom_card.dart';
 import 'package:LIVE365/components/no_account_text.dart';
 import 'package:LIVE365/components/socal_card.dart';
 import 'package:LIVE365/firebaseService/FirebaseService.dart';
 import 'package:LIVE365/home/home_screen.dart';
+import 'package:LIVE365/utils/firebase.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_facebook_login/flutter_facebook_login.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:http/http.dart' as http;
 
 import '../../SizeConfig.dart';
 import 'sign_form.dart';
 
-class Body extends StatelessWidget {
+class Body extends StatefulWidget {
+  @override
+  _BodyState createState() => _BodyState();
+}
+
+class _BodyState extends State<Body> {
   bool isSignIn = false;
   FirebaseAuth _auth = FirebaseAuth.instance;
-  User _user;
-  FacebookLogin facebookLogin = FacebookLogin();
   GoogleSignIn _googleSignIn = GoogleSignIn();
   FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  static final FacebookLogin facebookSignIn = new FacebookLogin();
 
+  String name = '', image;
   GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   @override
   Widget build(BuildContext context) {
@@ -27,7 +37,7 @@ class Body extends StatelessWidget {
         width: double.infinity,
         child: Padding(
           padding:
-              EdgeInsets.symmetric(horizontal: getProportionateScreenWidth(20)),
+              EdgeInsets.symmetric(horizontal: getProportionateScreenWidth(10)),
           child: SingleChildScrollView(
             child: Column(
               children: [
@@ -46,10 +56,9 @@ class Body extends StatelessWidget {
                 ),
                 SizedBox(height: SizeConfig.screenHeight * 0.08),
                 SignForm(),
-                SizedBox(height: SizeConfig.screenHeight * 0.08),
-                SizedBox(height: getProportionateScreenHeight(20)),
+                SizedBox(height: 40),
                 NoAccountText(),
-                SizedBox(height: 20),
+                SizedBox(height: 10),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -84,22 +93,62 @@ class Body extends StatelessWidget {
                     ),
                   ],
                 ),
-                SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    CustomCard(
-                      borderRadius: BorderRadius.circular(20.0),
-                      child: SocalCard(
-                        icon: "assets/icons/google-icon.svg",
-                        Name: "Join with Google",
-                        press: () async {
-                          await signInWithGoogle(context);
-                        },
-                      ),
-                    ),
-                  ],
-                ),
+                SizedBox(height: 5),
+                isSignIn != false
+                    ? Center(child: CircularProgressIndicator())
+                    : SizedBox(height: 1),
+                SizedBox(height: 10),
+                isSignIn == false
+                    ? Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          CustomCard(
+                            borderRadius: BorderRadius.circular(20.0),
+                            child: SocalCard(
+                              icon: "assets/icons/google-icon.svg",
+                              Name: "Join with Google",
+                              press: () async {
+                                await signInWithGoogle(context)
+                                    .whenComplete(() async {
+                                  var u = await FirebaseService.addUsers(
+                                      firebaseAuth.currentUser);
+                                  setState(() {
+                                    isSignIn = false;
+                                  });
+                                  Navigator.pushNamed(
+                                      context, HomeScreen.routeName);
+                                });
+                              },
+                            ),
+                          ), /*
+                          SizedBox(
+                            width: 5,
+                          ),
+                          CustomCard(
+                              borderRadius: BorderRadius.circular(20.0),
+                              color: Colors.blue.withOpacity(0.8),
+                              child: SocalCard(
+                                  icon: "assets/icons/facebook.svg",
+                                  Name: "Join with Facebook",
+                                  color: Colors.white,
+                                  press: () async {
+                                    loginWithFacebook(context)
+                                        .whenComplete(() async {
+                                      var u = await FirebaseService.addUsers(
+                                          firebaseAuth.currentUser);
+                                      setState(() {
+                                        isSignIn = false;
+                                      });
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  HomeScreen()));
+                                    });
+                                  })),*/
+                        ],
+                      )
+                    : SizedBox(height: 1),
               ],
             ),
           ),
@@ -109,9 +158,14 @@ class Body extends StatelessWidget {
   }
 
   Future<void> signInWithGoogle(context) async {
-    Scaffold.of(context)
+    setState(() {
+      isSignIn = true;
+    });
+
+    ScaffoldMessenger.of(context)
         .showSnackBar(SnackBar(content: Text("Checking Your Account..")));
-    Scaffold.of(context).showSnackBar(SnackBar(content: Text("please Wait..")));
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text("please Wait..")));
     final GoogleSignInAccount account = await _googleSignIn.signIn();
     final GoogleSignInAuthentication _googleAuth = await account.authentication;
     final AuthCredential credential = GoogleAuthProvider.credential(
@@ -119,49 +173,54 @@ class Body extends StatelessWidget {
       accessToken: _googleAuth.accessToken,
     );
     UserCredential userdata =
-        await _firebaseAuth.signInWithCredential(credential).catchError((e) {
-      print("Error===>" + e.toString());
-    });
-    Scaffold.of(context).showSnackBar(SnackBar(content: Text("please Wait..")));
-    FirebaseService.addUsers(userdata.user);
-    Navigator.pushNamed(context, HomeScreen.routeName);
+        await _firebaseAuth.signInWithCredential(credential);
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text("please Wait.."),
+      duration: Duration(seconds: 2),
+    ));
   }
 
-  Future<void> handleLogin(context) async {
-    final FacebookLoginResult result = await facebookLogin.logIn(['email']);
+  Future loginWithFacebook(context) async {
+    setState(() {
+      isSignIn = true;
+    });
+    final FacebookLoginResult result = await facebookSignIn.logIn(['email']);
+
     switch (result.status) {
+      case FacebookLoginStatus.loggedIn:
+        final FacebookAccessToken accessToken = result.accessToken;
+        final graphResponse = await http.get(
+            'https://graph.facebook.com/v2.12/me?fields=first_name,picture&access_token=${accessToken.token}');
+        final profile = jsonDecode(graphResponse.body);
+        setState(() {
+          name = profile['first_name'];
+          image = profile['picture']['data']['url'];
+        });
+
+        AuthCredential credential =
+            FacebookAuthProvider.credential(accessToken.token);
+        await _auth.signInWithCredential(credential);
+        break;
       case FacebookLoginStatus.cancelledByUser:
-        print(result.errorMessage);
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text("Login cancelled by the user."),
+          duration: Duration(seconds: 2),
+        ));
         break;
       case FacebookLoginStatus.error:
-        print(result.errorMessage);
-        break;
-      case FacebookLoginStatus.loggedIn:
-        try {
-          await loginWithfacebook(result, context);
-        } catch (e) {
-          print(e);
-        }
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Something went wrong with the login process.\n'
+              'Here\'s the error Facebook gave us: ${result.errorMessage}'),
+          duration: Duration(seconds: 2),
+        ));
         break;
     }
   }
 
-  Future loginWithfacebook(FacebookLoginResult result, context) async {
-    final FacebookAccessToken accessToken = result.accessToken;
-    AuthCredential credential =
-        FacebookAuthProvider.credential(accessToken.token);
-    await _auth.signInWithCredential(credential).catchError((e) {
-      print(e.toString());
-    }).then((value) => () {
-          FirebaseService.addUsers(value.user);
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) => HomeScreen()));
-        });
-    isSignIn = true;
-  }
-
   void showInSnackBar(String value) {
-    scaffoldKey.currentState.removeCurrentSnackBar();
-    scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(value)));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text("$value"),
+      duration: Duration(seconds: 2),
+    ));
   }
 }

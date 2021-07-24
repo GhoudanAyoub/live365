@@ -11,11 +11,12 @@ dependencies:
   flutter:
     sdk: flutter
 
-
+  firebase_messaging:
+  flutter_local_notifications:
+  country_list_pick: ^1.0.1+4
   fijkplayer: ^0.8.3
-  # 基础的点击
   tapped:
-  # map取值
+  badges: ^1.1.6
   safemap:
   firebase_core: "any"
   firebase_auth: "any"

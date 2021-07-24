@@ -182,7 +182,6 @@ class _CallPageState extends State<CallPage> {
     await Wakelock.enable();
   }
 
-  /// Helper function to get list of native views
   List<Widget> _getRenderViews() {
     final List<StatefulWidget> list = [];
     if (widget.role == ClientRole.Broadcaster) {
@@ -899,28 +898,31 @@ class _CallPageState extends State<CallPage> {
           padding: const EdgeInsets.only(left: 8, top: 5, right: 8, bottom: 5),
           child:
               Row(mainAxisAlignment: MainAxisAlignment.end, children: <Widget>[
-            new Expanded(
-                child: Padding(
-              padding: const EdgeInsets.fromLTRB(0.0, 0, 0, 0),
-              child: new TextField(
-                  cursorColor: Colors.blue,
-                  textInputAction: TextInputAction.send,
-                  onSubmitted: _sendMessage,
-                  style: TextStyle(color: Colors.white),
-                  controller: _channelMessageController,
-                  textCapitalization: TextCapitalization.sentences,
-                  decoration: InputDecoration(
-                    isDense: true,
-                    hintText: 'Say something...',
-                    hintStyle: TextStyle(color: Colors.white),
-                    enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(50.0),
-                        borderSide: BorderSide(color: Colors.white)),
-                    focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(50.0),
-                        borderSide: BorderSide(color: Colors.white)),
-                  )),
-            )),
+            Container(
+              width: 200,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(0.0, 0, 0, 0),
+                child: new TextField(
+                    cursorColor: Colors.blue,
+                    textInputAction: TextInputAction.send,
+                    onSubmitted: _sendMessage,
+                    style: TextStyle(color: Colors.white),
+                    controller: _channelMessageController,
+                    enabled: false,
+                    textCapitalization: TextCapitalization.sentences,
+                    decoration: InputDecoration(
+                      isDense: true,
+                      hintText: 'Say something...',
+                      hintStyle: TextStyle(color: Colors.white),
+                      enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(50.0),
+                          borderSide: BorderSide(color: Colors.white)),
+                      focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(50.0),
+                          borderSide: BorderSide(color: Colors.white)),
+                    )),
+              ),
+            ),
             Padding(
               padding: const EdgeInsets.fromLTRB(4.0, 0, 0, 0),
               child: MaterialButton(

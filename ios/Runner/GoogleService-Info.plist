@@ -3,21 +3,23 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>771052550982-gj82ta7787tnq7ggbfgi7o909aguj860.apps.googleusercontent.com</string>
+	<string>14565634679-eiv1b4ge1jgu6q4jhbtcbbslic6ri9fq.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.771052550982-gj82ta7787tnq7ggbfgi7o909aguj860</string>
+	<string>com.googleusercontent.apps.14565634679-eiv1b4ge1jgu6q4jhbtcbbslic6ri9fq</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>14565634679-02h4ebv8tqdrickdjjp3jacvgkie1g5u.apps.googleusercontent.com</string>
 	<key>API_KEY</key>
-	<string>AIzaSyCugpe0ga978dcmOt0s-jivFPCkMuLkXQU</string>
+	<string>AIzaSyDvpynTkP9xyNU8KO4UlJYWlQfn-trjeGw</string>
 	<key>GCM_SENDER_ID</key>
-	<string>771052550982</string>
+	<string>14565634679</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
 	<string>com.ghoudan.live365</string>
 	<key>PROJECT_ID</key>
-	<string>live365-7cbd6</string>
+	<string>live365-live365</string>
 	<key>STORAGE_BUCKET</key>
-	<string>live365-7cbd6.appspot.com</string>
+	<string>live365-live365.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -29,6 +31,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:771052550982:ios:4b7364193d56fe98ec4347</string>
+	<string>1:14565634679:ios:aea99877d8f826976b8c72</string>
 </dict>
 </plist>

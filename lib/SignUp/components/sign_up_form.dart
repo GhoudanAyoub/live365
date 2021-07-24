@@ -1,7 +1,9 @@
 import 'package:LIVE365/components/custom_surfix_icon.dart';
 import 'package:LIVE365/components/default_button.dart';
 import 'package:LIVE365/components/form_error.dart';
+import 'package:LIVE365/home/home_screen.dart';
 import 'package:LIVE365/services/auth_service.dart';
+import 'package:country_list_pick/country_list_pick.dart';
 import 'package:flutter/material.dart';
 
 import '../../SizeConfig.dart';
@@ -49,8 +51,33 @@ class _SignUpFormState extends State<SignUpForm> {
       key: _formKey,
       child: Column(
         children: [
-          buildECountryFormField(),
-          SizedBox(height: getProportionateScreenHeight(30)),
+          Container(
+              height: 120,
+              alignment: Alignment.center,
+              child: Card(
+                  color: GBottomNav,
+                  elevation: 6,
+                  child: Padding(
+                    padding: EdgeInsets.all(5),
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: CountryListPick(
+                        theme: CountryTheme(
+                          alphabetSelectedBackgroundColor: black,
+                          alphabetTextColor: Colors.black,
+                          isShowFlag: true,
+                          isShowTitle: true,
+                          isShowCode: false,
+                          isDownIcon: true,
+                        ),
+                        onChanged: (CountryCode code) {
+                          setState(() {
+                            _countryContoller.text = code.name;
+                          });
+                        },
+                      ),
+                    ),
+                  ))),
           buildENameFormField(),
           SizedBox(height: getProportionateScreenHeight(30)),
           buildEmailFormField(),
@@ -73,17 +100,14 @@ class _SignUpFormState extends State<SignUpForm> {
                     password: _passwordController.text,
                     country: _countryContoller.text,
                   );
-                  print(success);
                   if (success) {
-                    /* Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => HomeScreen()));*/
-                    Navigator.pop(context);
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => HomeScreen()));
                     Scaffold.of(context).showSnackBar(SnackBar(
                         content: Text('Congratulation Your Account Created')));
                   }
                 }
               } catch (e) {
-                print(e);
                 showInSnackBar(
                     '${authService.handleFirebaseAuthError(e.toString())}');
               }
@@ -95,8 +119,10 @@ class _SignUpFormState extends State<SignUpForm> {
   }
 
   void showInSnackBar(String value) {
-    scaffoldKey.currentState.removeCurrentSnackBar();
-    scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(value)));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text("$value"),
+      duration: Duration(seconds: 2),
+    ));
   }
 
   void emailExists() {
