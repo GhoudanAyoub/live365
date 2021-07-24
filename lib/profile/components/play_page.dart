@@ -15,7 +15,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:safemap/safemap.dart';
-import 'package:screen/screen.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:video_player/video_player.dart';
 
@@ -57,7 +56,6 @@ class _PlayPageState extends State<PlayPage>
   @override
   void initState() {
     WidgetsBinding.instance.addObserver(this);
-    Screen.keepOn(true);
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
     animationController = new AnimationController(
         duration: new Duration(seconds: 5), vsync: this);
@@ -86,7 +84,6 @@ class _PlayPageState extends State<PlayPage>
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _videoListController.currentPlayer.pause();
-    Screen.keepOn(false);
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
     super.dispose();
   }

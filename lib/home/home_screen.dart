@@ -27,7 +27,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:safemap/safemap.dart';
-import 'package:screen/screen.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:video_player/video_player.dart';
 
@@ -65,6 +64,7 @@ class _State extends State<HomeScreen>
   String profileId;
   String userProfileId;
 
+  String _lastSelected = 'TAB: 0';
   Widget currentPage;
 
   currentUserId() {
@@ -83,9 +83,10 @@ class _State extends State<HomeScreen>
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _videoListController.currentPlayer.pause();
-    Screen.keepOn(false);
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
     FirebaseService.changeStatus("Away");
+    animationController.dispose();
+    tkController.dispose();
     super.dispose();
   }
 
@@ -93,7 +94,6 @@ class _State extends State<HomeScreen>
   void initState() {
     WidgetsBinding.instance.addObserver(this);
     FirebaseService.changeStatus("Online");
-    Screen.keepOn(true);
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
     animationController = new AnimationController(
         duration: new Duration(seconds: 5), vsync: this);
@@ -193,77 +193,82 @@ class _State extends State<HomeScreen>
     var header =
         tabBarType == TikTokPageTag.home ? topScrollFeedRow() : Container();
 
-    return TikTokScaffold(
-        controller: tkController,
-        hasBottomPadding: hasBackground,
-        tabBar: tikTokTabBar,
-        header: header,
-        leftPage: searchPage,
-        rightPage: userPage,
-        enableGesture: tabBarType == TikTokPageTag.home,
-        //onPullDownRefresh: callList,
-        page: tabBarType != TikTokPageTag.home
-            ? currentPage
-            : PageView.builder(
-                key: Key('home'),
-                controller: _pageController,
-                pageSnapping: true,
-                onPageChanged: (value) {
-                  setState(() {
-                    userProfileId = listVideos[value].ownerId;
-                  });
-                },
-                physics: ClampingScrollPhysics(),
-                scrollDirection: Axis.vertical,
-                itemCount: _videoListController.videoCount,
-                itemBuilder: (context, i) {
-                  var data = listVideos[i];
-                  bool isF = SafeMap(favoriteMap)[i].boolean ?? false;
-                  var player = _videoListController.playerOfIndex(i);
+    return Scaffold(
+        resizeToAvoidBottomInset: false,
+        body: new WillPopScope(
+            onWillPop: () async => false,
+            child: TikTokScaffold(
+                controller: tkController,
+                hasBottomPadding: hasBackground,
+                tabBar: tikTokTabBar,
+                header: header,
+                leftPage: searchPage,
+                rightPage: userPage,
+                enableGesture: tabBarType == TikTokPageTag.home,
+                //onPullDownRefresh: callList,
+                page: tabBarType != TikTokPageTag.home
+                    ? currentPage
+                    : PageView.builder(
+                        key: Key('home'),
+                        controller: _pageController,
+                        pageSnapping: true,
+                        onPageChanged: (value) {
+                          setState(() {
+                            userProfileId = listVideos[value].ownerId;
+                          });
+                        },
+                        physics: ClampingScrollPhysics(),
+                        scrollDirection: Axis.vertical,
+                        itemCount: _videoListController.videoCount,
+                        itemBuilder: (context, i) {
+                          var data = listVideos[i];
+                          bool isF = SafeMap(favoriteMap)[i].boolean ?? false;
+                          var player = _videoListController.playerOfIndex(i);
 
-                  if (isF == true && firebaseAuth.currentUser != null) {
-                    likesRef.add({
-                      'userId': currentUserId(),
-                      'postId': data.id,
-                      'dateCreated': Timestamp.now(),
-                    });
-                    addLikesToNotification(data);
-                  }
-                  Widget buttons = videoData(i);
-                  // video
-                  Widget currentVideo = Center(
-                    child: FijkView(
-                      fit: FijkFit.fitHeight,
-                      player: player,
-                      color: Colors.black,
-                      panelBuilder: (_, __, ___, ____, _____) => Container(),
-                    ),
-                  );
+                          if (isF == true && firebaseAuth.currentUser != null) {
+                            likesRef.add({
+                              'userId': currentUserId(),
+                              'postId': data.id,
+                              'dateCreated': Timestamp.now(),
+                            });
+                            addLikesToNotification(data);
+                          }
+                          Widget buttons = videoData(i);
+                          // video
+                          Widget currentVideo = Center(
+                            child: FijkView(
+                              fit: FijkFit.fitHeight,
+                              player: player,
+                              color: Colors.black,
+                              panelBuilder: (_, __, ___, ____, _____) =>
+                                  Container(),
+                            ),
+                          );
 
-                  currentVideo = TikTokVideoPage(
-                    hidePauseIcon: player.state != FijkState.paused,
-                    aspectRatio: 9 / 16.0,
-                    key: Key(data.mediaUrl + '$i'),
-                    tag: data.mediaUrl,
-                    bottomPadding: hasBottomPadding ? 16.0 : 16.0,
-                    onSingleTap: () async {
-                      if (player.state == FijkState.started) {
-                        await player.pause();
-                      } else {
-                        await player.start();
-                      }
-                    },
-                    onAddFavorite: () {
-                      setState(() {
-                        favoriteMap[i] = true;
-                      });
-                    },
-                    rightButtonColumn: buttons,
-                    video: currentVideo,
-                  );
-                  return currentVideo;
-                },
-              ));
+                          currentVideo = TikTokVideoPage(
+                            hidePauseIcon: player.state != FijkState.paused,
+                            aspectRatio: 9 / 16.0,
+                            key: Key(data.mediaUrl + '$i'),
+                            tag: data.mediaUrl,
+                            bottomPadding: hasBottomPadding ? 16.0 : 16.0,
+                            onSingleTap: () async {
+                              if (player.state == FijkState.started) {
+                                await player.pause();
+                              } else {
+                                await player.start();
+                              }
+                            },
+                            onAddFavorite: () {
+                              setState(() {
+                                favoriteMap[i] = true;
+                              });
+                            },
+                            rightButtonColumn: buttons,
+                            video: currentVideo,
+                          );
+                          return currentVideo;
+                        },
+                      ))));
   }
 
   SignInForCamera() {

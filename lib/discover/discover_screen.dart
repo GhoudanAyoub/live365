@@ -77,6 +77,48 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
     );
   }
 
+  Widget getAllUsers() {
+    return ResponsiveBuilder(builder: (context, sizingInformation) {
+      return SafeArea(
+          child: Scaffold(
+        body: Stack(
+          children: [
+            SizedBox(
+              height: 10,
+            ),
+            Padding(
+              padding: EdgeInsets.only(left: 15.0, right: 15.0),
+              child: Material(
+                elevation: 5.0,
+                borderRadius: BorderRadius.circular(50.0),
+                child: TextFormField(
+                    cursorColor: black,
+                    controller: searchController,
+                    onChanged: (query) {
+                      search(query);
+                    },
+                    decoration: InputDecoration(
+                        border: InputBorder.none,
+                        prefixIcon:
+                            Icon(Icons.search, color: GBottomNav, size: 30.0),
+                        contentPadding: EdgeInsets.only(left: 15.0, top: 15.0),
+                        hintText: 'Search',
+                        hintStyle: TextStyle(
+                            color: Colors.white,
+                            fontFamily: 'SFProDisplay-Black'))),
+              ),
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            Container(
+                margin: EdgeInsets.fromLTRB(0, 60, 0, 70), child: buildUsers())
+          ],
+        ),
+      ));
+    });
+  }
+
   Widget getVideosAndUsers() {
     return ResponsiveBuilder(
       builder: (context, sizingInformation) {
@@ -147,48 +189,6 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
         );
       },
     );
-  }
-
-  Widget getAllUsers() {
-    return ResponsiveBuilder(builder: (context, sizingInformation) {
-      return SafeArea(
-          child: Scaffold(
-        body: Stack(
-          children: [
-            SizedBox(
-              height: 10,
-            ),
-            Padding(
-              padding: EdgeInsets.only(left: 15.0, right: 15.0),
-              child: Material(
-                elevation: 5.0,
-                borderRadius: BorderRadius.circular(50.0),
-                child: TextFormField(
-                    cursorColor: black,
-                    controller: searchController,
-                    onChanged: (query) {
-                      search(query);
-                    },
-                    decoration: InputDecoration(
-                        border: InputBorder.none,
-                        prefixIcon:
-                            Icon(Icons.search, color: GBottomNav, size: 30.0),
-                        contentPadding: EdgeInsets.only(left: 15.0, top: 15.0),
-                        hintText: 'Search',
-                        hintStyle: TextStyle(
-                            color: Colors.white,
-                            fontFamily: 'SFProDisplay-Black'))),
-              ),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Container(
-                margin: EdgeInsets.fromLTRB(0, 60, 0, 70), child: buildUsers())
-          ],
-        ),
-      ));
-    });
   }
 
   buildUsers() {

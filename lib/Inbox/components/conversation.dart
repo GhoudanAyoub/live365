@@ -46,23 +46,6 @@ class _ConversationState extends State<Conversation> {
       isFirst = true;
     }
     chatId = widget.chatId;
-
-    messageController.addListener(() {
-      if (focusNode.hasFocus && messageController.text.isNotEmpty) {
-        setTyping(true);
-      } else if (!focusNode.hasFocus ||
-          (focusNode.hasFocus && messageController.text.isEmpty)) {
-        setTyping(false);
-      }
-    });
-  }
-
-  setTyping(typing) {
-    UserViewModel viewModel = Provider.of<UserViewModel>(context);
-    viewModel.setUser();
-    var user = Provider.of<UserViewModel>(context, listen: true).user;
-    Provider.of<ConversationViewModel>(context, listen: false)
-        .setUserTyping(widget.chatId, user, typing);
   }
 
   @override
@@ -140,17 +123,19 @@ class _ConversationState extends State<Conversation> {
                           child: TextField(
                             controller: messageController,
                             focusNode: focusNode,
+                            readOnly: false,
                             style: TextStyle(
                               fontSize: 15.0,
-                              color: white,
+                              color: Colors.white,
                             ),
+                            cursorColor: Colors.white,
                             decoration: InputDecoration(
                               contentPadding: EdgeInsets.all(10.0),
                               enabledBorder: InputBorder.none,
                               border: InputBorder.none,
-                              hintText: "Type your message",
+                              hintText: "Type your message ...",
                               hintStyle: TextStyle(
-                                color: white,
+                                color: Colors.grey,
                               ),
                             ),
                             maxLines: null,
