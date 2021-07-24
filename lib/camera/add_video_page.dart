@@ -16,6 +16,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_builder/responsive_builder.dart';
 
+import '../camera/share_video.dart';
 import '../theme.dart';
 
 class AddVideoPage extends StatefulWidget {
@@ -53,7 +54,10 @@ class _AddVideoPageState extends State<AddVideoPage> {
         });
         _initCameraController(cameras[selectedCameraIndex]).then((void v) {});
       } else {
-        print('No camera available');
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text("No Camera Available"),
+          duration: Duration(seconds: 2),
+        ));
       }
     }).catchError((err) {
       print('Error :${err.code}Error message : ${err.message}');
@@ -72,7 +76,6 @@ class _AddVideoPageState extends State<AddVideoPage> {
     }
     _cameraController =
         CameraController(cameraDescription, ResolutionPreset.high);
-    print('heloooo $cameraDescription');
 
     _cameraController.addListener(() {
       if (mounted) {
@@ -157,8 +160,15 @@ class _AddVideoPageState extends State<AddVideoPage> {
     try {
       await _cameraController.stopVideoRecording();
       setState(() {
-        _showBottomSheet(context);
         viewModel.setMediaUrl(File(_filePath));
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ShareVideo(
+                file: _filePath,
+                viewModel: viewModel,
+              ),
+            ));
       });
     } on CameraException catch (e) {
       print(e);

@@ -356,9 +356,6 @@ class _MiddlePage extends StatelessWidget {
     Widget tabBarContainer = tabBar ??
         Container(
           height: 150,
-          child: Placeholder(
-            color: Colors.red,
-          ),
         );
     Widget mainVideoList = Container(
       color: Color(0xff1D1F22),
@@ -391,7 +388,7 @@ class _MiddlePage extends StatelessWidget {
           offset: Offset(0, offsetY),
           child: SafeArea(
             child: Container(
-              child: header ?? Placeholder(color: Colors.green),
+              child: header,
             ),
           ),
         ),

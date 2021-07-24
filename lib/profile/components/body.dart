@@ -12,7 +12,6 @@ import 'package:LIVE365/profile/components/play_page.dart';
 import 'package:LIVE365/profile/components/profile_pic.dart';
 import 'package:LIVE365/utils/firebase.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -32,15 +31,14 @@ class Body extends StatefulWidget {
 
 class _BodyState extends State<Body> {
   final auth = FirebaseService();
-  User user;
+  UserModel user;
   bool isLoading = false;
   int postCount = 0;
   int followersCount = 0;
   int followingCount = 0;
   bool isToggle = true;
   bool isFollowing = false;
-  UserModel users;
-  UserModel user1;
+  UserModel users, users2;
   final DateTime timestamp = DateTime.now();
   ScrollController controller = ScrollController();
 
@@ -71,36 +69,9 @@ class _BodyState extends State<Body> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         elevation: 2,
         toolbarHeight: 30,
-        leading: firebaseAuth.currentUser != null
-            ? widget.profileId == firebaseAuth.currentUser.uid
-                ? IconButton(
-                    icon: Icon(
-                      CupertinoIcons.text_justify,
-                      color: Colors.white,
-                      size: 20,
-                    ),
-                    onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => SettingScreen(
-                              users: user1,
-                            ),
-                          ));
-                    })
-                : IconButton(
-                    icon: Icon(
-                      Icons.list,
-                      color: Colors.white,
-                    ),
-                    onPressed: () {
-                      reportSystem();
-                    })
-            : Container(
-                height: 0,
-              ),
       ),
       body: CustomScrollView(
         slivers: [
@@ -128,20 +99,31 @@ class _BodyState extends State<Body> {
                       style: TextStyle(fontWeight: FontWeight.w900),
                     ),
                     Spacer(),
-                    IconButton(
-                        icon: Icon(
-                          Icons.video_collection_outlined,
-                          color: Colors.white,
-                        ),
-                        onPressed: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => PlayPage(
-                                  clips: listvideo,
-                                ),
-                              ));
-                        }),
+                    StreamBuilder(
+                      stream: usersRef.doc(widget.profileId).snapshots(),
+                      builder:
+                          (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                        if (snapshot.hasData) {
+                          users2 = UserModel.fromJson(snapshot.data.data());
+                          return IconButton(
+                              icon: Icon(
+                                Icons.video_collection_outlined,
+                                color: Colors.white,
+                              ),
+                              onPressed: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => PlayPage(
+                                        clips: listvideo,
+                                        user: users2,
+                                      ),
+                                    ));
+                              });
+                        }
+                        return Container();
+                      },
+                    ),
                     buildIcons(),
                   ],
                 ),
@@ -151,6 +133,238 @@ class _BodyState extends State<Body> {
           })),
         ],
       ),
+    );
+  }
+
+  Widget displayUserInfo() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        StreamBuilder(
+          stream: usersRef.doc(widget.profileId).snapshots(),
+          builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+            if (snapshot.hasData) {
+              user = UserModel.fromJson(snapshot.data.data());
+              return Column(
+                children: <Widget>[
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      firebaseAuth.currentUser != null
+                          ? widget.profileId == firebaseAuth.currentUser.uid
+                              ? IconButton(
+                                  icon: Icon(
+                                    CupertinoIcons.text_justify,
+                                    color: Colors.white,
+                                    size: 20,
+                                  ),
+                                  onPressed: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => SettingScreen(
+                                            users: user,
+                                          ),
+                                        ));
+                                  })
+                              : IconButton(
+                                  icon: Icon(
+                                    Icons.list,
+                                    color: Colors.white,
+                                  ),
+                                  onPressed: () {
+                                    reportSystem();
+                                  })
+                          : Container(
+                              height: 0,
+                            )
+                    ],
+                  ),
+                  ProfilePic(
+                    image: firebaseAuth.currentUser != null &&
+                            firebaseAuth.currentUser.uid == user.id
+                        ? auth.getProfileImage()
+                        : user.photoUrl,
+                  ),
+                  SizedBox(height: 5),
+                  Column(
+                    children: [
+                      Center(
+                        child: Align(
+                          alignment: Alignment.center,
+                          child: Container(
+                            padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
+                            child: Text("${user.username ?? 'Anonymous'}",
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: getProportionateScreenWidth(22),
+                                  color: GTextColorWhite,
+                                  fontFamily: "SFProDisplay-Bold",
+                                  fontWeight: FontWeight.bold,
+                                )),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 5),
+                  Column(
+                    children: [
+                      Center(
+                        child: Align(
+                          alignment: Alignment.center,
+                          child: Container(
+                            padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
+                            width: 300.0,
+                            child: Text(
+                                "${user.bio.isEmpty ? 'Everyday LIVE365' : user.bio}",
+                                textAlign: TextAlign.center,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: getProportionateScreenWidth(12),
+                                  color: GTextColorWhite,
+                                  fontFamily: "SFProDisplay-Light",
+                                  fontWeight: FontWeight.normal,
+                                )),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 10.0),
+                  Container(
+                    height: 60.0,
+                    child: Align(
+                      alignment: Alignment.center,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                        child: FlatButton(
+                          padding: EdgeInsets.all(10),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15)),
+                          color: Color(0xFFF5F6F9),
+                          onPressed: () {},
+                          child: GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => FollowUnfollowPage(
+                                          profileId: widget.profileId),
+                                    ));
+                              },
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                children: <Widget>[
+                                  StreamBuilder(
+                                    stream: postRef
+                                        .where('ownerId',
+                                            isEqualTo: widget.profileId)
+                                        .snapshots(),
+                                    builder: (context,
+                                        AsyncSnapshot<QuerySnapshot> snapshot) {
+                                      if (snapshot.hasData) {
+                                        QuerySnapshot snap = snapshot.data;
+                                        List<DocumentSnapshot> docs = snap.docs;
+                                        return StreamBuilder(
+                                          stream: videoRef
+                                              .where('ownerId',
+                                                  isEqualTo: widget.profileId)
+                                              .snapshots(),
+                                          builder: (context,
+                                              AsyncSnapshot<QuerySnapshot>
+                                                  snapshot) {
+                                            if (snapshot.hasData) {
+                                              QuerySnapshot snap =
+                                                  snapshot.data;
+                                              List<DocumentSnapshot> docs1 =
+                                                  snap.docs;
+                                              return buildCount(
+                                                  "POSTS",
+                                                  docs.length + docs1?.length ??
+                                                      0);
+                                            } else {
+                                              return buildCount("POSTS", 0);
+                                            }
+                                          },
+                                        );
+                                      } else {
+                                        return buildCount("POSTS", 0);
+                                      }
+                                    },
+                                  ),
+                                  Padding(
+                                    padding:
+                                        const EdgeInsets.only(bottom: 15.0),
+                                    child: Container(
+                                      height: 50.0,
+                                      width: 0.3,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                  StreamBuilder(
+                                    stream: followersRef
+                                        .doc(widget.profileId)
+                                        .collection('userFollowers')
+                                        .snapshots(),
+                                    builder: (context,
+                                        AsyncSnapshot<QuerySnapshot> snapshot) {
+                                      if (snapshot.hasData) {
+                                        QuerySnapshot snap = snapshot.data;
+                                        List<DocumentSnapshot> docs = snap.docs;
+                                        return buildCount(
+                                            "FOLLOWERS", docs?.length ?? 0);
+                                      } else {
+                                        return buildCount("FOLLOWERS", 0);
+                                      }
+                                    },
+                                  ),
+                                  Padding(
+                                    padding:
+                                        const EdgeInsets.only(bottom: 15.0),
+                                    child: Container(
+                                      height: 50.0,
+                                      width: 0.3,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                  StreamBuilder(
+                                    stream: followingRef
+                                        .doc(widget.profileId)
+                                        .collection('userFollowing')
+                                        .snapshots(),
+                                    builder: (context,
+                                        AsyncSnapshot<QuerySnapshot> snapshot) {
+                                      if (snapshot.hasData) {
+                                        QuerySnapshot snap = snapshot.data;
+                                        List<DocumentSnapshot> docs = snap.docs;
+                                        return buildCount(
+                                            "FOLLOWING", docs?.length ?? 0);
+                                      } else {
+                                        return buildCount("FOLLOWING", 0);
+                                      }
+                                    },
+                                  ),
+                                ],
+                              )),
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 10.0),
+                  firebaseAuth.currentUser != null
+                      ? buildProfileButton(user)
+                      : Container(
+                          height: 0,
+                        ),
+                ],
+              );
+            }
+            return Container();
+          },
+        ),
+      ],
     );
   }
 
@@ -218,27 +432,6 @@ class _BodyState extends State<Body> {
     }
   }
 
-/*
-  buildVideos() {
-    return StreamBuilderWrapper(
-      shrinkWrap: true,
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      text: "No Posts For The Moment",
-      stream:
-          videoRef.where('ownerId', isEqualTo: widget.profileId).snapshots(),
-      physics: NeverScrollableScrollPhysics(),
-      itemBuilder: (_, DocumentSnapshot snapshot) {
-        Video video = Video.fromJson(snapshot.data());
-        return Padding(
-          padding: const EdgeInsets.only(bottom: 15.0),
-          child: Videos(
-            video: video,
-          ),
-        );
-      },
-    );
-  }
-*/
   buildPosts() {
     return StreamBuilderWrapper(
       shrinkWrap: true,
@@ -347,38 +540,36 @@ class _BodyState extends State<Body> {
   }
 
   handleFollow() async {
-    if (firebaseAuth.currentUser != null) {
-      DocumentSnapshot doc = await usersRef.doc(currentUserId()).get();
-      users = UserModel.fromJson(doc.data());
-      setState(() {
-        isFollowing = true;
-      });
-      //updates the followers collection of the followed user
-      followersRef
-          .doc(widget.profileId)
-          .collection('userFollowers')
-          .doc(currentUserId())
-          .set({});
-      //updates the following collection of the currentUser
-      followingRef
-          .doc(currentUserId())
-          .collection('userFollowing')
-          .doc(widget.profileId)
-          .set({});
-      //update the notification feeds
-      notificationRef
-          .doc(widget.profileId)
-          .collection('notifications')
-          .doc(currentUserId())
-          .set({
-        "type": "follow",
-        "ownerId": widget.profileId,
-        "username": users.username,
-        "userId": users.id,
-        "userDp": users.photoUrl,
-        "timestamp": timestamp,
-      });
-    }
+    DocumentSnapshot doc = await usersRef.doc(currentUserId()).get();
+    users = UserModel.fromJson(doc.data());
+    setState(() {
+      isFollowing = true;
+    });
+    //updates the followers collection of the followed user
+    followersRef
+        .doc(widget.profileId)
+        .collection('userFollowers')
+        .doc(currentUserId())
+        .set({});
+    //updates the following collection of the currentUser
+    followingRef
+        .doc(currentUserId())
+        .collection('userFollowing')
+        .doc(widget.profileId)
+        .set({});
+    //update the notification feeds
+    notificationRef
+        .doc(widget.profileId)
+        .collection('notifications')
+        .doc(currentUserId())
+        .set({
+      "type": "follow",
+      "ownerId": widget.profileId,
+      "username": users.username,
+      "userId": users.id,
+      "userDp": users.photoUrl,
+      "timestamp": timestamp,
+    });
   }
 
   buildButton({String text, Function function}) {
@@ -407,170 +598,6 @@ class _BodyState extends State<Body> {
           ),
         ),
       ),
-    );
-  }
-
-  Widget displayUserInfo() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        StreamBuilder(
-          stream: usersRef.doc(widget.profileId).snapshots(),
-          builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-            if (snapshot.hasData) {
-              UserModel user = UserModel.fromJson(snapshot.data.data());
-              return Column(
-                children: <Widget>[
-                  ProfilePic(
-                    image: firebaseAuth.currentUser != null &&
-                            firebaseAuth.currentUser.uid == user.id
-                        ? auth.getProfileImage()
-                        : user.photoUrl,
-                  ),
-                  SizedBox(height: 5),
-                  Text("${user.username ?? 'Anonymous'}",
-                      style: TextStyle(
-                        fontSize: getProportionateScreenWidth(22),
-                        color: GTextColorWhite,
-                        fontFamily: "SFProDisplay-Bold",
-                        fontWeight: FontWeight.bold,
-                      )),
-                  SizedBox(height: 5),
-                  Column(
-                    children: [
-                      Center(
-                        child: Align(
-                          alignment: Alignment.center,
-                          child: Container(
-                            padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
-                            child: Text(
-                                "${user.bio.isEmpty ? 'Everyday LIVE365' : user.bio}",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: getProportionateScreenWidth(12),
-                                  color: GTextColorWhite,
-                                  fontFamily: "SFProDisplay-Light",
-                                  fontWeight: FontWeight.normal,
-                                )),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 10.0),
-                  Container(
-                    height: 60.0,
-                    child: Align(
-                      alignment: Alignment.center,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                        child: FlatButton(
-                          padding: EdgeInsets.all(10),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15)),
-                          color: Color(0xFFF5F6F9),
-                          onPressed: () {},
-                          child: GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) => FollowUnfollowPage(
-                                          profileId: widget.profileId),
-                                    ));
-                              },
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceAround,
-                                children: <Widget>[
-                                  StreamBuilder(
-                                    stream: postRef
-                                        .where('ownerId',
-                                            isEqualTo: widget.profileId)
-                                        .snapshots(),
-                                    builder: (context,
-                                        AsyncSnapshot<QuerySnapshot> snapshot) {
-                                      if (snapshot.hasData) {
-                                        QuerySnapshot snap = snapshot.data;
-                                        List<DocumentSnapshot> docs = snap.docs;
-                                        return buildCount(
-                                            "POSTS", docs?.length ?? 0);
-                                      } else {
-                                        return buildCount("POSTS", 0);
-                                      }
-                                    },
-                                  ),
-                                  Padding(
-                                    padding:
-                                        const EdgeInsets.only(bottom: 15.0),
-                                    child: Container(
-                                      height: 50.0,
-                                      width: 0.3,
-                                      color: Colors.grey,
-                                    ),
-                                  ),
-                                  StreamBuilder(
-                                    stream: followersRef
-                                        .doc(widget.profileId)
-                                        .collection('userFollowers')
-                                        .snapshots(),
-                                    builder: (context,
-                                        AsyncSnapshot<QuerySnapshot> snapshot) {
-                                      if (snapshot.hasData) {
-                                        QuerySnapshot snap = snapshot.data;
-                                        List<DocumentSnapshot> docs = snap.docs;
-                                        return buildCount(
-                                            "FOLLOWERS", docs?.length ?? 0);
-                                      } else {
-                                        return buildCount("FOLLOWERS", 0);
-                                      }
-                                    },
-                                  ),
-                                  Padding(
-                                    padding:
-                                        const EdgeInsets.only(bottom: 15.0),
-                                    child: Container(
-                                      height: 50.0,
-                                      width: 0.3,
-                                      color: Colors.grey,
-                                    ),
-                                  ),
-                                  StreamBuilder(
-                                    stream: followingRef
-                                        .doc(widget.profileId)
-                                        .collection('userFollowing')
-                                        .snapshots(),
-                                    builder: (context,
-                                        AsyncSnapshot<QuerySnapshot> snapshot) {
-                                      if (snapshot.hasData) {
-                                        QuerySnapshot snap = snapshot.data;
-                                        List<DocumentSnapshot> docs = snap.docs;
-                                        return buildCount(
-                                            "FOLLOWING", docs?.length ?? 0);
-                                      } else {
-                                        return buildCount("FOLLOWING", 0);
-                                      }
-                                    },
-                                  ),
-                                ],
-                              )),
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 10.0),
-                  firebaseAuth.currentUser != null
-                      ? buildProfileButton(user)
-                      : Container(
-                          height: 0,
-                        ),
-                ],
-              );
-            }
-            return Container();
-          },
-        ),
-      ],
     );
   }
 

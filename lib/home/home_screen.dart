@@ -19,7 +19,10 @@ class _State extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(child: Scaffold(body: Body()));
+    return SafeArea(
+        child: Scaffold(
+            body:
+                new WillPopScope(onWillPop: () async => false, child: Body())));
   }
 
   @override
