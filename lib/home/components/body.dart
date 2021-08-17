@@ -198,6 +198,9 @@ class _BodyState extends State<Body>
     return Scaffold(
       body: Stack(
         children: [
+          SizedBox(
+            height: 20,
+          ),
           homeScreen(header, hasBottomPadding, currentPage, searchPage,
               tikTokTabBar, hasBackground),
           liveButton == true
@@ -978,16 +981,21 @@ class _BodyState extends State<Body>
                     ],
                   ),
                   SizedBox(width: 10.0),
-                  Column(
-                    children: [
-                      buildBookButton(video),
-                      Center(
-                          child: Text('Save',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white))),
-                    ],
-                  ),
+                  firebaseAuth.currentUser != null
+                      ? Column(
+                          children: [
+                            buildBookButton(video),
+                            Center(
+                                child: Text('Save',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white))),
+                          ],
+                        )
+                      : Container(
+                          width: 0,
+                          height: 0,
+                        ),
                 ],
               )
             ],
@@ -1014,39 +1022,38 @@ class _BodyState extends State<Body>
   }
 
   Widget buildBookButton(video) {
-    if (firebaseAuth.currentUser != null)
-      return StreamBuilder(
-        stream: bookRef
-            .where('postId', isEqualTo: video.id)
-            .where('userId', isEqualTo: currentUserId())
-            .snapshots(),
-        builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-          if (snapshot.hasData) {
-            List<QueryDocumentSnapshot> docs = snapshot?.data?.docs ?? [];
-            return IconButton(
-              onPressed: () {
-                if (docs.isEmpty) {
-                  bookRef.add({
-                    'userId': currentUserId(),
-                    'postId': video.id,
-                    'dateCreated': Timestamp.now(),
-                  });
-                } else {
-                  bookRef.doc(docs[0].id).delete();
-                }
-              },
-              icon: docs.isEmpty
-                  ? Icon(CupertinoIcons.bookmark, size: 25, color: Colors.white)
-                  : Icon(
-                      CupertinoIcons.bookmark_solid,
-                      size: 25,
-                      color: Colors.white,
-                    ),
-            );
-          }
-          return Container();
-        },
-      );
+    return StreamBuilder(
+      stream: bookRef
+          .where('postId', isEqualTo: video.id)
+          .where('userId', isEqualTo: currentUserId())
+          .snapshots(),
+      builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        if (snapshot.hasData) {
+          List<QueryDocumentSnapshot> docs = snapshot?.data?.docs ?? [];
+          return IconButton(
+            onPressed: () {
+              if (docs.isEmpty) {
+                bookRef.add({
+                  'userId': currentUserId(),
+                  'postId': video.id,
+                  'dateCreated': Timestamp.now(),
+                });
+              } else {
+                bookRef.doc(docs[0].id).delete();
+              }
+            },
+            icon: docs.isEmpty
+                ? Icon(CupertinoIcons.bookmark, size: 25, color: Colors.white)
+                : Icon(
+                    CupertinoIcons.bookmark_solid,
+                    size: 25,
+                    color: Colors.white,
+                  ),
+          );
+        }
+        return Container();
+      },
+    );
   }
 
   Widget buildCommentsCount(BuildContext context, int count) {

@@ -1,4 +1,3 @@
-import 'package:LIVE365/SizeConfig.dart';
 import 'package:LIVE365/models/User.dart';
 import 'package:LIVE365/models/post.dart';
 import 'package:LIVE365/profile/components/body.dart';
@@ -11,8 +10,6 @@ import 'package:flutter_icons/flutter_icons.dart';
 //import 'package:like_button/like_button.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
-import '../constants.dart';
-import 'cached_image.dart';
 import 'comment.dart';
 import 'indicators.dart';
 
@@ -37,119 +34,32 @@ class _PostsState extends State<Posts> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {},
-      child: Center(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.all(
-                Radius.circular(30.0),
-              ),
-              child: Stack(
-                children: [
-                  Container(
-                    height: 320.0,
-                    width: MediaQuery.of(context).size.width - 18.0,
-                    child: cachedNetworkImage(widget.post.mediaUrl),
-                  ),
-                  Positioned(
-                    left: 0.0,
-                    bottom: 0.0,
-                    width: getProportionateScreenWidth(350),
-                    child: Container(
-                      decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                              begin: Alignment.bottomCenter,
-                              end: Alignment.topCenter,
-                              colors: [
-                            Colors.black,
-                            Colors.black.withOpacity(0.1),
-                          ])),
-                    ),
-                  ),
-                  Positioned(
-                    left: 10.0,
-                    top: 10.0,
-                    right: 10.0,
-                    child: buildPostHeader(),
-                  ),
-                  Positioned(
-                    left: 10.0,
-                    bottom: 10.0,
-                    right: 10.0,
-                    child: buildPostButtom(),
-                  )
-                ],
-              ),
-            )
-          ],
+    return Padding(
+      padding: EdgeInsets.fromLTRB(0, 5, 0, 5),
+      child: Card(
+        elevation: 3,
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+        child: Stack(
+          children: [buildImage(context), buildPostButtom()],
         ),
       ),
-    );
-  }
-
-  showImageBig(BuildContext context) {
-    return showModalBottomSheet(
-      backgroundColor: GBottomNav,
-      context: context,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10.0),
-      ),
-      builder: (BuildContext context) {
-        return Scaffold(
-          body: Center(
-            child: Column(
-              children: [
-                buildImage(context),
-                SizedBox(
-                  height: getProportionateScreenHeight(10),
-                ),
-                ListTile(
-                  title: Text(
-                    widget.post.username,
-                    style: TextStyle(
-                        fontWeight: FontWeight.w800, color: Colors.white),
-                  ),
-                  subtitle: Row(
-                    children: [
-                      Icon(Feather.clock, color: Colors.white, size: 13.0),
-                      SizedBox(width: 3.0),
-                      Text(timeago.format(widget.post.timestamp.toDate()),
-                          style: TextStyle(
-                              fontWeight: FontWeight.normal,
-                              color: Colors.white)),
-                    ],
-                  ),
-                  trailing: buildLikeButton(),
-                )
-              ],
-            ),
-          ),
-        );
-      },
     );
   }
 
   buildImage(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(5.0),
-        child: CachedNetworkImage(
-          imageUrl: widget.post.mediaUrl,
-          placeholder: (context, url) {
-            return circularProgress(context);
-          },
-          errorWidget: (context, url, error) {
-            return Icon(Icons.error, color: Colors.white);
-          },
-          height: 400.0,
-          fit: BoxFit.cover,
-          width: MediaQuery.of(context).size.width,
-        ),
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(5.0),
+      child: CachedNetworkImage(
+        imageUrl: widget.post.mediaUrl,
+        placeholder: (context, url) {
+          return circularProgress(context);
+        },
+        errorWidget: (context, url, error) {
+          return Icon(Icons.error, color: Colors.white);
+        },
+        fit: BoxFit.cover,
+        width: MediaQuery.of(context).size.width,
       ),
     );
   }
@@ -232,19 +142,24 @@ class _PostsState extends State<Posts> {
       ),
       trailing: Wrap(children: [
         buildLikeButton(),
-        IconButton(
-          icon: Icon(
-            CupertinoIcons.chat_bubble,
-            color: Colors.white,
-          ),
-          onPressed: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (_) => Comments(post: widget.post),
+        firebaseAuth.currentUser != null
+            ? IconButton(
+                icon: Icon(
+                  CupertinoIcons.chat_bubble,
+                  color: Colors.white,
+                ),
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => Comments(post: widget.post),
+                    ),
+                  );
+                },
+              )
+            : Container(
+                width: 0,
+                height: 0,
               ),
-            );
-          },
-        ),
       ]),
     );
   }
@@ -270,12 +185,7 @@ class _PostsState extends State<Posts> {
                 ),
                 onPressed: () => handleDelete(context),
               )
-            : IconButton(
-                ///Feature coming soon
-                icon: Icon(CupertinoIcons.bookmark,
-                    color: Colors.white, size: 25.0),
-                onPressed: () {},
-              ),
+            : null,
       );
     } else
       return ListTile(

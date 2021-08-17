@@ -679,7 +679,8 @@ class _PlayPageState extends State<PlayPage>
                     ],
                   ),
                   SizedBox(width: 10.0),
-                  firebaseAuth.currentUser.uid == widget.user.id
+                  firebaseAuth.currentUser != null &&
+                          firebaseAuth.currentUser.uid == widget.user.id
                       ? Column(
                           children: [
                             IconButton(

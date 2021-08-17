@@ -156,7 +156,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
         body: Stack(
           children: [
             SizedBox(
-              height: 10,
+              height: 20,
             ),
             Padding(
               padding: EdgeInsets.only(left: 15.0, right: 15.0),

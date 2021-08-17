@@ -61,13 +61,13 @@ class _SettingScreenState extends State<SettingScreen> {
                 icon: "assets/icons/Question mark.svg",
                 press: _launchURL3,
               ),
-              ProfileMenu(
+              /* ProfileMenu(
                 text: "Buy Coins",
                 icon: "assets/icons/Question mark.svg",
                 press: () {
                   chooseUpload(context);
                 },
-              ),
+              ),*/
               ProfileMenu(
                 text: "Terms and Conditions",
                 icon: "assets/icons/Question mark.svg",

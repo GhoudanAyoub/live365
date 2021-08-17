@@ -33,7 +33,7 @@ dependencies:
   sliding_up_panel: ^1.0.2
   wakelock:
   permission_handler: ^3.0.0
-  url_launcher: ^5.7.10
+  url_launcher:
   font_awesome_flutter: 8.8.1
   gradient_text: 1.0.2
   image_picker: ^0.6.7+12

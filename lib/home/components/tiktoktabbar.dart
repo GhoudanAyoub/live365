@@ -107,7 +107,7 @@ class TikTokTabBar extends StatelessWidget {
             children: <Widget>[
               IconButton(
                 icon: SvgPicture.asset(
-                  "assets/icons/Search Icon.svg",
+                  "assets/icons/User Icon.svg",
                   color: white,
                 ),
               ),

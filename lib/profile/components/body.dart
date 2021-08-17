@@ -441,11 +441,8 @@ class _BodyState extends State<Body> {
       physics: NeverScrollableScrollPhysics(),
       itemBuilder: (_, DocumentSnapshot snapshot) {
         PostModel posts = PostModel.fromJson(snapshot.data());
-        return Padding(
-          padding: const EdgeInsets.only(bottom: 15.0),
-          child: Posts(
-            post: posts,
-          ),
+        return Posts(
+          post: posts,
         );
       },
     );
