@@ -576,35 +576,6 @@ class _BodyState extends State<Body>
                 fontWeight: FontWeight.bold,
               ),
             ),
-            /*
-            FlatButton(
-                onPressed: () {
-                  setState(() {
-                    followButton = false;
-                    liveButton = false;
-                    recommended = true;
-                  });
-                },
-                child: Text('RECOMMENDED',
-                    style: recommended
-                        ? TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: "SFProDisplay-Regular",
-                            fontSize: 16)
-                        : TextStyle(
-                            color: Colors.grey,
-                            fontFamily: "SFProDisplay-Regular",
-                            fontSize: 14))),
-            Text(
-              ".",
-              style: TextStyle(
-                fontFamily: "SFProDisplay-Bold",
-                color: orange,
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-            ),*/
             FlatButton(
                 onPressed: () {
                   setState(() {
@@ -1266,7 +1237,7 @@ class _BodyState extends State<Body>
         ),
         builder: (BuildContext context) {
           return FractionallySizedBox(
-            heightFactor: 1.1,
+            heightFactor: 1.0,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -1286,15 +1257,7 @@ class _BodyState extends State<Body>
       height: 390,
       child: Column(
         children: [
-          Flexible(
-            child: ListView(
-              children: [
-                Flexible(
-                  child: buildComments(video),
-                )
-              ],
-            ),
-          ),
+          Expanded(child: buildComments(video)),
           firebaseAuth.currentUser != null
               ? Align(
                   alignment: Alignment.bottomCenter,

@@ -9,7 +9,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
-import '../constants.dart';
 import 'cached_image.dart';
 import 'indicators.dart';
 
@@ -50,36 +49,18 @@ class _PostTileState extends State<PostTile> {
 
   showImageBig() {
     return showModalBottomSheet(
-      backgroundColor: GBottomNav,
+      backgroundColor: Colors.transparent,
       context: context,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10.0),
       ),
       builder: (BuildContext context) {
         return FractionallySizedBox(
-          heightFactor: 1.3,
+          heightFactor: 1.0,
           child: Center(
             child: Column(
               children: [
-                buildImage(context),
-                ListTile(
-                  title: Text(
-                    widget.post.username,
-                    style: TextStyle(
-                        fontWeight: FontWeight.w800, color: Colors.white),
-                  ),
-                  subtitle: Row(
-                    children: [
-                      Icon(Feather.clock, color: Colors.white, size: 13.0),
-                      SizedBox(width: 3.0),
-                      Text(timeago.format(widget.post.timestamp.toDate()),
-                          style: TextStyle(
-                              fontWeight: FontWeight.normal,
-                              color: Colors.white)),
-                    ],
-                  ),
-                  trailing: buildLikeButton(),
-                )
+                buildImageCard(),
               ],
             ),
           ),
@@ -87,6 +68,44 @@ class _PostTileState extends State<PostTile> {
       },
     );
   }
+
+  Widget buildImageCard() => Card(
+        clipBehavior: Clip.antiAlias,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24),
+        ),
+        child: Stack(
+          alignment: Alignment.bottomCenter,
+          children: [
+            Ink.image(
+              image: NetworkImage(widget.post.mediaUrl),
+              child: InkWell(
+                onTap: () {},
+                child: circularProgress(context),
+              ),
+              height: 350,
+              fit: BoxFit.cover,
+            ),
+            ListTile(
+              title: Text(
+                widget.post.username,
+                style:
+                    TextStyle(fontWeight: FontWeight.w800, color: Colors.white),
+              ),
+              subtitle: Row(
+                children: [
+                  Icon(Feather.clock, color: Colors.white, size: 13.0),
+                  SizedBox(width: 3.0),
+                  Text(timeago.format(widget.post.timestamp.toDate()),
+                      style: TextStyle(
+                          fontWeight: FontWeight.normal, color: Colors.white)),
+                ],
+              ),
+              trailing: buildLikeButton(),
+            )
+          ],
+        ),
+      );
 
   buildImage(BuildContext context) {
     return Padding(

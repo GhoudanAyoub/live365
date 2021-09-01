@@ -12,6 +12,7 @@ dependencies:
     sdk: flutter
 
 
+  lottie:
   fijkplayer: ^0.8.3
   # 基础的点击
   tapped:
@@ -92,6 +93,7 @@ flutter:
     - assets/images/
     - assets/icons/
     - assets/gift/
+    - assets/lotties/
 
 fonts:
   fonts:

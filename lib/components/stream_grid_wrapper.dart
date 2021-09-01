@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-
-import 'indicators.dart';
+import 'package:lottie/lottie.dart';
 
 typedef ItemBuilder<T> = Widget Function(
   BuildContext context,
@@ -57,7 +56,9 @@ class StreamGridWrapper extends StatelessWidget {
                   },
                 );
         } else {
-          return circularProgress(context);
+          return Center(
+            child: Lottie.asset('assets/lotties/loading-animation.json'),
+          );
         }
       },
     );

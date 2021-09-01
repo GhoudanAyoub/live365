@@ -73,65 +73,68 @@ class _BodyState extends State<Body> {
         elevation: 2,
         toolbarHeight: 30,
       ),
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            automaticallyImplyLeading: false,
-            pinned: true,
-            floating: true,
-            toolbarHeight: 1.0,
-            collapsedHeight: 1.0,
-            expandedHeight: 330.0,
-            flexibleSpace: FlexibleSpaceBar(
-              background: displayUserInfo(),
-            ),
-          ),
-          SliverList(delegate:
-              SliverChildBuilderDelegate((BuildContext context, int index) {
-            if (index > 0) return null;
-            return Column(children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                child: Row(
-                  children: [
-                    Text(
-                      'All Posts',
-                      style: TextStyle(fontWeight: FontWeight.w900),
-                    ),
-                    Spacer(),
-                    StreamBuilder(
-                      stream: usersRef.doc(widget.profileId).snapshots(),
-                      builder:
-                          (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-                        if (snapshot.hasData) {
-                          users2 = UserModel.fromJson(snapshot.data.data());
-                          return IconButton(
-                              icon: Icon(
-                                Icons.video_collection_outlined,
-                                color: Colors.white,
-                              ),
-                              onPressed: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => PlayPage(
-                                        clips: listvideo,
-                                        user: users2,
-                                      ),
-                                    ));
-                              });
-                        }
-                        return Container();
-                      },
-                    ),
-                    buildIcons(),
-                  ],
-                ),
+      body: Padding(
+        padding: EdgeInsets.only(bottom: 40),
+        child: CustomScrollView(
+          slivers: [
+            SliverAppBar(
+              automaticallyImplyLeading: false,
+              pinned: true,
+              floating: false,
+              toolbarHeight: 1.0,
+              collapsedHeight: 1.0,
+              expandedHeight: 330.0,
+              flexibleSpace: FlexibleSpaceBar(
+                background: displayUserInfo(),
               ),
-              buildPostView(),
-            ]);
-          })),
-        ],
+            ),
+            SliverList(delegate:
+                SliverChildBuilderDelegate((BuildContext context, int index) {
+              if (index > 0) return null;
+              return Column(children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  child: Row(
+                    children: [
+                      Text(
+                        'All Posts',
+                        style: TextStyle(fontWeight: FontWeight.w900),
+                      ),
+                      Spacer(),
+                      StreamBuilder(
+                        stream: usersRef.doc(widget.profileId).snapshots(),
+                        builder: (context,
+                            AsyncSnapshot<DocumentSnapshot> snapshot) {
+                          if (snapshot.hasData) {
+                            users2 = UserModel.fromJson(snapshot.data.data());
+                            return IconButton(
+                                icon: Icon(
+                                  Icons.video_collection_outlined,
+                                  color: Colors.white,
+                                ),
+                                onPressed: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => PlayPage(
+                                          clips: listvideo,
+                                          user: users2,
+                                        ),
+                                      ));
+                                });
+                          }
+                          return Container();
+                        },
+                      ),
+                      buildIcons(),
+                    ],
+                  ),
+                ),
+                buildPostView(),
+              ]);
+            })),
+          ],
+        ),
       ),
     );
   }

@@ -47,20 +47,9 @@ class _CommentsState extends State<Comments> {
         height: MediaQuery.of(context).size.height,
         child: Column(
           children: [
-            Flexible(
-              child: ListView(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                    child: Container(
-                      child: buildFullPost(),
-                    ),
-                  ),
-                  Flexible(
-                    child: buildComments(),
-                  )
-                ],
-              ),
+            buildImageCard(),
+            Expanded(
+              child: buildComments(),
             ),
             Align(
               alignment: Alignment.bottomCenter,
@@ -135,6 +124,59 @@ class _CommentsState extends State<Comments> {
     );
   }
 
+  Widget buildImageCard() => Card(
+        clipBehavior: Clip.antiAlias,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24),
+        ),
+        child: Stack(
+          alignment: Alignment.bottomCenter,
+          children: [
+            Container(
+              height: 350.0,
+              width: MediaQuery.of(context).size.width,
+              child: cachedNetworkImage(widget.post.mediaUrl),
+            ),
+            ListTile(
+              contentPadding: EdgeInsets.symmetric(horizontal: 10.0),
+              title: Text(
+                widget.post.description == null ? "" : widget.post.description,
+                overflow: TextOverflow.ellipsis,
+                style:
+                    TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+              ),
+              subtitle: Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: Row(
+                  children: [
+                    Text(timeago.format(widget.post.timestamp.toDate()),
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, color: Colors.white)),
+                    SizedBox(width: 3.0),
+                    StreamBuilder(
+                      stream: likesRef
+                          .where('postId', isEqualTo: widget.post.postId)
+                          .snapshots(),
+                      builder:
+                          (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                        if (snapshot.hasData) {
+                          QuerySnapshot snap = snapshot.data;
+                          List<DocumentSnapshot> docs = snap.docs;
+                          return buildLikesCount(context, docs?.length ?? 0);
+                        } else {
+                          return buildLikesCount(context, 0);
+                        }
+                      },
+                    ),
+                    SizedBox(width: 5.0),
+                    buildLikeButton()
+                  ],
+                ),
+              ),
+            )
+          ],
+        ),
+      );
   buildFullPost() {
     return Column(
       mainAxisSize: MainAxisSize.min,

@@ -36,17 +36,110 @@ class _PostsState extends State<Posts> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.fromLTRB(0, 5, 0, 5),
-      child: Card(
-        elevation: 3,
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-        child: Stack(
-          children: [buildImage(context), buildPostButtom()],
-        ),
-      ),
-    );
+        padding: EdgeInsets.fromLTRB(0, 5, 0, 5), child: buildImageCard());
   }
+
+  Widget buildImageCard() => Card(
+        clipBehavior: Clip.antiAlias,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24),
+        ),
+        child: Stack(
+          alignment: Alignment.bottomCenter,
+          children: [
+            Ink.image(
+              image: NetworkImage(widget.post.mediaUrl),
+              child: InkWell(
+                onTap: () {},
+              ),
+              height: 350,
+              fit: BoxFit.cover,
+            ),
+            ListTile(
+              title: Text(
+                widget.post.description == null ? "" : widget.post.description,
+                overflow: TextOverflow.ellipsis,
+                style:
+                    TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+              ),
+              subtitle: Row(
+                children: [
+                  Text(timeago.format(widget.post.timestamp.toDate()),
+                      style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.normal,
+                          color: Colors.white)),
+                  SizedBox(width: 3.0),
+                  StreamBuilder(
+                    stream: likesRef
+                        .where('postId', isEqualTo: widget.post.postId)
+                        .snapshots(),
+                    builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                      if (snapshot.hasData) {
+                        QuerySnapshot snap = snapshot.data;
+                        List<DocumentSnapshot> docs = snap.docs;
+                        l = docs?.length ?? 0;
+                        return buildLikesCount(context, docs?.length ?? 0);
+                      } else {
+                        return buildLikesCount(context, 0);
+                      }
+                    },
+                  ),
+                  SizedBox(width: 5.0),
+                  StreamBuilder(
+                    stream: commentRef
+                        .doc(widget.post.postId)
+                        .collection("comments")
+                        .snapshots(),
+                    builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                      if (snapshot.hasData) {
+                        QuerySnapshot snap = snapshot.data;
+                        List<DocumentSnapshot> docs = snap.docs;
+                        c = docs?.length ?? 0;
+                        return buildCommentsCount(context, docs?.length ?? 0);
+                      } else {
+                        return buildCommentsCount(context, 0);
+                      }
+                    },
+                  ),
+                  SizedBox(width: 5.0),
+                  buildLikeButton(),
+                  firebaseAuth.currentUser != null
+                      ? IconButton(
+                          icon: Icon(
+                            CupertinoIcons.chat_bubble,
+                            color: Colors.white,
+                          ),
+                          onPressed: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => Comments(post: widget.post),
+                              ),
+                            );
+                          },
+                        )
+                      : Container(
+                          width: 0,
+                          height: 0,
+                        ),
+                  firebaseAuth.currentUser != null &&
+                          firebaseAuth.currentUser.uid == widget.post.ownerId
+                      ? IconButton(
+                          onPressed: () {
+                            deleteImage(context, widget.post.id);
+                          },
+                          icon: Icon(CupertinoIcons.delete,
+                              size: 20, color: Colors.white),
+                        )
+                      : Container(
+                          height: 0,
+                        ),
+                ],
+              ),
+            )
+          ],
+        ),
+      );
 
   buildImage(BuildContext context) {
     return ClipRRect(
