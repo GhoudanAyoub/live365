@@ -32,6 +32,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:lottie/lottie.dart';
 import 'package:safemap/safemap.dart';
 import 'package:screen/screen.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -70,6 +71,7 @@ class _BodyState extends State<Body>
   final DateTime timestamp = DateTime.now();
   UserModel user;
   String profileId;
+  Live live;
 
   currentUserId() {
     return firebaseAuth.currentUser.uid;
@@ -613,6 +615,20 @@ class _BodyState extends State<Body>
       );
   Widget scrollFeed() {
     if (firebaseAuth.currentUser != null) {
+      if (live != null && live.endAt != null)
+        return Center(
+            child: Column(
+          children: [
+            SizedBox(
+              height: 100,
+            ),
+            Lottie.asset('assets/lotties/chat_not_ready.json'),
+            Text(
+              "No Live For The Moment",
+              style: TextStyle(fontSize: 14, color: Colors.white),
+            )
+          ],
+        ));
       return CustomScrollView(
         slivers: <Widget>[
           SliverList(
@@ -626,7 +642,7 @@ class _BodyState extends State<Body>
                     "\n\n\n\n\n\n\n\nRush and Be The First To\nUpload The First Live 😊",
                 physics: NeverScrollableScrollPhysics(),
                 itemBuilder: (_, DocumentSnapshot snapshot) {
-                  Live live = Live.fromJson(snapshot.data());
+                  live = Live.fromJson(snapshot.data());
                   if (live.endAt != null) return Container();
                   return GestureDetector(
                       onTap: () {

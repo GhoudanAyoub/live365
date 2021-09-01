@@ -246,111 +246,103 @@ class _BodyState extends State<Body> {
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(15)),
                           color: Color(0xFFF5F6F9),
-                          onPressed: () {},
-                          child: GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) => FollowUnfollowPage(
-                                          profileId: widget.profileId),
-                                    ));
-                              },
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceAround,
-                                children: <Widget>[
-                                  StreamBuilder(
-                                    stream: postRef
-                                        .where('ownerId',
-                                            isEqualTo: widget.profileId)
-                                        .snapshots(),
-                                    builder: (context,
-                                        AsyncSnapshot<QuerySnapshot> snapshot) {
-                                      if (snapshot.hasData) {
-                                        QuerySnapshot snap = snapshot.data;
-                                        List<DocumentSnapshot> docs = snap.docs;
-                                        return StreamBuilder(
-                                          stream: videoRef
-                                              .where('ownerId',
-                                                  isEqualTo: widget.profileId)
-                                              .snapshots(),
-                                          builder: (context,
-                                              AsyncSnapshot<QuerySnapshot>
-                                                  snapshot) {
-                                            if (snapshot.hasData) {
-                                              QuerySnapshot snap =
-                                                  snapshot.data;
-                                              List<DocumentSnapshot> docs1 =
-                                                  snap.docs;
-                                              return buildCount(
-                                                  "POSTS",
-                                                  docs.length + docs1?.length ??
-                                                      0);
-                                            } else {
-                                              return buildCount("POSTS", 0);
-                                            }
-                                          },
-                                        );
-                                      } else {
-                                        return buildCount("POSTS", 0);
-                                      }
-                                    },
-                                  ),
-                                  Padding(
-                                    padding:
-                                        const EdgeInsets.only(bottom: 15.0),
-                                    child: Container(
-                                      height: 50.0,
-                                      width: 0.3,
-                                      color: Colors.grey,
-                                    ),
-                                  ),
-                                  StreamBuilder(
-                                    stream: followersRef
-                                        .doc(widget.profileId)
-                                        .collection('userFollowers')
-                                        .snapshots(),
-                                    builder: (context,
-                                        AsyncSnapshot<QuerySnapshot> snapshot) {
-                                      if (snapshot.hasData) {
-                                        QuerySnapshot snap = snapshot.data;
-                                        List<DocumentSnapshot> docs = snap.docs;
-                                        return buildCount(
-                                            "FOLLOWERS", docs?.length ?? 0);
-                                      } else {
-                                        return buildCount("FOLLOWERS", 0);
-                                      }
-                                    },
-                                  ),
-                                  Padding(
-                                    padding:
-                                        const EdgeInsets.only(bottom: 15.0),
-                                    child: Container(
-                                      height: 50.0,
-                                      width: 0.3,
-                                      color: Colors.grey,
-                                    ),
-                                  ),
-                                  StreamBuilder(
-                                    stream: followingRef
-                                        .doc(widget.profileId)
-                                        .collection('userFollowing')
-                                        .snapshots(),
-                                    builder: (context,
-                                        AsyncSnapshot<QuerySnapshot> snapshot) {
-                                      if (snapshot.hasData) {
-                                        QuerySnapshot snap = snapshot.data;
-                                        List<DocumentSnapshot> docs = snap.docs;
-                                        return buildCount(
-                                            "FOLLOWING", docs?.length ?? 0);
-                                      } else {
-                                        return buildCount("FOLLOWING", 0);
-                                      }
-                                    },
-                                  ),
-                                ],
-                              )),
+                          onPressed: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => FollowUnfollowPage(
+                                      profileId: widget.profileId),
+                                ));
+                          },
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: <Widget>[
+                              StreamBuilder(
+                                stream: postRef
+                                    .where('ownerId',
+                                        isEqualTo: widget.profileId)
+                                    .snapshots(),
+                                builder: (context,
+                                    AsyncSnapshot<QuerySnapshot> snapshot) {
+                                  if (snapshot.hasData) {
+                                    QuerySnapshot snap = snapshot.data;
+                                    List<DocumentSnapshot> docs = snap.docs;
+                                    return StreamBuilder(
+                                      stream: videoRef
+                                          .where('ownerId',
+                                              isEqualTo: widget.profileId)
+                                          .snapshots(),
+                                      builder: (context,
+                                          AsyncSnapshot<QuerySnapshot>
+                                              snapshot) {
+                                        if (snapshot.hasData) {
+                                          QuerySnapshot snap = snapshot.data;
+                                          List<DocumentSnapshot> docs1 =
+                                              snap.docs;
+                                          return buildCount("POSTS",
+                                              docs.length + docs1?.length ?? 0);
+                                        } else {
+                                          return buildCount("POSTS", 0);
+                                        }
+                                      },
+                                    );
+                                  } else {
+                                    return buildCount("POSTS", 0);
+                                  }
+                                },
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 15.0),
+                                child: Container(
+                                  height: 50.0,
+                                  width: 0.3,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                              StreamBuilder(
+                                stream: followersRef
+                                    .doc(widget.profileId)
+                                    .collection('userFollowers')
+                                    .snapshots(),
+                                builder: (context,
+                                    AsyncSnapshot<QuerySnapshot> snapshot) {
+                                  if (snapshot.hasData) {
+                                    QuerySnapshot snap = snapshot.data;
+                                    List<DocumentSnapshot> docs = snap.docs;
+                                    return buildCount(
+                                        "FOLLOWERS", docs?.length ?? 0);
+                                  } else {
+                                    return buildCount("FOLLOWERS", 0);
+                                  }
+                                },
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 15.0),
+                                child: Container(
+                                  height: 50.0,
+                                  width: 0.3,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                              StreamBuilder(
+                                stream: followingRef
+                                    .doc(widget.profileId)
+                                    .collection('userFollowing')
+                                    .snapshots(),
+                                builder: (context,
+                                    AsyncSnapshot<QuerySnapshot> snapshot) {
+                                  if (snapshot.hasData) {
+                                    QuerySnapshot snap = snapshot.data;
+                                    List<DocumentSnapshot> docs = snap.docs;
+                                    return buildCount(
+                                        "FOLLOWING", docs?.length ?? 0);
+                                  } else {
+                                    return buildCount("FOLLOWING", 0);
+                                  }
+                                },
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
