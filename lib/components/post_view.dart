@@ -50,7 +50,13 @@ class _PostsState extends State<Posts> {
             Ink.image(
               image: NetworkImage(widget.post.mediaUrl),
               child: InkWell(
-                onTap: () {},
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => Comments(post: widget.post),
+                    ),
+                  );
+                },
               ),
               height: 350,
               fit: BoxFit.cover,

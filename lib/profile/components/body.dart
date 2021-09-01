@@ -98,7 +98,8 @@ class _BodyState extends State<Body> {
                     children: [
                       Text(
                         'All Posts',
-                        style: TextStyle(fontWeight: FontWeight.w900),
+                        style: TextStyle(
+                            fontWeight: FontWeight.w900, color: Colors.white),
                       ),
                       Spacer(),
                       StreamBuilder(
@@ -113,14 +114,23 @@ class _BodyState extends State<Body> {
                                   color: Colors.white,
                                 ),
                                 onPressed: () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => PlayPage(
-                                          clips: listvideo,
-                                          user: users2,
-                                        ),
-                                      ));
+                                  if (listvideo.length != 0)
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => PlayPage(
+                                            clips: listvideo,
+                                            user: users2,
+                                          ),
+                                        ));
+                                  else
+                                    ScaffoldMessenger.of(context)
+                                        .showSnackBar(SnackBar(
+                                      content: Text(
+                                          'Mr ${users2.username} Didn\'t Post Anything yet '),
+                                      duration: Duration(seconds: 2),
+                                      backgroundColor: Colors.green,
+                                    ));
                                 });
                           }
                           return Container();

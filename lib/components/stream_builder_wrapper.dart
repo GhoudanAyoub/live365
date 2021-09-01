@@ -39,7 +39,10 @@ class StreamBuilderWrapper extends StatelessWidget {
                   padding: const EdgeInsets.only(top: 100.0),
                   child: Center(
                     child: Container(
-                      child: Text(text),
+                      child: Text(
+                        text,
+                        style: TextStyle(color: Colors.white),
+                      ),
                     ),
                   ),
                 )

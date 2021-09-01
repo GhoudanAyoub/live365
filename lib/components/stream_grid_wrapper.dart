@@ -37,7 +37,10 @@ class StreamGridWrapper extends StatelessWidget {
                   padding: const EdgeInsets.only(top: 100.0),
                   child: Container(
                     child: Center(
-                      child: Text('No Posts For The Moment'),
+                      child: Text(
+                        'No Posts For The Moment',
+                        style: TextStyle(color: Colors.white),
+                      ),
                     ),
                   ),
                 )
