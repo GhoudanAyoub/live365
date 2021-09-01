@@ -10,6 +10,7 @@ import 'package:flutter_icons/flutter_icons.dart';
 //import 'package:like_button/like_button.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
+import '../constants.dart';
 import 'comment.dart';
 import 'indicators.dart';
 
@@ -60,6 +61,7 @@ class _PostsState extends State<Posts> {
         },
         fit: BoxFit.cover,
         width: MediaQuery.of(context).size.width,
+        height: 300,
       ),
     );
   }
@@ -89,79 +91,117 @@ class _PostsState extends State<Posts> {
 
   buildPostButtom() {
     return ListTile(
-      contentPadding: EdgeInsets.symmetric(horizontal: 10.0),
       title: Text(
         widget.post.description == null ? "" : widget.post.description,
         overflow: TextOverflow.ellipsis,
         style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
       ),
-      subtitle: Padding(
-        padding: const EdgeInsets.only(top: 8.0),
-        child: Row(
-          children: [
-            Text(timeago.format(widget.post.timestamp.toDate()),
-                style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.normal,
-                    color: Colors.white)),
-            SizedBox(width: 3.0),
-            StreamBuilder(
-              stream: likesRef
-                  .where('postId', isEqualTo: widget.post.postId)
-                  .snapshots(),
-              builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                if (snapshot.hasData) {
-                  QuerySnapshot snap = snapshot.data;
-                  List<DocumentSnapshot> docs = snap.docs;
-                  l = docs?.length ?? 0;
-                  return buildLikesCount(context, docs?.length ?? 0);
-                } else {
-                  return buildLikesCount(context, 0);
-                }
-              },
-            ),
-            SizedBox(width: 5.0),
-            StreamBuilder(
-              stream: commentRef
-                  .doc(widget.post.postId)
-                  .collection("comments")
-                  .snapshots(),
-              builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                if (snapshot.hasData) {
-                  QuerySnapshot snap = snapshot.data;
-                  List<DocumentSnapshot> docs = snap.docs;
-                  c = docs?.length ?? 0;
-                  return buildCommentsCount(context, docs?.length ?? 0);
-                } else {
-                  return buildCommentsCount(context, 0);
-                }
-              },
-            ),
-          ],
-        ),
-      ),
-      trailing: Wrap(children: [
-        buildLikeButton(),
-        firebaseAuth.currentUser != null
-            ? IconButton(
-                icon: Icon(
-                  CupertinoIcons.chat_bubble,
-                  color: Colors.white,
+      subtitle: Row(
+        children: [
+          Text(timeago.format(widget.post.timestamp.toDate()),
+              style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.normal,
+                  color: Colors.white)),
+          SizedBox(width: 3.0),
+          StreamBuilder(
+            stream: likesRef
+                .where('postId', isEqualTo: widget.post.postId)
+                .snapshots(),
+            builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+              if (snapshot.hasData) {
+                QuerySnapshot snap = snapshot.data;
+                List<DocumentSnapshot> docs = snap.docs;
+                l = docs?.length ?? 0;
+                return buildLikesCount(context, docs?.length ?? 0);
+              } else {
+                return buildLikesCount(context, 0);
+              }
+            },
+          ),
+          SizedBox(width: 5.0),
+          StreamBuilder(
+            stream: commentRef
+                .doc(widget.post.postId)
+                .collection("comments")
+                .snapshots(),
+            builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+              if (snapshot.hasData) {
+                QuerySnapshot snap = snapshot.data;
+                List<DocumentSnapshot> docs = snap.docs;
+                c = docs?.length ?? 0;
+                return buildCommentsCount(context, docs?.length ?? 0);
+              } else {
+                return buildCommentsCount(context, 0);
+              }
+            },
+          ),
+          SizedBox(width: 5.0),
+          buildLikeButton(),
+          firebaseAuth.currentUser != null
+              ? IconButton(
+                  icon: Icon(
+                    CupertinoIcons.chat_bubble,
+                    color: Colors.white,
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => Comments(post: widget.post),
+                      ),
+                    );
+                  },
+                )
+              : Container(
+                  width: 0,
+                  height: 0,
                 ),
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => Comments(post: widget.post),
-                    ),
-                  );
-                },
-              )
-            : Container(
-                width: 0,
-                height: 0,
-              ),
-      ]),
+          firebaseAuth.currentUser != null &&
+                  firebaseAuth.currentUser.uid == widget.post.ownerId
+              ? IconButton(
+                  onPressed: () {
+                    deleteImage(context, widget.post.id);
+                  },
+                  icon: Icon(CupertinoIcons.delete,
+                      size: 20, color: Colors.white),
+                )
+              : Container(
+                  height: 0,
+                ),
+        ],
+      ),
     );
+  }
+
+  deleteImage(BuildContext parentContext, videoid) {
+    return showDialog(
+        context: parentContext,
+        builder: (context) {
+          return SimpleDialog(
+            backgroundColor: GBottomNav,
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(5.0)),
+            children: [
+              SimpleDialogOption(
+                onPressed: () {
+                  Navigator.pop(context);
+                  postRef.doc(videoid).delete();
+                },
+                child: Text(
+                  'Delete',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+              Divider(),
+              SimpleDialogOption(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text('Cancel', style: TextStyle(color: Colors.white)),
+              ),
+            ],
+          );
+        });
   }
 
   buildPostHeader() {

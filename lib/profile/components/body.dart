@@ -435,7 +435,7 @@ class _BodyState extends State<Body> {
   buildPosts() {
     return StreamBuilderWrapper(
       shrinkWrap: true,
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      padding: const EdgeInsets.fromLTRB(10, 0, 10, 20),
       text: "No Posts For The Moment",
       stream: postRef.where('ownerId', isEqualTo: widget.profileId).snapshots(),
       physics: NeverScrollableScrollPhysics(),
