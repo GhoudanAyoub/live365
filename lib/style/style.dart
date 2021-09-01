@@ -18,6 +18,7 @@ class StandardTextStyle {
   static const TextStyle big = const TextStyle(
     fontWeight: FontWeight.w600,
     fontSize: SysSize.big,
+    color: Colors.white,
     inherit: true,
   );
   static const TextStyle bigWithOpacity = const TextStyle(

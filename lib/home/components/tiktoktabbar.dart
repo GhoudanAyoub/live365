@@ -1,8 +1,8 @@
 import 'package:LIVE365/components/cam_icon.dart';
 import 'package:LIVE365/components/selectedtext.dart';
 import 'package:LIVE365/style/style.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 
 import '../../constants.dart';
 
@@ -40,10 +40,15 @@ class TikTokTabBar extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
               IconButton(
-                icon: SvgPicture.asset(
-                  "assets/icons/Phone.svg",
-                  color: white,
+                icon: Icon(
+                  current == TikTokPageTag.home
+                      ? CupertinoIcons.rhombus_fill
+                      : CupertinoIcons.rhombus,
+                  color: current == TikTokPageTag.home
+                      ? Colors.white
+                      : Colors.grey,
                 ),
+                onPressed: null,
               ),
               Center(
                 child: SelectText(
@@ -61,10 +66,15 @@ class TikTokTabBar extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
               IconButton(
-                icon: SvgPicture.asset(
-                  "assets/icons/Search Icon.svg",
-                  color: white,
+                icon: Icon(
+                  current == TikTokPageTag.search
+                      ? CupertinoIcons.search_circle_fill
+                      : CupertinoIcons.search,
+                  color: current == TikTokPageTag.search
+                      ? Colors.white
+                      : Colors.grey,
                 ),
+                onPressed: null,
               ),
               Center(
                 child: SelectText(
@@ -85,10 +95,14 @@ class TikTokTabBar extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
               IconButton(
-                icon: SvgPicture.asset(
-                  "assets/icons/Chat bubble Icon.svg",
-                  color: white,
+                icon: Icon(
+                  current == TikTokPageTag.msg
+                      ? CupertinoIcons.chat_bubble_2_fill
+                      : CupertinoIcons.chat_bubble_2,
+                  color:
+                      current == TikTokPageTag.msg ? Colors.white : Colors.grey,
                 ),
+                onPressed: null,
               ),
               Center(
                 child: SelectText(
@@ -106,10 +120,14 @@ class TikTokTabBar extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
               IconButton(
-                icon: SvgPicture.asset(
-                  "assets/icons/User Icon.svg",
-                  color: white,
+                icon: Icon(
+                  current == TikTokPageTag.me
+                      ? Icons.supervised_user_circle
+                      : CupertinoIcons.profile_circled,
+                  color:
+                      current == TikTokPageTag.me ? Colors.white : Colors.grey,
                 ),
+                onPressed: null,
               ),
               Center(
                 child: SelectText(
