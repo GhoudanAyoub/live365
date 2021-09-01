@@ -1,6 +1,5 @@
 import 'package:LIVE365/components/cam_icon.dart';
 import 'package:LIVE365/components/selectedtext.dart';
-import 'package:LIVE365/style/style.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -30,7 +29,6 @@ class TikTokTabBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final EdgeInsets padding = MediaQuery.of(context).padding;
     Widget row = Row(
       children: <Widget>[
         Expanded(
@@ -141,10 +139,10 @@ class TikTokTabBar extends StatelessWidget {
       ],
     );
     return Container(
-      color: hasBackground ? GBottomNav : ColorPlate.back2.withOpacity(0),
+      color: current == TikTokPageTag.home ? Colors.transparent : GBottomNav,
       child: Container(
-        padding: EdgeInsets.only(bottom: padding.bottom),
-        height: 70 + padding.bottom,
+        padding: EdgeInsets.only(bottom: 10),
+        height: 80,
         child: row,
       ),
     );
