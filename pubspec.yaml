@@ -16,7 +16,8 @@ dependencies:
   fijkplayer: ^0.8.3
   # 基础的点击
   tapped:
-  # map取值
+  get:
+  http:
   safemap:
   firebase_core: "any"
   firebase_auth: "any"

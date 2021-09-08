@@ -13,6 +13,7 @@ import 'package:LIVE365/components/stream_builder_wrapper.dart';
 import 'package:LIVE365/components/stream_comments_wrapper.dart';
 import 'package:LIVE365/discover/discover_screen.dart';
 import 'package:LIVE365/firebaseService/FirebaseService.dart';
+import 'package:LIVE365/helper/videos_controller.dart';
 import 'package:LIVE365/home/components/tiktokscafold.dart';
 import 'package:LIVE365/home/components/tiktoktabbar.dart';
 import 'package:LIVE365/home/components/tiktokvideopage.dart';
@@ -32,7 +33,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:lottie/lottie.dart';
+import 'package:get/get.dart';
 import 'package:safemap/safemap.dart';
 import 'package:screen/screen.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -48,6 +49,7 @@ class Body extends StatefulWidget {
 
 class _BodyState extends State<Body>
     with SingleTickerProviderStateMixin, WidgetsBindingObserver {
+  final VideosController videosController = Get.put(VideosController());
   PageController _pageController = PageController();
   VideoListController _videoListController = VideoListController();
   TikTokScaffoldController tkController = TikTokScaffoldController();
@@ -620,9 +622,13 @@ class _BodyState extends State<Body>
             child: Column(
           children: [
             SizedBox(
-              height: 100,
+              height: 200,
             ),
-            Lottie.asset('assets/lotties/chat_not_ready.json'),
+            Icon(
+              CupertinoIcons.videocam,
+              color: Colors.white,
+              size: 100,
+            ),
             Text(
               "No Live For The Moment",
               style: TextStyle(fontSize: 14, color: Colors.white),

@@ -1,5 +1,13 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:video_player/video_player.dart';
+
+List<Video> VideoFromJson(String str) =>
+    List<Video>.from(json.decode(str).map((x) => Video.fromJson(x)));
+
+String VideoToJson(List<Video> data) =>
+    json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
 class Video {
   String id;
