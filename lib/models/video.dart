@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:video_player/video_player.dart';
 
 List<Video> VideoFromJson(String str) =>
@@ -20,7 +19,7 @@ class Video {
   String tags;
   String description;
   String mediaUrl;
-  Timestamp timestamp;
+  String timestamp;
 
   VideoPlayerController controller;
 

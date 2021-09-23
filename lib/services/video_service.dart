@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:LIVE365/models/User.dart';
 import 'package:LIVE365/models/video.dart';
+import 'package:LIVE365/services/remote_services.dart';
 import 'package:LIVE365/services/services.dart';
 import 'package:LIVE365/utils/firebase.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -37,7 +38,11 @@ class VideoService extends Service {
         await usersRef.doc(firebaseAuth.currentUser.uid).get();
     user = UserModel.fromJson(doc.data());
     var ref = videoRef.doc();
-    ref.set({
+    //MySql
+    RemoteServices.addVideos(
+        ref, link, user, image, songName, videoTitle, tags, description);
+    //Firebase
+    /* ref.set({
       "id": ref.id,
       "videoId": ref.id,
       "videoTitle": videoTitle,
@@ -51,7 +56,7 @@ class VideoService extends Service {
       "timestamp": Timestamp.now(),
     }).catchError((e) {
       print(e);
-    });
+    });*/
   }
 
   uploadComment(String username, String comment, String userDp, String userId,

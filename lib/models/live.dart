@@ -1,5 +1,12 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+List<Live> LiveFromJson(String str) =>
+    List<Live>.from(json.decode(str).map((x) => Live.fromJson(x)));
+
+String LiveToJson(List<Live> data) =>
+    json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 class Live {
   String id;
   String ownerId;
@@ -40,4 +47,21 @@ class Live {
         startAt: json['startAt'],
         endAt: json['endAt'],
       );
+
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = this.id;
+    data['image'] = this.image;
+    data['channelId'] = this.channelId;
+    data['ownerId'] = this.ownerId;
+    data['username'] = this.username;
+    data['channelName'] = this.channelName;
+    data['hostImage'] = this.hostImage;
+    data['views'] = this.views;
+    data['me'] = this.me;
+    data['startAt'] = this.startAt;
+    data['endAt'] = this.endAt;
+    return data;
+  }
 }

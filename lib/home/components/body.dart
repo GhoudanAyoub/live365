@@ -23,7 +23,7 @@ import 'package:LIVE365/models/live.dart';
 import 'package:LIVE365/models/post_comments.dart';
 import 'package:LIVE365/models/video.dart';
 import 'package:LIVE365/profile/profile_screen.dart';
-import 'package:LIVE365/services/remote_services.dart';
+import 'package:LIVE365/services/video_service.dart';
 import 'package:LIVE365/style/style.dart';
 import 'package:LIVE365/utils/firebase.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -108,7 +108,7 @@ class _BodyState extends State<Body>
   }
 
   callList() async {
-    listVideos = await RemoteServices.fetchVideos();
+    listVideos = await VideoService.getVideoList();
     _videoListController.init(
       _pageController,
       listVideos,
