@@ -72,9 +72,10 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return SafeArea(
+        child: Scaffold(
       body: getAllUsers(),
-    );
+    ));
   }
 
   Widget getVideosAndUsers() {
@@ -155,11 +156,9 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
           child: Scaffold(
         body: Stack(
           children: [
-            SizedBox(
-              height: 20,
-            ),
             Padding(
-              padding: EdgeInsets.only(left: 15.0, right: 15.0),
+              padding:
+                  EdgeInsets.only(top: 10, left: 15.0, right: 15.0, bottom: 10),
               child: Material(
                 elevation: 5.0,
                 borderRadius: BorderRadius.circular(50.0),
@@ -180,11 +179,8 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                             fontFamily: 'SFProDisplay-Black'))),
               ),
             ),
-            SizedBox(
-              height: 10,
-            ),
             Container(
-                margin: EdgeInsets.fromLTRB(0, 60, 0, 70), child: buildUsers())
+                margin: EdgeInsets.fromLTRB(0, 80, 0, 70), child: buildUsers())
           ],
         ),
       ));

@@ -104,6 +104,7 @@ class _BodyState extends State<Body>
         duration: new Duration(seconds: 5), vsync: this);
     animationController.repeat();
     callList();
+    debugPrint('8855 ${videosController.videoList[1].videoTitle}');
     super.initState();
   }
 

@@ -6,7 +6,7 @@ class RemoteServices {
 
   static Future<List<Video>> fetchVideos() async {
     var response =
-        await client.get(Uri.parse('http://172.29.128.1:3000/api/videos'));
+        await client.get(Uri.parse('http://172.104.161.105/api/videos'));
     if (response.statusCode == 200) {
       var jsonString = response.body;
       return VideoFromJson(jsonString);

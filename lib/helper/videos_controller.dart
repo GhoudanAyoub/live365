@@ -17,7 +17,7 @@ class VideosController extends GetxController {
       isLoading(true);
       List<Video> videos = await RemoteServices.fetchVideos();
       if (videos != null) {
-        videoList.value = videos;
+        videoList.assignAll(videos);
       }
     } finally {
       isLoading(false);

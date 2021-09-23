@@ -65,7 +65,8 @@ class _ActivitiesState extends State<Activities> {
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
+    return SafeArea(
+        child: DefaultTabController(
       length: 2,
       child: Scaffold(
         appBar: AppBar(
@@ -86,7 +87,7 @@ class _ActivitiesState extends State<Activities> {
           children: containers,
         ),
       ),
-    );
+    ));
   }
 
   deleteAllItems() async {
