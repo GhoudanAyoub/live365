@@ -1149,7 +1149,7 @@ class _JoinPageState extends State<JoinPage> {
         });
       }
     };
-    await _client.login(null, widget.username);
+    await _client.login(widget.channelToken, widget.username);
 
     await _createChannel(widget.channelName).then((value) {
       setState(() {

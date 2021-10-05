@@ -43,7 +43,7 @@ class VideoService extends Service {
         videoTitle, tags, description);
 
     //Firebase
-    /* ref.set({
+    ref.set({
       "id": ref.id,
       "videoId": ref.id,
       "videoTitle": videoTitle,
@@ -57,7 +57,7 @@ class VideoService extends Service {
       "timestamp": Timestamp.now(),
     }).catchError((e) {
       print(e);
-    });*/
+    });
   }
 
   uploadComment(String username, String comment, String userDp, String userId,

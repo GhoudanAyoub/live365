@@ -103,7 +103,7 @@ class _ChatBubbleState extends State<ChatBubble> {
                             fit: BoxFit.cover,
                           ),
                     onLongPress: () {
-                      deleteMsg(context);
+                      widget.isMe ? deleteMsg(context) : null;
                     },
                   )),
             ],

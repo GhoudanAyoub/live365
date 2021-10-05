@@ -29,7 +29,6 @@ class PostService extends Service {
     //MySql
     RemoteServices.addPosts(context, ref, link, user, image, tags, description);
 
-    /*
     ref.set({
       "id": ref.id,
       "postId": ref.id,
@@ -41,7 +40,7 @@ class PostService extends Service {
       "timestamp": Timestamp.now(),
     }).catchError((e) {
       print(e);
-    });*/
+    });
   }
 
   uploadComment(String username, String comment, String userDp, String userId,

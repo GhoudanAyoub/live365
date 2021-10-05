@@ -53,7 +53,6 @@ class _CallPageState extends State<CallPage> {
   bool _isLogin = true;
   bool _isInChannel = true;
   int userNo = 0;
-  var userMap;
   var tryingToEnd = false;
   bool personBool = false;
   bool accepted = false;
@@ -94,7 +93,6 @@ class _CallPageState extends State<CallPage> {
     super.initState();
     // initialize agora sdk
     initialize();
-    userMap = {widget.channelName: widget.image};
     _createClient();
   }
 
@@ -377,7 +375,7 @@ class _CallPageState extends State<CallPage> {
                                         horizontal: 8,
                                       ),
                                       child: Text(
-                                        _infoStrings[index].user,
+                                        _infoStrings[index].user ?? "",
                                         style: TextStyle(
                                             color: Colors.white,
                                             fontSize: 14,
@@ -1071,11 +1069,10 @@ class _CallPageState extends State<CallPage> {
         });
       }
     };
-    await _client.login(null, widget.channelName);
-    await _createChannel(widget.channelName).then((value) {
-      setState(() {
-        _channel = value;
-      });
+    await _client.login(widget.channelToken, widget.channelName);
+
+    setState(() async {
+      _channel = await _createChannel(widget.channelName);
     });
     await _channel.join();
     var len;
@@ -1097,7 +1094,6 @@ class _CallPageState extends State<CallPage> {
             username: member.userId, name: nm.displayName, image: img));
         if (userList.length > 0) anyPerson = true;
       });
-      userMap.putIfAbsent(member.userId, () => img);
       var len;
       channel.getMembers().then((value) {
         len = value.length;
@@ -1158,12 +1154,12 @@ class _CallPageState extends State<CallPage> {
         waiting = false;
       });
     } else {
-      var image = userMap[user];
-      comments m =
-          new comments(message: info, type: type, user: user, image: image);
+      comments m = new comments(
+          message: info, type: type, user: user, image: widget.image);
       setState(() {
-        _infoStrings.insert(0, m);
+        _infoStrings.add(m);
       });
+      debugPrint('8855${_infoStrings[2].message}');
     }
   }
 }
