@@ -9,8 +9,16 @@ import 'package:firebase_storage/firebase_storage.dart';
 class ChatService {
   FirebaseStorage storage = FirebaseStorage.instance;
 
+  deleteMessage(String chatId, String msgId) async {
+    await chatRef.doc("$chatId").collection("messages").doc(msgId).delete();
+  }
+
   sendMessage(Message message, String chatId) async {
-    await chatRef.doc("$chatId").collection("messages").add(message.toJson());
+    await chatRef
+        .doc("$chatId")
+        .collection("messages")
+        .doc(message.msgId)
+        .set(message.toJson());
     await chatRef.doc("$chatId").update({"lastTextTime": Timestamp.now()});
   }
 

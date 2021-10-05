@@ -23,7 +23,7 @@ class CallPage extends StatefulWidget {
   /// non-modifiable channel name of the page
   final String channelName;
   final String userName;
-
+  final String channelToken;
   final String image;
   final time;
 
@@ -36,7 +36,8 @@ class CallPage extends StatefulWidget {
       this.channelName,
       this.time,
       this.image,
-      this.role})
+      this.role,
+      this.channelToken})
       : super(key: key);
 
   @override
@@ -114,7 +115,7 @@ class _CallPageState extends State<CallPage> {
     configuration.dimensions = VideoDimensions(
         SizeConfig.screenWidth.toInt(), SizeConfig.screenHeight.toInt());
     await _engine.setVideoEncoderConfiguration(configuration);
-    await _engine.joinChannel(Token, widget.channelName, null, 0);
+    await _engine.joinChannel(widget.channelToken, widget.channelName, null, 0);
   }
 
   /// Create agora sdk instance and initialize
@@ -143,7 +144,8 @@ class _CallPageState extends State<CallPage> {
             name: documentId,
             id: uid,
             time: widget.time,
-            image: widget.image);
+            image: widget.image,
+            channelToken: widget.channelToken);
       }
       userJoinChannelSuccess();
       channelName = documentId;
@@ -1112,7 +1114,8 @@ class _CallPageState extends State<CallPage> {
             name: documentId,
             id: channel.channelId,
             time: widget.time,
-            image: widget.image);
+            image: widget.image,
+            channelToken: widget.channelToken);
       }
       _log(info: 'Member joined: ', user: member.userId, type: 'join');
     };

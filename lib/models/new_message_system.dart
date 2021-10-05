@@ -3,14 +3,16 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'enum/message_type.dart';
 
 class Message {
+  String msgId;
   String content;
   String senderUid;
   MessageType type;
   Timestamp time;
 
-  Message({this.content, this.senderUid, this.type, this.time});
+  Message({this.msgId, this.content, this.senderUid, this.type, this.time});
 
   Message.fromJson(Map<String, dynamic> json) {
+    msgId = json['msgId'];
     content = json['content'];
     senderUid = json['senderUid'];
     if (json['type'] == 'text') {
@@ -31,6 +33,7 @@ class Message {
       data['type'] = 'image';
     }
     data['time'] = this.time;
+    data['msgId'] = this.msgId;
     return data;
   }
 }

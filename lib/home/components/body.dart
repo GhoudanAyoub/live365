@@ -108,6 +108,8 @@ class _BodyState extends State<Body>
   }
 
   callList() async {
+    // MongoDb server
+    //listVideos = await RemoteServices.fetchVideos();
     listVideos = await VideoService.getVideoList();
     _videoListController.init(
       _pageController,
@@ -657,6 +659,7 @@ class _BodyState extends State<Body>
                             channelId: live.channelId,
                             username: live.username,
                             hostImage: live.image,
+                            channelToken: live.channelToken,
                             userImage: live.image);
                       },
                       child: Padding(
@@ -726,7 +729,12 @@ class _BodyState extends State<Body>
   }
 
   Future<void> onJoin(
-      {channelName, channelId, username, hostImage, userImage}) async {
+      {channelName,
+      channelId,
+      username,
+      hostImage,
+      userImage,
+      channelToken}) async {
     // update input validation
     if (channelName.isNotEmpty) {
       // push video page with given channel name
@@ -737,6 +745,7 @@ class _BodyState extends State<Body>
             channelName: channelName,
             channelId: channelId,
             username: username,
+            channelToken: channelToken,
             hostImage: hostImage,
             userImage: userImage,
           ),

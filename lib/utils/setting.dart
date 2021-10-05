@@ -1,3 +1,1 @@
-const APP_ID_old = '329f6ac8a3a941f29ec83aa7965260d4';
-const Token = null;
-const APP_ID = 'b42ce8d86225475c9558e478f1ed4e8e';
+const APP_ID = 'b727503d55e4445397df20478c05ddf2';

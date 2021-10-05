@@ -123,11 +123,11 @@ class PostsViewModel extends ChangeNotifier {
     }
   }
 
-  uploadPosts() async {
+  uploadPosts(context) async {
     try {
       loading = true;
       notifyListeners();
-      await postService.uploadPost(mediaUrl, tags, description);
+      await postService.uploadPost(context, mediaUrl, tags, description);
       loading = false;
       resetPost();
       notifyListeners();

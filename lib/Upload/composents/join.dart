@@ -25,6 +25,7 @@ class JoinPage extends StatefulWidget {
   final String username;
   final String hostImage;
   final String userImage;
+  final String channelToken;
   final ClientRole role;
 
   /// Creates a call page with given channel name.
@@ -35,7 +36,8 @@ class JoinPage extends StatefulWidget {
       this.username,
       this.hostImage,
       this.userImage,
-      this.role})
+      this.role,
+      this.channelToken})
       : super(key: key);
 
   @override
@@ -113,12 +115,12 @@ class _JoinPageState extends State<JoinPage> {
     VideoEncoderConfiguration configuration = VideoEncoderConfiguration();
     configuration.dimensions = VideoDimensions(1920, 1080);
     await _engine.setVideoEncoderConfiguration(configuration);
-    await _engine.joinChannel(Token, widget.channelName, null, 0);
+    await _engine.joinChannel(widget.channelToken, widget.channelName, null, 0);
   }
 
   /// Create agora sdk instance and initialize
   Future<void> _initAgoraRtcEngine() async {
-    _engine = await RtcEngine.create(APP_ID);
+    _engine = await RtcEngine.createWithConfig(RtcEngineConfig(APP_ID));
     await _engine.enableVideo();
     await _engine.setChannelProfile(ChannelProfile.LiveBroadcasting);
     await _engine.setClientRole(ClientRole.Audience);

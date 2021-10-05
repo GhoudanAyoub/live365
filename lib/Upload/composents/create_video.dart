@@ -90,7 +90,7 @@ class _CreateVideoState extends State<CreateVideo> {
             actions: [
               GestureDetector(
                 onTap: () async {
-                  await viewModel.uploadVideos();
+                  await viewModel.uploadVideos(context);
                   Navigator.pop(context);
                   viewModel.resetVedio();
                 },

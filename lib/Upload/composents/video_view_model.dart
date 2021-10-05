@@ -106,12 +106,12 @@ class VideoViewModel extends ChangeNotifier {
 
   //Functions
 
-  uploadVideos() async {
+  uploadVideos(context) async {
     try {
       loading = true;
       notifyListeners();
       await postService.uploadVideo(
-          mediaUrl, songName, videoTitle, tags, description);
+          context, mediaUrl, songName, videoTitle, tags, description);
       loading = false;
       resetVedio();
       notifyListeners();

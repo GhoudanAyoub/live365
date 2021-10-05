@@ -197,7 +197,9 @@ class _BodyState extends State<Body> {
                     image: firebaseAuth.currentUser != null &&
                             firebaseAuth.currentUser.uid == user.id
                         ? auth.getProfileImage()
-                        : user.photoUrl,
+                        : user.photoUrl != null && user.photoUrl != ''
+                            ? user.photoUrl
+                            : auth.stockImages,
                   ),
                   SizedBox(height: 5),
                   Column(
@@ -230,7 +232,7 @@ class _BodyState extends State<Body> {
                             padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
                             width: 300.0,
                             child: Text(
-                                "${user.bio.isEmpty ? 'Everyday LIVE365' : user.bio}",
+                                "${user.bio == null || user.bio.isEmpty ? 'Everyday LIVE365' : user.bio}",
                                 textAlign: TextAlign.center,
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(

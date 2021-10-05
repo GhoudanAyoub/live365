@@ -102,7 +102,7 @@ class _ShareVideoState extends State<ShareVideo> {
                       DefaultButton(
                         text: "Upload",
                         press: () async {
-                          await widget.viewModel.uploadVideos();
+                          await widget.viewModel.uploadVideos(context);
                           Navigator.pop(context);
                           widget.viewModel.resetVedio();
                           submitted = true;

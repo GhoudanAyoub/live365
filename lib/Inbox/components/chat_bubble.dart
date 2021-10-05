@@ -1,12 +1,17 @@
 import 'package:LIVE365/components/text_time.dart';
 import 'package:LIVE365/models/enum/message_type.dart';
+import 'package:LIVE365/services/chat_service.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
+import '../../constants.dart';
+
 class ChatBubble extends StatefulWidget {
   final String message;
+  final String messageID;
+  final String chatId;
   final MessageType type;
   final Timestamp time;
   final bool isMe;
@@ -16,6 +21,8 @@ class ChatBubble extends StatefulWidget {
     @required this.time,
     @required this.isMe,
     @required this.type,
+    @required this.messageID,
+    @required this.chatId,
   });
 
   @override
@@ -77,24 +84,28 @@ class _ChatBubbleState extends State<ChatBubble> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
               Padding(
-                padding:
-                    EdgeInsets.all(widget.type == MessageType.TEXT ? 5 : 0),
-                child: widget.type == MessageType.TEXT
-                    ? Text(
-                        widget.message,
-                        style: TextStyle(
-                          color: widget.isMe
-                              ? Colors.white
-                              : Theme.of(context).textTheme.headline6.color,
-                        ),
-                      )
-                    : CachedNetworkImage(
-                        imageUrl: "${widget.message}",
-                        height: 200,
-                        width: MediaQuery.of(context).size.width / 1.3,
-                        fit: BoxFit.cover,
-                      ),
-              ),
+                  padding:
+                      EdgeInsets.all(widget.type == MessageType.TEXT ? 5 : 0),
+                  child: GestureDetector(
+                    child: widget.type == MessageType.TEXT
+                        ? Text(
+                            widget.message,
+                            style: TextStyle(
+                              color: widget.isMe
+                                  ? Colors.white
+                                  : Theme.of(context).textTheme.headline6.color,
+                            ),
+                          )
+                        : CachedNetworkImage(
+                            imageUrl: "${widget.message}",
+                            height: 200,
+                            width: MediaQuery.of(context).size.width / 1.3,
+                            fit: BoxFit.cover,
+                          ),
+                    onLongPress: () {
+                      deleteMsg(context);
+                    },
+                  )),
             ],
           ),
         ),
@@ -120,5 +131,36 @@ class _ChatBubbleState extends State<ChatBubble> {
         ),
       ],
     );
+  }
+
+  deleteMsg(BuildContext parentContext) {
+    return showDialog(
+        context: parentContext,
+        builder: (context) {
+          return SimpleDialog(
+            backgroundColor: GBottomNav,
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(5.0)),
+            children: [
+              SimpleDialogOption(
+                onPressed: () {
+                  Navigator.pop(context);
+                  ChatService().deleteMessage(widget.chatId, widget.messageID);
+                },
+                child: Text(
+                  'Delete',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+              Divider(),
+              SimpleDialogOption(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text('Cancel', style: TextStyle(color: Colors.white)),
+              ),
+            ],
+          );
+        });
   }
 }

@@ -10,6 +10,8 @@ import 'package:google_sign_in/google_sign_in.dart';
 import '../utils.dart';
 
 class FirebaseService {
+  String stockImages =
+      "https://images.unsplash.com/photo-1571741140674-8949ca7df2a7?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60";
   static final liveCollection = 'liveuser';
   static final CollectionReference userCollection =
       FirebaseFirestore.instance.collection('LIVE365Users');
@@ -35,7 +37,8 @@ class FirebaseService {
   }
 
   //USER LIVE
-  static void createLiveUser({username, name, id, time, image}) async {
+  static void createLiveUser(
+      {username, name, id, time, image, channelToken}) async {
     var ref = liveRef.doc();
     await liveRef.doc().set({
       'id': ref.id,
@@ -46,7 +49,8 @@ class FirebaseService {
       'startAt': Timestamp.now(),
       'hostImage': image,
       'image': image,
-      'endAt': null
+      'endAt': null,
+      'channelToken': channelToken
     });
   }
 

@@ -107,8 +107,10 @@ class _ConversationState extends State<Conversation> {
                           Message message = Message.fromJson(
                               messages.reversed.toList()[index].data());
                           return ChatBubble(
+                              messageID: message.msgId,
                               message: '${message.content}',
                               time: message?.time,
+                              chatId: widget.chatId,
                               isMe: message?.senderUid == user?.uid,
                               type: message?.type);
                         },
@@ -183,14 +185,16 @@ class _ConversationState extends State<Conversation> {
     var user,
     bool typing,
   ) {
-    if (user.isOnline) {
+    if (user.isOnline != null && user.isOnline) {
       if (typing) {
         return "typing...";
       } else {
         return "online";
       }
     } else {
-      return 'last seen ${timeago.format(user.lastSeen.toDate())}';
+      return user.lastSeen != null
+          ? 'last seen ${timeago.format(user.lastSeen.toDate())}'
+          : "";
     }
   }
 
@@ -325,6 +329,7 @@ class _ConversationState extends State<Conversation> {
     }
 
     Message message = Message(
+      msgId: uuid.v4(),
       content: '$msg',
       senderUid: user?.uid,
       type: isImage ? MessageType.IMAGE : MessageType.TEXT,

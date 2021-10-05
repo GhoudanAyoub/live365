@@ -1,5 +1,7 @@
 import 'package:LIVE365/Upload/composents/host.dart';
 import 'package:LIVE365/firebaseService/FirebaseService.dart';
+import 'package:LIVE365/services/remote_services.dart';
+import 'package:LIVE365/utils/firebase.dart';
 import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -58,19 +60,24 @@ class _CameraAccessScreenState extends State<CameraAccessScreen> {
   }
 
   Future<void> onCreate({username, image}) async {
+    String channelToken;
     // await for camera and mic permissions before pushing video page
     await _handleCameraAndMic();
     var date = DateTime.now();
     var currentTime = '${DateFormat("dd-MM-yyyy hh:mm:ss").format(date)}';
+    //get Channel  token from server
+    channelToken = await RemoteServices.fetchToken(
+        '${firebaseAuth.currentUser.uid}Broadcaster');
     // push video page with given channel name
     await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => CallPage(
           userName: auth.getCurrentUserName(),
-          channelName: 'Broadcaster',
+          channelName: '${firebaseAuth.currentUser.uid}Broadcaster',
           time: currentTime,
           image: image,
+          channelToken: channelToken,
           role: ClientRole.Broadcaster,
         ),
       ),

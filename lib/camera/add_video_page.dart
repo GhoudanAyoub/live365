@@ -301,7 +301,7 @@ class _AddVideoPageState extends State<AddVideoPage> {
                       DefaultButton(
                         text: "Upload",
                         press: () async {
-                          await viewModel.uploadVideos();
+                          await viewModel.uploadVideos(context);
                           Navigator.pop(context);
                           viewModel.resetVedio();
                           submitted = true;

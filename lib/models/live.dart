@@ -7,12 +7,14 @@ List<Live> LiveFromJson(String str) =>
 
 String LiveToJson(List<Live> data) =>
     json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
+
 class Live {
   String id;
   String ownerId;
   String username;
   String channelName;
   String hostImage;
+  String channelToken;
   String image;
   String views;
   int channelId;
@@ -32,6 +34,7 @@ class Live {
     this.me,
     this.startAt,
     this.endAt,
+    this.channelToken,
   });
 
   static Live fromJson(Map<String, dynamic> json) => Live(
@@ -46,8 +49,8 @@ class Live {
         me: json['me'],
         startAt: json['startAt'],
         endAt: json['endAt'],
+        channelToken: json['channelToken'],
       );
-
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
@@ -62,6 +65,7 @@ class Live {
     data['me'] = this.me;
     data['startAt'] = this.startAt;
     data['endAt'] = this.endAt;
+    data['channelToken'] = this.channelToken;
     return data;
   }
 }

@@ -31,16 +31,17 @@ class VideoService extends Service {
     return videoList;
   }
 
-  uploadVideo(File image, String songName, String videoTitle, String tags,
-      String description) async {
+  uploadVideo(context, File image, String songName, String videoTitle,
+      String tags, String description) async {
     String link = await uploadV(videos, image);
     DocumentSnapshot doc =
         await usersRef.doc(firebaseAuth.currentUser.uid).get();
     user = UserModel.fromJson(doc.data());
     var ref = videoRef.doc();
     //MySql
-    RemoteServices.addVideos(
-        ref, link, user, image, songName, videoTitle, tags, description);
+    RemoteServices.addVideos(context, ref, link, user, image, songName,
+        videoTitle, tags, description);
+
     //Firebase
     /* ref.set({
       "id": ref.id,

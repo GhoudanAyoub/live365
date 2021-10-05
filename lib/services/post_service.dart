@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:LIVE365/models/User.dart';
+import 'package:LIVE365/services/remote_services.dart';
 import 'package:LIVE365/services/services.dart';
 import 'package:LIVE365/utils/firebase.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -19,12 +20,16 @@ class PostService extends Service {
     });
   }
 
-  uploadPost(File image, String tags, String description) async {
+  uploadPost(context, File image, String tags, String description) async {
     String link = await uploadImage(posts, image);
     DocumentSnapshot doc =
         await usersRef.doc(firebaseAuth.currentUser.uid).get();
     user = UserModel.fromJson(doc.data());
     var ref = postRef.doc();
+    //MySql
+    RemoteServices.addPosts(context, ref, link, user, image, tags, description);
+
+    /*
     ref.set({
       "id": ref.id,
       "postId": ref.id,
@@ -36,7 +41,7 @@ class PostService extends Service {
       "timestamp": Timestamp.now(),
     }).catchError((e) {
       print(e);
-    });
+    });*/
   }
 
   uploadComment(String username, String comment, String userDp, String userId,
