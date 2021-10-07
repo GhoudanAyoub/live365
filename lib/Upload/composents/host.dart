@@ -96,8 +96,115 @@ class _CallPageState extends State<CallPage> {
   void initState() {
     super.initState();
     // initialize agora sdk
-    _createClient();
     initialize();
+    _createClient();
+  }
+
+  void _createClient() async {
+    _client = await AgoraRtmClient.createInstance(APP_ID);
+    _client.onMessageReceived = (AgoraRtmMessage message, String peerId) {
+      _log(user: peerId, info: message.text, type: 'message');
+    };
+    _client.onConnectionStateChanged = (int state, int reason) {
+      if (state == 5) {
+        _client.logout();
+        setState(() {
+          _isLogin = false;
+        });
+      }
+    };
+
+    try {
+      await _client.login(widget.channelToken, firebaseAuth.currentUser.uid);
+      logController
+          .addLog('Login success: ' + firebaseAuth.currentUser.displayName);
+      _joinChannel();
+    } catch (errorCode) {
+      print('Login error: ' + errorCode.toString());
+    }
+  }
+
+  void _joinChannel() async {
+    try {
+      setState(() async {
+        _channel = await _createChannel(widget.channelName);
+      });
+      await _channel.join();
+      logController.addLog('Join channel success.');
+      var len;
+      _channel.getMembers().then((value) {
+        len = value.length;
+        setState(() {
+          userNo = len - 1;
+        });
+      });
+    } catch (errorCode) {
+      print('Join channel error: ' + errorCode.toString());
+    }
+  }
+
+//todo : remove the _logs after
+  Future<AgoraRtmChannel> _createChannel(String name) async {
+    try {
+      _channel = await _client.createChannel(name);
+    } catch (error) {
+      print('create channel error: ' + error.toString());
+    }
+    _channel.onMemberJoined = (AgoraRtmMember member) async {
+      var img = await auth.getProfileImage();
+      var nm = await auth.getCurrentUser();
+      setState(() {
+        userList.add(new User(
+            username: member.userId, name: nm.displayName, image: img));
+        if (userList.length > 0) anyPerson = true;
+      });
+      var len;
+      _channel.getMembers().then((value) {
+        len = value.length;
+        setState(() {
+          userNo = len - 1;
+        });
+      });
+
+      final documentId = widget.channelName;
+      channelName = documentId;
+      if (widget.role == ClientRole.Broadcaster) {
+        FirebaseService.createLiveUser(
+            username: widget.userName,
+            name: documentId,
+            id: _channel.channelId,
+            time: widget.time,
+            image: widget.image,
+            channelToken: widget.channelToken);
+      }
+      logController.addLog(
+          "Member joined: " + member.userId + ', channel: ' + member.channelId);
+      _log(info: 'Member joined: ', user: member.userId, type: 'join');
+    };
+
+    _channel.onMemberLeft = (AgoraRtmMember member) {
+      logController.addLog(
+          "Member left: " + member.userId + ', channel: ' + member.channelId);
+      var len;
+      setState(() {
+        userList.removeWhere((element) => element.username == member.userId);
+        if (userList.length == 0) anyPerson = false;
+      });
+
+      _channel.getMembers().then((value) {
+        len = value.length;
+        setState(() {
+          userNo = len - 1;
+        });
+      });
+    };
+    _channel.onMessageReceived =
+        (AgoraRtmMessage message, AgoraRtmMember member) {
+      logController
+          .addLog("Public Message from " + member.userId + ": " + message.text);
+      _log(user: member.userId, info: message.text, type: 'message');
+    };
+    return _channel;
   }
 
   Future<void> initialize() async {
@@ -112,8 +219,12 @@ class _CallPageState extends State<CallPage> {
     }
 
     await _initAgoraRtcEngine();
-    streamId = await _engine?.createDataStream(false, false);
+    // streamId = await _engine?.createDataStream(false, false);
     _addAgoraEventHandlers();
+    VideoEncoderConfiguration configuration = VideoEncoderConfiguration();
+    configuration.dimensions = VideoDimensions(
+        SizeConfig.screenWidth.toInt(), SizeConfig.screenHeight.toInt());
+    await _engine.setVideoEncoderConfiguration(configuration);
     await _engine.joinChannel(widget.channelToken, widget.channelName, null, 0);
   }
 
@@ -1089,109 +1200,6 @@ class _CallPageState extends State<CallPage> {
     }
   }
 
-  void _createClient() async {
-    _client = await AgoraRtmClient.createInstance(APP_ID);
-    _client.onMessageReceived = (AgoraRtmMessage message, String peerId) {
-      _log(user: peerId, info: message.text, type: 'message');
-    };
-    _client.onConnectionStateChanged = (int state, int reason) {
-      if (state == 5) {
-        _client.logout();
-        setState(() {
-          _isLogin = false;
-        });
-      }
-    };
-
-    try {
-      await _client.login(widget.channelToken, firebaseAuth.currentUser.uid);
-      logController
-          .addLog('Login success: ' + firebaseAuth.currentUser.displayName);
-      _joinChannel();
-    } catch (errorCode) {
-      print('Login error: ' + errorCode.toString());
-    }
-  }
-
-  void _joinChannel() async {
-    try {
-      setState(() async {
-        _channel = await _createChannel(widget.channelName);
-      });
-      await _channel.join();
-      logController.addLog('Join channel success.');
-      var len;
-      _channel.getMembers().then((value) {
-        len = value.length;
-        setState(() {
-          userNo = len - 1;
-        });
-      });
-    } catch (errorCode) {
-      print('Join channel error: ' + errorCode.toString());
-    }
-  }
-
-//todo : remove the _logs after
-  Future<AgoraRtmChannel> _createChannel(String name) async {
-    AgoraRtmChannel channel = await _client.createChannel(name);
-    channel.onMemberJoined = (AgoraRtmMember member) async {
-      var img = await auth.getProfileImage();
-      var nm = await auth.getCurrentUser();
-      setState(() {
-        userList.add(new User(
-            username: member.userId, name: nm.displayName, image: img));
-        if (userList.length > 0) anyPerson = true;
-      });
-      var len;
-      channel.getMembers().then((value) {
-        len = value.length;
-        setState(() {
-          userNo = len - 1;
-        });
-      });
-
-      final documentId = widget.channelName;
-      channelName = documentId;
-      if (widget.role == ClientRole.Broadcaster) {
-        FirebaseService.createLiveUser(
-            username: widget.userName,
-            name: documentId,
-            id: channel.channelId,
-            time: widget.time,
-            image: widget.image,
-            channelToken: widget.channelToken);
-      }
-      logController.addLog(
-          "Member joined: " + member.userId + ', channel: ' + member.channelId);
-      _log(info: 'Member joined: ', user: member.userId, type: 'join');
-    };
-
-    channel.onMemberLeft = (AgoraRtmMember member) {
-      logController.addLog(
-          "Member left: " + member.userId + ', channel: ' + member.channelId);
-      var len;
-      setState(() {
-        userList.removeWhere((element) => element.username == member.userId);
-        if (userList.length == 0) anyPerson = false;
-      });
-
-      channel.getMembers().then((value) {
-        len = value.length;
-        setState(() {
-          userNo = len - 1;
-        });
-      });
-    };
-    channel.onMessageReceived =
-        (AgoraRtmMessage message, AgoraRtmMember member) {
-      logController
-          .addLog("Public Message from " + member.userId + ": " + message.text);
-      _log(user: member.userId, info: message.text, type: 'message');
-    };
-    return channel;
-  }
-
   void _log({String info, String type, String user}) {
     if (type == 'message' && info.contains('m1x2y3z4p5t6l7k8')) {
       popUp();
@@ -1214,7 +1222,7 @@ class _CallPageState extends State<CallPage> {
       setState(() {
         _infoStrings.add(m);
       });
-      debugPrint('8855${_infoStrings[2].message}');
+      debugPrint('8855${_infoStrings[0].message}');
     }
   }
 }

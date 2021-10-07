@@ -88,7 +88,6 @@ class RemoteServices {
           backgroundColor: primary,
           textColor: Colors.white,
           fontSize: 16.0);
-      Navigator.pop(context);
     } else {
       Fluttertoast.showToast(
           msg: message["message"],
