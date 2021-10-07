@@ -3,8 +3,10 @@ import 'dart:math' as math;
 
 import 'package:LIVE365/SizeConfig.dart';
 import 'package:LIVE365/firebaseService/FirebaseService.dart';
+import 'package:LIVE365/helper/logs.dart';
 import 'package:LIVE365/home/home_screen.dart';
 import 'package:LIVE365/models/live_comments.dart';
+import 'package:LIVE365/utils/firebase.dart';
 import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:agora_rtc_engine/rtc_local_view.dart' as RtcLocalView;
 import 'package:agora_rtc_engine/rtc_remote_view.dart' as RtcRemoteView;
@@ -46,6 +48,7 @@ class CallPage extends StatefulWidget {
 
 class _CallPageState extends State<CallPage> {
   final auth = FirebaseService();
+  LogController logController = LogController();
   static final _users = <int>[];
   String channelName;
   List<User> userList = [];
@@ -92,8 +95,8 @@ class _CallPageState extends State<CallPage> {
   void initState() {
     super.initState();
     // initialize agora sdk
-    initialize();
     _createClient();
+    initialize();
   }
 
   Future<void> initialize() async {
@@ -291,6 +294,36 @@ class _CallPageState extends State<CallPage> {
   /// Info panel to show logs
   Widget messageList() {
     return Container(
+        padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),
+        alignment: Alignment.bottomCenter,
+        child: FractionallySizedBox(
+            heightFactor: 0.5,
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 48),
+              child: ValueListenableBuilder(
+                valueListenable: logController,
+                builder: (context, log, widget) {
+                  return Expanded(
+                    child: Container(
+                      child: ListView.builder(
+                        itemExtent: 24,
+                        itemBuilder: (context, i) {
+                          return ListTile(
+                            contentPadding: const EdgeInsets.all(0.0),
+                            title: Text(log[i]),
+                          );
+                        },
+                        itemCount: log.length,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            )));
+  }
+
+  Widget messageList2() {
+    return Container(
       padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),
       alignment: Alignment.bottomCenter,
       child: FractionallySizedBox(
@@ -375,22 +408,22 @@ class _CallPageState extends State<CallPage> {
                                         horizontal: 8,
                                       ),
                                       child: Text(
-                                        _infoStrings[index].user ?? "",
+                                        _infoStrings[index].user ?? "unknown",
                                         style: TextStyle(
                                             color: Colors.white,
-                                            fontSize: 14,
+                                            fontSize: 12,
                                             fontWeight: FontWeight.bold),
                                       ),
                                     ),
                                     SizedBox(
                                       height: 5,
                                     ),
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 8,
-                                      ),
+                                    Container(
+                                      width: SizeConfig.screenWidth - 80,
                                       child: Text(
                                         _infoStrings[index].message,
+                                        textAlign: TextAlign.start,
+                                        overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
                                             color: Colors.white, fontSize: 14),
                                       ),
@@ -1069,21 +1102,37 @@ class _CallPageState extends State<CallPage> {
         });
       }
     };
-    await _client.login(widget.channelToken, widget.channelName);
 
-    setState(() async {
-      _channel = await _createChannel(widget.channelName);
-    });
-    await _channel.join();
-    var len;
-    _channel.getMembers().then((value) {
-      len = value.length;
-      setState(() {
-        userNo = len - 1;
-      });
-    });
+    try {
+      await _client.login(widget.channelToken, firebaseAuth.currentUser.uid);
+      logController
+          .addLog('Login success: ' + firebaseAuth.currentUser.displayName);
+      _joinChannel();
+    } catch (errorCode) {
+      print('Login error: ' + errorCode.toString());
+    }
   }
 
+  void _joinChannel() async {
+    try {
+      setState(() async {
+        _channel = await _createChannel(widget.channelName);
+      });
+      await _channel.join();
+      logController.addLog('Join channel success.');
+      var len;
+      _channel.getMembers().then((value) {
+        len = value.length;
+        setState(() {
+          userNo = len - 1;
+        });
+      });
+    } catch (errorCode) {
+      print('Join channel error: ' + errorCode.toString());
+    }
+  }
+
+//todo : remove the _logs after
   Future<AgoraRtmChannel> _createChannel(String name) async {
     AgoraRtmChannel channel = await _client.createChannel(name);
     channel.onMemberJoined = (AgoraRtmMember member) async {
@@ -1113,10 +1162,14 @@ class _CallPageState extends State<CallPage> {
             image: widget.image,
             channelToken: widget.channelToken);
       }
+      logController.addLog(
+          "Member joined: " + member.userId + ', channel: ' + member.channelId);
       _log(info: 'Member joined: ', user: member.userId, type: 'join');
     };
 
     channel.onMemberLeft = (AgoraRtmMember member) {
+      logController.addLog(
+          "Member left: " + member.userId + ', channel: ' + member.channelId);
       var len;
       setState(() {
         userList.removeWhere((element) => element.username == member.userId);
@@ -1132,6 +1185,8 @@ class _CallPageState extends State<CallPage> {
     };
     channel.onMessageReceived =
         (AgoraRtmMessage message, AgoraRtmMember member) {
+      logController
+          .addLog("Public Message from " + member.userId + ": " + message.text);
       _log(user: member.userId, info: message.text, type: 'message');
     };
     return channel;

@@ -3,6 +3,7 @@ import 'dart:math' as math;
 
 import 'package:LIVE365/Upload/composents/Loading.dart';
 import 'package:LIVE365/firebaseService/FirebaseService.dart';
+import 'package:LIVE365/helper/logs.dart';
 import 'package:LIVE365/models/live_comments.dart';
 import 'package:LIVE365/utils/firebase.dart';
 import 'package:agora_rtc_engine/rtc_engine.dart';
@@ -45,6 +46,7 @@ class JoinPage extends StatefulWidget {
 }
 
 class _JoinPageState extends State<JoinPage> {
+  LogController logController = LogController();
   final auth = FirebaseService();
   bool loading = true;
   bool completed = false;
@@ -1133,39 +1135,49 @@ class _JoinPageState extends State<JoinPage> {
   }
 
   void _createClient() async {
-    _client =
-        await AgoraRtmClient.createInstance('b42ce8d86225475c9558e478f1ed4e8e');
-    _client.onMessageReceived = (AgoraRtmMessage message, String peerId) async {
-      var img = await auth.getProfileImage();
-      userMap.putIfAbsent(peerId, () => img);
+    _client = await AgoraRtmClient.createInstance(APP_ID);
+    _client.onMessageReceived = (AgoraRtmMessage message, String peerId) {
       _log(user: peerId, info: message.text, type: 'message');
     };
     _client.onConnectionStateChanged = (int state, int reason) {
       if (state == 5) {
         _client.logout();
-        // _log('Logout.');
         setState(() {
           _isLogin = false;
         });
       }
     };
-    await _client.login(widget.channelToken, widget.username);
 
-    await _createChannel(widget.channelName).then((value) {
-      setState(() {
-        _channel = value;
-      });
-    });
-    await _channel.join();
-    var len;
-    _channel.getMembers().then((value) {
-      len = value.length;
-      setState(() {
-        userNo = len - 1;
-      });
-    });
+    try {
+      await _client.login(widget.channelToken, firebaseAuth.currentUser.uid);
+      logController
+          .addLog('Login success: ' + firebaseAuth.currentUser.displayName);
+      _joinChannel();
+    } catch (errorCode) {
+      print('Login error: ' + errorCode.toString());
+    }
   }
 
+  void _joinChannel() async {
+    try {
+      setState(() async {
+        _channel = await _createChannel(widget.channelName);
+      });
+      await _channel.join();
+      logController.addLog('Join channel success.');
+      var len;
+      _channel.getMembers().then((value) {
+        len = value.length;
+        setState(() {
+          userNo = len - 1;
+        });
+      });
+    } catch (errorCode) {
+      print('Join channel error: ' + errorCode.toString());
+    }
+  }
+
+//todo : remove the _logs after
   Future<AgoraRtmChannel> _createChannel(String name) async {
     AgoraRtmChannel channel = await _client.createChannel(name);
     channel.onMemberJoined = (AgoraRtmMember member) async {
@@ -1178,12 +1190,17 @@ class _JoinPageState extends State<JoinPage> {
           userNo = len - 1;
         });
       });
-
+      logController.addLog(
+          "Member joined: " + member.userId + ', channel: ' + member.channelId);
       _log(info: 'Member joined: ', user: member.userId, type: 'join');
     };
+
     channel.onMemberLeft = (AgoraRtmMember member) {
+      logController.addLog(
+          "Member left: " + member.userId + ', channel: ' + member.channelId);
       var len;
-      _channel.getMembers().then((value) {
+
+      channel.getMembers().then((value) {
         len = value.length;
         setState(() {
           userNo = len - 1;
@@ -1194,6 +1211,8 @@ class _JoinPageState extends State<JoinPage> {
         (AgoraRtmMessage message, AgoraRtmMember member) async {
       var img = await auth.getProfileImage();
       userMap.putIfAbsent(member.userId, () => img);
+      logController
+          .addLog("Public Message from " + member.userId + ": " + message.text);
       _log(user: member.userId, info: message.text, type: 'message');
     };
     return channel;
