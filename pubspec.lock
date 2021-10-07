@@ -7,14 +7,14 @@ packages:
       name: agora_rtc_engine
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "3.3.2"
+    version: "4.0.7"
   agora_rtm:
     dependency: "direct main"
     description:
       name: agora_rtm
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.9.14"
+    version: "1.0.1"
   animations:
     dependency: "direct main"
     description:
@@ -519,7 +519,7 @@ packages:
       name: json_annotation
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "3.1.1"
+    version: "4.0.1"
   like_button:
     dependency: "direct main"
     description:

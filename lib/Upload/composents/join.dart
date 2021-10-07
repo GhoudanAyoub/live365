@@ -77,6 +77,7 @@ class _JoinPageState extends State<JoinPage> {
   bool accepted = false;
   bool stop = false;
   RtcEngine _engine;
+  int streamId;
   final _infoString = <String>[];
 
   var Balance;
@@ -86,7 +87,6 @@ class _JoinPageState extends State<JoinPage> {
     // clear users
     _users.clear();
     // destroy sdk
-    // destroy sdk
     _engine.leaveChannel();
     _engine.destroy();
     super.dispose();
@@ -95,7 +95,6 @@ class _JoinPageState extends State<JoinPage> {
   @override
   void initState() {
     super.initState();
-    // initialize agora sdk
     initialize();
     userMap = {widget.username: widget.userImage};
     _createClient();
@@ -113,10 +112,8 @@ class _JoinPageState extends State<JoinPage> {
     }
 
     await _initAgoraRtcEngine();
+    streamId = await _engine?.createDataStream(false, false);
     _addAgoraEventHandlers();
-    VideoEncoderConfiguration configuration = VideoEncoderConfiguration();
-    configuration.dimensions = VideoDimensions(1920, 1080);
-    await _engine.setVideoEncoderConfiguration(configuration);
     await _engine.joinChannel(widget.channelToken, widget.channelName, null, 0);
   }
 
@@ -125,9 +122,8 @@ class _JoinPageState extends State<JoinPage> {
     _engine = await RtcEngine.createWithConfig(RtcEngineConfig(APP_ID));
     await _engine.enableVideo();
     await _engine.setChannelProfile(ChannelProfile.LiveBroadcasting);
-    await _engine.setClientRole(ClientRole.Audience);
-    await _engine.enableLocalAudio(false);
-    await _engine.enableLocalVideo(!muted);
+    await _engine.setClientRole(ClientRole.Broadcaster);
+    await _engine.enableLocalAudio(true);
   }
 
   /// Add agora event handlers

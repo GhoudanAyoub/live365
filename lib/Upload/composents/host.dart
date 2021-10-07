@@ -78,6 +78,7 @@ class _CallPageState extends State<CallPage> {
   bool waiting = false;
   bool muted = false;
   RtcEngine _engine;
+  int streamId;
   final _infoString = <String>[];
 
   @override
@@ -111,11 +112,8 @@ class _CallPageState extends State<CallPage> {
     }
 
     await _initAgoraRtcEngine();
+    streamId = await _engine?.createDataStream(false, false);
     _addAgoraEventHandlers();
-    VideoEncoderConfiguration configuration = VideoEncoderConfiguration();
-    configuration.dimensions = VideoDimensions(
-        SizeConfig.screenWidth.toInt(), SizeConfig.screenHeight.toInt());
-    await _engine.setVideoEncoderConfiguration(configuration);
     await _engine.joinChannel(widget.channelToken, widget.channelName, null, 0);
   }
 
@@ -124,7 +122,7 @@ class _CallPageState extends State<CallPage> {
     _engine = await RtcEngine.createWithConfig(RtcEngineConfig(APP_ID));
     await _engine.enableVideo();
     await _engine.setChannelProfile(ChannelProfile.LiveBroadcasting);
-    await _engine.setClientRole(widget.role);
+    await _engine.setClientRole(ClientRole.Broadcaster);
     await _engine.enableLocalAudio(true);
   }
 
@@ -213,6 +211,13 @@ class _CallPageState extends State<CallPage> {
     );
   }
 
+  void _onToggleMute() {
+    setState(() {
+      muted = !muted;
+    });
+    _engine.muteLocalAudioStream(muted);
+  }
+
   /// Video layout wrapper
   Widget _viewRows() {
     final views = _getRenderViews();
@@ -233,11 +238,6 @@ class _CallPageState extends State<CallPage> {
         ));
     }
     return Container();
-
-    /*    return Container(
-        child: Column(
-          children: <Widget>[_videoView(views[0])],
-        ));*/
   }
 
   void popUp() async {
@@ -292,7 +292,7 @@ class _CallPageState extends State<CallPage> {
   }
 
   /// Info panel to show logs
-  Widget messageList() {
+  Widget messageList2() {
     return Container(
         padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),
         alignment: Alignment.bottomCenter,
@@ -322,7 +322,7 @@ class _CallPageState extends State<CallPage> {
             )));
   }
 
-  Widget messageList2() {
+  Widget messageList() {
     return Container(
       padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),
       alignment: Alignment.bottomCenter,
