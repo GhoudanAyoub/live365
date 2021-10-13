@@ -1026,7 +1026,7 @@ class _JoinPageState extends State<JoinPage> {
               child: new TextField(
                   cursorColor: Colors.blue,
                   textInputAction: TextInputAction.go,
-                  onSubmitted: _sendMessage,
+                  enabled: false,
                   style: TextStyle(
                     color: Colors.white,
                   ),
@@ -1048,7 +1048,7 @@ class _JoinPageState extends State<JoinPage> {
               padding: const EdgeInsets.fromLTRB(8.0, 0, 0, 0),
               child: MaterialButton(
                 minWidth: 0,
-                onPressed: _toggleSendChannelMessage,
+                onPressed: () => _toggleSendChannelMessage(_channel),
                 child: Icon(
                   Icons.send,
                   color: Colors.white,
@@ -1103,7 +1103,7 @@ class _JoinPageState extends State<JoinPage> {
     }
   }
 
-  void _toggleSendChannelMessage() async {
+  void _toggleSendChannelMessage(_channel) async {
     String text = _channelMessageController.text;
     if (text.isEmpty) {
       return;
@@ -1224,16 +1224,17 @@ class _JoinPageState extends State<JoinPage> {
       var image = userMap[user];
       if (info.contains('d1a2v3i4s5h6')) {
         var mess = info.split(' ');
-        if (mess[1] == widget.username) {
-          /*m = new Message(
-              message: 'working', type: type, user: user, image: image);*/
+        if (mess[1] == widget.userImage) {
+          m = new comments(
+              message: 'working', type: type, user: user, image: image);
           setState(() {
-            //_infoStrings.insert(0, m);
+            _infoStrings.insert(0, m);
             requested = true;
           });
         }
       } else {
         m = new comments(message: info, type: type, user: user, image: image);
+
         setState(() {
           _infoStrings.insert(0, m);
         });

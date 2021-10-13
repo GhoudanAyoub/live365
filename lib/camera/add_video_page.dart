@@ -99,7 +99,6 @@ class _AddVideoPageState extends State<AddVideoPage> {
 
   void _showCameraException(CameraException e) {
     String errorText = 'Error:${e.code}\nError message : ${e.description}';
-    print(errorText);
   }
 
   void _onPlay() => OpenFile.open(_filePath);
@@ -317,36 +316,6 @@ class _AddVideoPageState extends State<AddVideoPage> {
         });
   }
 
-/*
-  void onNewCameraSelected(CameraDescription cameraDescription) async {
-    if (_cameraController != null) {
-      await controller.dispose();
-    }
-    _cameraController = CameraController(
-      cameraDescription,
-      ResolutionPreset.high,
-      enableAudio: enableAudio,
-    );
-
-// If the controller is updated then update the UI.
-    controller.addListener(() {
-      if (mounted) setState(() {});
-      if (controller.value.hasError) {
-        showInSnackBar('Camera error ${controller.value.errorDescription}');
-      }
-    });
-
-    try {
-      await controller.initialize();
-    } on CameraException catch (e) {
-      _showCameraException(e);
-    }
-
-    if (mounted) {
-      setState(() {});
-    }
-  }
-*/
   @override
   Widget build(BuildContext context) {
     viewModel = Provider.of<VideoViewModel>(context);

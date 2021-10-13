@@ -64,7 +64,6 @@ class PaypalPaymentState extends State<PaypalPayment> {
           });
         }
       } catch (e) {
-        print('exception: ' + e.toString());
         final snackBar = SnackBar(
           content: Text(e.toString()),
           duration: Duration(seconds: 10),
@@ -148,8 +147,6 @@ class PaypalPaymentState extends State<PaypalPayment> {
 
   @override
   Widget build(BuildContext context) {
-    print(checkoutUrl);
-
     if (checkoutUrl != null) {
       return Scaffold(
         appBar: AppBar(

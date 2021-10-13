@@ -62,44 +62,37 @@ class VideoViewModel extends ChangeNotifier {
   }
 
   setUsername(String val) {
-    print('SetName $val');
     username = val;
     notifyListeners();
   }
 
   setMediaUrl(File val) {
-    print('SetMediaUrl $val');
     mediaUrl = val;
     loading = false;
     notifyListeners();
   }
 
   setDescription(String val) {
-    print('SetDescription $val');
     description = val;
     notifyListeners();
   }
 
   setBio(String val) {
-    print('SetBio $val');
     bio = val;
     notifyListeners();
   }
 
   setTags(String val) {
-    print('SetTags $val');
     tags = val;
     notifyListeners();
   }
 
   setSongName(String val) {
-    print('SetSongName $val');
     songName = val;
     notifyListeners();
   }
 
   setVideoTitle(String val) {
-    print('SetVideoTitle $val');
     videoTitle = val;
     notifyListeners();
   }
@@ -116,7 +109,6 @@ class VideoViewModel extends ChangeNotifier {
       resetVedio();
       notifyListeners();
     } catch (e) {
-      print(e);
       loading = false;
       resetVedio();
       showInSnackBar('Uploaded successfully!');

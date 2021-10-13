@@ -5,12 +5,14 @@ class CustomCard extends StatelessWidget {
   final Function onTap;
   final BorderRadius borderRadius;
   final bool elevated;
+  final Color color;
 
   CustomCard({
     @required this.child,
     this.onTap,
     this.borderRadius,
     this.elevated = true,
+    this.color,
   });
 
   @override
@@ -19,7 +21,7 @@ class CustomCard extends StatelessWidget {
       decoration: elevated
           ? BoxDecoration(
               borderRadius: borderRadius,
-              color: Theme.of(context).cardColor,
+              color: color == null ? Theme.of(context).cardColor : color,
               boxShadow: [
                 BoxShadow(
                   color: Colors.grey[300].withOpacity(0.8),

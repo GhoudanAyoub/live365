@@ -204,8 +204,7 @@ class _PostTileState extends State<PostTile> {
       );
     else
       return IconButton(
-        onPressed: () {},
-        icon: Icon(CupertinoIcons.heart, size: 35, color: Colors.white),
-      );
+          onPressed: () {},
+          icon: Icon(CupertinoIcons.heart, color: Colors.white));
   }
 }

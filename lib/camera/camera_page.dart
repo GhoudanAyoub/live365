@@ -136,9 +136,7 @@ class _CameraViewState extends State<_CameraView> {
       setState(() {
         _showBottomSheet(context);
       });
-    } on CameraException catch (e) {
-      print(e);
-    }
+    } on CameraException catch (e) {}
   }
 
   String _getLensDirectionText(CameraLensDirection lensDirection) {
@@ -182,9 +180,7 @@ class _CameraViewState extends State<_CameraView> {
 
     try {
       await _controller.initialize();
-    } on CameraException catch (e) {
-      print(e);
-    }
+    } on CameraException catch (e) {}
 
     if (mounted) {
       setState(() {});

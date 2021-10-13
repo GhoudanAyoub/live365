@@ -4,7 +4,12 @@ import '../../SizeConfig.dart';
 import '../../constants.dart';
 import 'sign_up_form.dart';
 
-class Body extends StatelessWidget {
+class Body extends StatefulWidget {
+  @override
+  _BodyState createState() => _BodyState();
+}
+
+class _BodyState extends State<Body> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
