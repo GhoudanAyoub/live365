@@ -13,6 +13,10 @@ class ChatService {
     await chatRef.doc("$chatId").collection("messages").doc(msgId).delete();
   }
 
+  deleteConversation(String chatId) async {
+    await chatRef.doc("$chatId").delete();
+  }
+
   sendMessage(Message message, String chatId) async {
     await chatRef
         .doc("$chatId")

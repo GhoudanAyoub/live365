@@ -2,10 +2,13 @@ import 'package:LIVE365/components/chat_item.dart';
 import 'package:LIVE365/components/indicators.dart';
 import 'package:LIVE365/models/new_message_system.dart';
 import 'package:LIVE365/profile/components/user_view_model.dart';
+import 'package:LIVE365/services/chat_service.dart';
 import 'package:LIVE365/utils/firebase.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+import '../../constants.dart';
 
 class Chats extends StatelessWidget {
   @override
@@ -32,18 +35,21 @@ class Chats extends StatelessWidget {
                           Message message =
                               Message.fromJson(messages.first.data());
                           List users = chatListSnapshot.data()['users'];
-                          // remove the current user's id from the Users
-                          // list so we can get the second user's id
                           users.remove('${viewModel.user?.uid ?? ""}');
                           String recipient = users[0];
-                          return ChatItem(
-                            userId: recipient,
-                            messageCount: messages?.length,
-                            msg: message?.content,
-                            time: message?.time,
-                            chatId: chatListSnapshot.id,
-                            type: message?.type,
-                            currentUserId: viewModel.user?.uid ?? "",
+                          return GestureDetector(
+                            child: ChatItem(
+                              userId: recipient,
+                              messageCount: messages?.length,
+                              msg: message?.content,
+                              time: message?.time,
+                              chatId: chatListSnapshot.id,
+                              type: message?.type,
+                              currentUserId: viewModel.user?.uid ?? "",
+                            ),
+                            onLongPress: () {
+                              deleteConversation(context, chatListSnapshot.id);
+                            },
                           );
                         } else {
                           return SizedBox();
@@ -72,6 +78,37 @@ class Chats extends StatelessWidget {
             }
           }),
     );
+  }
+
+  deleteConversation(BuildContext parentContext, chatId) {
+    return showDialog(
+        context: parentContext,
+        builder: (context) {
+          return SimpleDialog(
+            backgroundColor: GBottomNav,
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(5.0)),
+            children: [
+              SimpleDialogOption(
+                onPressed: () {
+                  Navigator.pop(context);
+                  ChatService().deleteConversation(chatId);
+                },
+                child: Text(
+                  'Delete',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+              Divider(),
+              SimpleDialogOption(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text('Cancel', style: TextStyle(color: Colors.white)),
+              ),
+            ],
+          );
+        });
   }
 
   Stream<QuerySnapshot> userChatsStream(String uid) {

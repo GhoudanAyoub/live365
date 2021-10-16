@@ -783,22 +783,27 @@ class _BodyState extends State<Body>
                                     text: listVideos[index].videoTitle,
                                     style: StandardTextStyle.normal),
                                 TextSpan(
-                                    text: '${listVideos[index].tags}\n',
+                                    text: '${listVideos[index].tags ?? ''}\n',
                                     style: StandardTextStyle.normal),
                               ]),
                               style: StandardTextStyle.normal,
                             )),
-                        Container(
-                          padding: EdgeInsets.only(left: 10),
-                          child: Row(
-                            children: <Widget>[
-                              Icon(Icons.music_note,
-                                  size: 16, color: Colors.white),
-                              Text(listVideos[index].songName ?? '',
-                                  style: StandardTextStyle.normal)
-                            ],
-                          ),
-                        )
+                        listVideos[index].songName != null
+                            ? Container(
+                                padding: EdgeInsets.only(left: 10),
+                                child: Row(
+                                  children: <Widget>[
+                                    Icon(Icons.music_note,
+                                        size: 16, color: Colors.white),
+                                    Text(listVideos[index].songName,
+                                        style: StandardTextStyle.normal)
+                                  ],
+                                ),
+                              )
+                            : Container(
+                                width: 0,
+                                height: 0,
+                              )
                       ],
                     ),
                   ),
