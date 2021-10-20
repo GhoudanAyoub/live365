@@ -220,9 +220,10 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                           radius: 35.0,
                           backgroundImage: NetworkImage(user?.photoUrl),
                         )
-                      : Image.asset(
-                          "assets/images/Profile Image.png",
-                          width: 70.0,
+                      : CircleAvatar(
+                          radius: 35.0,
+                          backgroundImage: NetworkImage(
+                              "https://westcoastsoccer.demosphere-secure.com/_files/about-us/contact-us/default_user.png"),
                         ),
                   title: Text(user?.username,
                       style: TextStyle(

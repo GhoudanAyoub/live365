@@ -239,7 +239,7 @@ class _CameraViewState extends State<_CameraView> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
+    return SafeArea(
         child: Padding(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -282,7 +282,7 @@ class _CameraViewState extends State<_CameraView> {
           )
         ],
       ),
-      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
     ));
   }
 }

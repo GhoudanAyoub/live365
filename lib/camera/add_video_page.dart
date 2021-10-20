@@ -75,7 +75,7 @@ class _AddVideoPageState extends State<AddVideoPage> {
       await _cameraController.dispose();
     }
     _cameraController =
-        CameraController(cameraDescription, ResolutionPreset.high);
+        CameraController(cameraDescription, ResolutionPreset.medium);
 
     _cameraController.addListener(() {
       if (mounted) {
@@ -352,7 +352,8 @@ class _AddVideoPageState extends State<AddVideoPage> {
     viewModel = Provider.of<VideoViewModel>(context);
     return ResponsiveBuilder(
       builder: (BuildContext context, SizingInformation sizingInformation) {
-        return Scaffold(
+        return SafeArea(
+            child: Scaffold(
           body: Stack(
             children: <Widget>[
               _cameraController.value.isInitialized
@@ -364,18 +365,17 @@ class _AddVideoPageState extends State<AddVideoPage> {
               _bottomRowWidget(),
             ],
           ),
-        );
+        ));
       },
     );
   }
 
   Widget _topRowWidget(context) {
     return Positioned(
-      top: 30,
-      left: 10,
+      top: 10,
+      left: 20,
       right: 20,
       child: Container(
-        margin: EdgeInsets.symmetric(horizontal: 10),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
@@ -388,7 +388,7 @@ class _AddVideoPageState extends State<AddVideoPage> {
                   Icons.close,
                   color: color,
                 )),
-            Container(
+            /* Container(
               child: Row(
                 children: <Widget>[
                   Icon(
@@ -401,20 +401,16 @@ class _AddVideoPageState extends State<AddVideoPage> {
                   ),
                 ],
               ),
-            ),
+            ),*/
             Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-                FlatButton.icon(
+                TextButton(
                   onPressed: _onSwitchCamera,
-                  icon: Icon(
+                  child: Icon(
                     CupertinoIcons.switch_camera,
                     color: Colors.white,
                     size: 24,
-                  ),
-                  label: Text(
-                    "flip",
-                    style: _textStyle,
                   ),
                 ),
               ],

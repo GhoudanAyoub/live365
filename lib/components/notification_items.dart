@@ -125,7 +125,7 @@ class _ActivityItemsState extends State<ActivityItems> {
     return ClipRRect(
       borderRadius: BorderRadius.circular(5.0),
       child: CachedNetworkImage(
-        imageUrl: widget.activity.mediaUrl,
+        imageUrl: widget.activity.mediaUrl ?? "",
         placeholder: (context, url) {
           return circularProgress(context);
         },
