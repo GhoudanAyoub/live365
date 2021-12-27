@@ -5,7 +5,6 @@ import 'package:LIVE365/firebaseService/FirebaseService.dart';
 import 'package:LIVE365/home/home_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_facebook_login/flutter_facebook_login.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 import '../../SizeConfig.dart';
@@ -13,13 +12,9 @@ import 'sign_form.dart';
 
 class Body extends StatelessWidget {
   bool isSignIn = false;
-  FirebaseAuth _auth = FirebaseAuth.instance;
-  User _user;
-  FacebookLogin facebookLogin = FacebookLogin();
   GoogleSignIn _googleSignIn = GoogleSignIn();
   FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
-  GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -133,43 +128,5 @@ class Body extends StatelessWidget {
     ));
     FirebaseService.addUsers(userdata.user);
     Navigator.pushNamed(context, HomeScreen.routeName);
-  }
-
-  Future<void> handleLogin(context) async {
-    final FacebookLoginResult result = await facebookLogin.logIn(['email']);
-    switch (result.status) {
-      case FacebookLoginStatus.cancelledByUser:
-        print(result.errorMessage);
-        break;
-      case FacebookLoginStatus.error:
-        print(result.errorMessage);
-        break;
-      case FacebookLoginStatus.loggedIn:
-        try {
-          await loginWithfacebook(result, context);
-        } catch (e) {
-          print(e);
-        }
-        break;
-    }
-  }
-
-  Future loginWithfacebook(FacebookLoginResult result, context) async {
-    final FacebookAccessToken accessToken = result.accessToken;
-    AuthCredential credential =
-        FacebookAuthProvider.credential(accessToken.token);
-    await _auth.signInWithCredential(credential).catchError((e) {
-      print(e.toString());
-    }).then((value) => () {
-          FirebaseService.addUsers(value.user);
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) => HomeScreen()));
-        });
-    isSignIn = true;
-  }
-
-  void showInSnackBar(String value) {
-    scaffoldKey.currentState.removeCurrentSnackBar();
-    scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(value)));
   }
 }

@@ -47,8 +47,8 @@ android {
         applicationId "com.ghoudan.live365"
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 24
-        versionName "1.0.5"
+        versionCode 27
+        versionName "1.0.8"
         multiDexEnabled true
     }
     signingConfigs {
@@ -75,5 +75,4 @@ dependencies {
     implementation platform('com.google.firebase:firebase-bom:26.3.0')
     implementation 'com.google.firebase:firebase-analytics'
     implementation 'com.android.support:multidex:1.0.3'
-    implementation 'com.facebook.android:facebook-android-sdk:5.15.3'
 }
